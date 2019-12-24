@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-project(simd-containers-tests)
+project(avec-tests)
 
 set(CMAKE_CXX_STANDARD 17)
 cmake_policy(SET CMP0074 NEW)
@@ -12,11 +12,11 @@ include_directories(../vectorclass)
 
 if(WIN32)
 
-add_executable(simd-test-avx testing.cpp)
-add_executable(simd-test-sse2 testing.cpp)
+add_executable(avec-test-avx testing.cpp)
+add_executable(avec-test-sse2 testing.cpp)
 
-target_compile_options (simd-test-avx PRIVATE /arch:AVX)
-target_compile_options (simd-test-sse2 PRIVATE /arch:SSE2)
+target_compile_options (avec-test-avx PRIVATE /arch:AVX)
+target_compile_options (avec-test-sse2 PRIVATE /arch:SSE2)
 
 
 endif(WIN32)
