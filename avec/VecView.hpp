@@ -69,8 +69,8 @@ public:
   VecView& operator=(VecView<Vec4f> const other)
   {
     if constexpr (!std::is_same<Scalar, float>::value) {
-      assert(false,
-             "Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.");
+      // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
+      assert(false);
       return *this;
     }
     std::copy(other.ptr, other.ptr + Vec4f::size(), ptr);
@@ -85,8 +85,8 @@ public:
   VecView& operator=(VecView<Vec8f> const x)
   {
     if constexpr (!std::is_same<Scalar, float>::value) {
-      assert(false,
-             "Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.");
+      // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
+      assert(false);
       return *this;
     }
     std::copy(x.ptr, x.ptr + Vec::size(), ptr);
@@ -101,8 +101,8 @@ public:
   VecView& operator=(VecView<Vec2d> const x)
   {
     if constexpr (!std::is_same<Scalar, double>::value) {
-      assert(false,
-             "Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.");
+      // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
+      assert(false);
       return *this;
     }
     std::copy(x.ptr, x.ptr + Vec::size(), ptr);
@@ -117,8 +117,8 @@ public:
   VecView& operator=(VecView<Vec4d> const x)
   {
     if constexpr (!std::is_same<Scalar, double>::value) {
-      assert(false,
-             "Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.");
+      // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
+      assert(false);
       return *this;
     }
     std::copy(x.ptr, x.ptr + Vec4d::size(), ptr);
@@ -133,8 +133,8 @@ public:
   VecView& operator=(VecView<Vec8d> const x)
   {
     if constexpr (!std::is_same<Scalar, double>::value) {
-      assert(false,
-             "Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.");
+      // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
+      assert(false);
       return *this;
     }
     std::copy(x.ptr, x.ptr + Vec::size(), ptr);
