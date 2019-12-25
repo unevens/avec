@@ -52,34 +52,49 @@ class InterleavedBuffer final
 
 public:
   /**
-   * @return the i-th 8 channel interleaved VecBuffer, by reference
+   * @return the i-th VecBuffer of 8 channel, by reference
    */
   VecBuffer<Vec8>& GetBuffer8(int i) { return buffers8[i]; }
 
   /**
-   * @return the i-th 4 channel interleaved VecBuffer, by reference
+   * @return the i-th VecBuffer of 4 channel, by reference
    */
   VecBuffer<Vec4>& GetBuffer4(int i) { return buffers4[i]; }
 
   /**
-   * @return the i-th 2 channel interleaved VecBuffer, by reference
+   * @return the i-th VecBuffer of 2 channel, by reference
    */
   VecBuffer<Vec2>& GetBuffer2(int i) { return buffers2[i]; }
 
   /**
-   * @return the i-th 8 channel interleaved VecBuffer, by const reference
+   * @return the i-th VecBuffer of 8 channel, by const reference
    */
   VecBuffer<Vec8> const& GetBuffer8(int i) const { return buffers8[i]; }
 
   /**
-   * @return the i-th 4 channel interleaved VecBuffer, by const reference
+   * @return the i-th VecBuffer of 4 channel, by const reference
    */
   VecBuffer<Vec4> const& GetBuffer4(int i) const { return buffers4[i]; }
 
   /**
-   * @return the i-th 2 channel interleaved VecBuffer, by const reference
+   * @return the i-th VecBuffer of 2 channel, by const reference
    */
   VecBuffer<Vec2> const& GetBuffer2(int i) const { return buffers2[i]; }
+
+  /**
+   * @return the number of 8 channels VecBuffers
+   */
+  int GetNumBuffers8() const { return (int)buffers8.size(); }
+
+  /**
+   * @return the number of 4 channels VecBuffers
+   */
+  int GetNumBuffers4() const { return (int)buffers4.size(); }
+
+  /**
+   * @return the number of 2 channels VecBuffers
+   */
+  int GetNumBuffers2() const { return (int)buffers2.size(); }
 
   /**
    * @return the numSamples of each VecBuffer
