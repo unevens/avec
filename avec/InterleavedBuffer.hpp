@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Dario Mambro
+Copyright 2019-2020 Dario Mambro
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -304,7 +304,7 @@ InterleavedBuffer<Scalar>::SetNumChannels(int value)
   if constexpr (VEC8_AVAILABLE) {
     auto d8 = std::div(numChannels, 8);
     buffers8.resize((std::size_t)d8.quot + (d8.rem > 4 ? 1 : 0));
-    buffers4.resize((d8.rem <= 4) ? 1 : 0);
+    buffers4.resize((d8.rem <= 4 && d8.rem > 0) ? 1 : 0);
   }
   else if constexpr (VEC4_AVAILABLE) {
     auto d4 = std::div(numChannels, 4);
@@ -437,7 +437,9 @@ InterleavedBuffer<Scalar>::Interleave(Scalar* const* input,
                                       int numInputChannels,
                                       int numInputSamples)
 {
-  SetNumChannels(numInputChannels);
+  if (numInputChannels > numChannels) {
+    SetNumChannels(numInputChannels);
+  }
   SetNumSamples(numInputSamples);
 
   if (VEC8_AVAILABLE && buffers8.size() > 0) {
@@ -459,7 +461,8 @@ InterleavedBuffer<Scalar>::Interleave(Scalar* const* input,
   int processedChannels = 0;
   if constexpr (VEC8_AVAILABLE) {
     auto d8 = std::div(numInputChannels, 8);
-    for (int b = 0; b < std::min(d8.quot + (d8.rem > 4), (int)buffers8.size());
+    for (int b = 0;
+         b < std::min(d8.quot + (d8.rem > 0 ? 1 : 0), (int)buffers8.size());
          ++b) {
       int r = std::min(8, numInputChannels - processedChannels);
       for (int i = 0; i < r; ++i) {
