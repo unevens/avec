@@ -20,6 +20,10 @@ limitations under the License.
 #include "avec/VecBuffer.hpp"
 #include <algorithm>
 
+#ifndef AVEC_MIX_VEC_SIZES
+#define AVEC_MIX_VEC_SIZES 0
+#endif
+
 namespace avec {
 
 /**
@@ -40,9 +44,6 @@ class InterleavedBuffer final
 
   std::vector<VecBuffer<Vec8>> buffers8;
   std::vector<VecBuffer<Vec4>> buffers4;
-
-  // fallback when VEC4_AVAILABLE == false (Scalar=double, and no AVX)
-  // otherwise unused
   std::vector<VecBuffer<Vec2>> buffers2;
 
   int numChannels;
@@ -303,17 +304,27 @@ InterleavedBuffer<Scalar>::SetNumChannels(int value)
   numChannels = value;
   if constexpr (VEC8_AVAILABLE) {
     auto d8 = std::div(numChannels, 8);
+#if AVEC_MIX_VEC_SIZES
     buffers8.resize((std::size_t)d8.quot + (d8.rem > 4 ? 1 : 0));
     buffers4.resize((d8.rem <= 4) ? 1 : 0);
+    buffers2.resize(0);
+#else
+    buffers8.resize((std::size_t)d8.quot + (d8.rem > 0 ? 1 : 0));
+    buffers4.resize(0);
+    buffers2.resize(0);
+#endif
   }
   else if constexpr (VEC4_AVAILABLE) {
     auto d4 = std::div(numChannels, 4);
     buffers8.resize(0);
     buffers4.resize((std::size_t)d4.quot + (d4.rem > 0 ? 1 : 0));
+    buffers2.resize(0);
   }
   else {
     auto d2 = std::div(numChannels, 2);
     buffers2.resize((std::size_t)d2.quot + (d2.rem > 0 ? 1 : 0));
+    buffers8.resize(0);
+    buffers4.resize(0);
   }
   Reserve(capacity);
   SetNumSamples(numSamples);
@@ -345,8 +356,9 @@ InterleavedBuffer<Scalar>::Deinterleave(Scalar** output,
   }
   int b = 0;
   for (int c = 0; c < numOutputChannels; ++c) {
-    if (VEC8_AVAILABLE && buffers8.size() > 0) {
+    if constexpr (VEC8_AVAILABLE) {
       auto d = std::div(b, 8);
+#if AVEC_MIX_VEC_SIZES
       assert(d.quot <= buffers8.size());
       if (d.quot == buffers8.size()) {
         assert(buffers4.size() > 0);
@@ -359,8 +371,14 @@ InterleavedBuffer<Scalar>::Deinterleave(Scalar** output,
           output[c][i] = buffers8[d.quot](8 * i + d.rem);
         }
       }
+#else
+      assert(d.quot < buffers8.size());
+      for (int i = 0; i < numOutputSamples; ++i) {
+        output[c][i] = buffers8[d.quot](8 * i + d.rem);
+      }
+#endif
     }
-    else if (VEC4_AVAILABLE && buffers4.size()) {
+    else if constexpr (VEC4_AVAILABLE) {
       auto d = std::div(b, 4);
       assert(d.quot < buffers4.size());
       for (int i = 0; i < numOutputSamples; ++i) {
@@ -396,8 +414,9 @@ InterleavedBuffer<Scalar>::DeinterleaveTracks(Scalar** output,
   int b = 0;
   for (int n = 0; n < numTracks; ++n) {
     for (int c = 0; c < numOutputChannels; ++c) {
-      if (VEC8_AVAILABLE && buffers8.size() > 0) {
+      if constexpr (VEC8_AVAILABLE) {
         auto d = std::div(b, 8);
+#if AVEC_MIX_VEC_SIZES
         assert(d.quot <= buffers8.size());
         if (d.quot == buffers8.size()) {
           assert(buffers4.size() > 0);
@@ -410,8 +429,14 @@ InterleavedBuffer<Scalar>::DeinterleaveTracks(Scalar** output,
             output[c][i] += buffers8[d.quot](8 * i + d.rem);
           }
         }
+#else
+        assert(d.quot < buffers8.size());
+        for (int i = 0; i < numOutputSamples; ++i) {
+          output[c][i] += buffers8[d.quot](8 * i + d.rem);
+        }
+#endif
       }
-      else if (VEC4_AVAILABLE && buffers4.size() > 0) {
+      else if constexpr (VEC4_AVAILABLE) {
         auto d = std::div(b, 4);
         assert(d.quot < buffers4.size());
         for (int i = 0; i < numOutputSamples; ++i) {
@@ -459,7 +484,7 @@ InterleavedBuffer<Scalar>::Interleave(Scalar* const* input,
   int processedChannels = 0;
   if constexpr (VEC8_AVAILABLE) {
     auto d8 = std::div(numInputChannels, 8);
-    for (int b = 0; b < std::min(d8.quot + (d8.rem > 4), (int)buffers8.size());
+    for (int b = 0; b < std::min(d8.quot + (d8.rem > 0), (int)buffers8.size());
          ++b) {
       int r = std::min(8, numInputChannels - processedChannels);
       for (int i = 0; i < r; ++i) {
@@ -495,22 +520,23 @@ InterleavedBuffer<Scalar>::Interleave(Scalar* const* input,
       }
     }
   }
-
-  auto d2 = std::div(numInputChannels, 2);
-  for (int b = 0;
-       b < std::min(d2.quot + (d2.rem > 0 ? 1 : 0), (int)buffers2.size());
-       ++b) {
-    int r = std::min(2, numInputChannels - processedChannels);
-    for (int i = 0; i < r; ++i) {
-      auto c = b * 2 + i;
-      for (int j = 0; j < numInputSamples; ++j) {
-        buffers2[b](j * 2 + i) = input[c][j];
+  else {
+    auto d2 = std::div(numInputChannels, 2);
+    for (int b = 0;
+         b < std::min(d2.quot + (d2.rem > 0 ? 1 : 0), (int)buffers2.size());
+         ++b) {
+      int r = std::min(2, numInputChannels - processedChannels);
+      for (int i = 0; i < r; ++i) {
+        auto c = b * 2 + i;
+        for (int j = 0; j < numInputSamples; ++j) {
+          buffers2[b](j * 2 + i) = input[c][j];
+        }
       }
-    }
-    processedChannels += r;
-    assert(processedChannels <= numInputChannels);
-    if (processedChannels == numInputChannels) {
-      return true;
+      processedChannels += r;
+      assert(processedChannels <= numInputChannels);
+      if (processedChannels == numInputChannels) {
+        return true;
+      }
     }
   }
 
@@ -522,7 +548,8 @@ template<typename Scalar>
 Scalar&
 InterleavedBuffer<Scalar>::At(int channel, int sample)
 {
-  if (VEC8_AVAILABLE && buffers8.size() > 0) {
+  if constexpr (VEC8_AVAILABLE) {
+#if AVEC_MIX_VEC_SIZES
     auto d8 = std::div(channel, 8);
     if (d8.quot < buffers8.size()) {
       return buffers8[d8.quot](8 * sample + d8.rem);
@@ -530,6 +557,10 @@ InterleavedBuffer<Scalar>::At(int channel, int sample)
     else {
       return buffers4[0](4 * sample + d8.rem);
     }
+#else
+    auto d8 = std::div(channel, 8);
+    return buffers8[d8.quot](8 * sample + d8.rem);
+#endif
   }
   else if constexpr (VEC4_AVAILABLE) {
     auto d4 = std::div(channel, 4);
