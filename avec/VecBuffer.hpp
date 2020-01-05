@@ -112,7 +112,7 @@ public:
   /**
    * @return a reference to the i-th Scalar elements of the buffer.
    */
-  Scalar operator()(int i = 0) const { return data[i]; }
+  Scalar const& operator()(int i = 0) const { return data[i]; }
 
   /**
    * @return a VecView to the memory corresponding to the i-th vecotr elements

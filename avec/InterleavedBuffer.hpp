@@ -246,13 +246,23 @@ public:
 
   /**
    * Returns the value of a a specific sample of a specific channel of the
+   * buffer. cosnt version
+   * @param channel
+   * @param sample
+   * @return a pointer to the const value of the sample of the channel, same as
+   * doing &scalarBuffer[channel][sample] on a ScalarBuffer or a Scalar**
+   */
+  Scalar const* At(int channel, int sample) const;
+
+  /**
+   * Returns the value of a a specific sample of a specific channel of the
    * buffer.
    * @param channel
    * @param sample
-   * @return the value of the sample of the channel, same as doing
-   * scalarBuffer[channel][sample] on a ScalarBuffer or a Scalar**
+   * @return a pointer to the value of the sample of the channel, same as doing
+   * &scalarBuffer[channel][sample] on a ScalarBuffer or a Scalar**
    */
-  Scalar& At(int channel, int sample);
+  Scalar* At(int channel, int sample);
 };
 
 static_assert(
@@ -496,7 +506,8 @@ InterleavedBuffer<Scalar>::Interleave(Scalar* const* input,
   if constexpr (VEC8_AVAILABLE) {
     auto d8 = std::div(numInputChannels, 8);
 
-    for (int b = 0; b < std::min(d8.quot + (d8.rem > 0), (int)buffers8.size());         ++b) {
+    for (int b = 0; b < std::min(d8.quot + (d8.rem > 0), (int)buffers8.size());
+         ++b) {
       int r = std::min(8, numInputChannels - processedChannels);
       for (int i = 0; i < r; ++i) {
         auto c = b * 8 + i;
@@ -550,7 +561,6 @@ InterleavedBuffer<Scalar>::Interleave(Scalar* const* input,
         return true;
       }
     }
-
   }
 
   assert(false);
@@ -558,32 +568,39 @@ InterleavedBuffer<Scalar>::Interleave(Scalar* const* input,
 }
 
 template<typename Scalar>
-Scalar&
-InterleavedBuffer<Scalar>::At(int channel, int sample)
+Scalar const*
+InterleavedBuffer<Scalar>::At(int channel, int sample) const
 {
-
   if constexpr (VEC8_AVAILABLE) {
 #if AVEC_MIX_VEC_SIZES
     auto d8 = std::div(channel, 8);
     if (d8.quot < buffers8.size()) {
-      return buffers8[d8.quot](8 * sample + d8.rem);
+      return &buffers8[d8.quot](8 * sample + d8.rem);
     }
     else {
-      return buffers4[0](4 * sample + d8.rem);
+      return &buffers4[0](4 * sample + d8.rem);
     }
 #else
     auto d8 = std::div(channel, 8);
-    return buffers8[d8.quot](8 * sample + d8.rem);
+    return &buffers8[d8.quot](8 * sample + d8.rem);
 #endif
   }
   else if constexpr (VEC4_AVAILABLE) {
     auto d4 = std::div(channel, 4);
-    return buffers4[d4.quot](4 * sample + d4.rem);
+    return &buffers4[d4.quot](4 * sample + d4.rem);
   }
   else {
     auto d2 = std::div(channel, 2);
-    return buffers2[d2.quot](2 * sample + d2.rem);
+    return &buffers2[d2.quot](2 * sample + d2.rem);
   }
+}
+
+template<typename Scalar>
+Scalar*
+InterleavedBuffer<Scalar>::At(int channel, int sample)
+{
+  return const_cast<Scalar*>(
+    const_cast<InterleavedBuffer<Scalar> const*>(this)->At(channel, sample));
 }
 
 } // namespace avec
