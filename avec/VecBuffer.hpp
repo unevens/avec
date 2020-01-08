@@ -61,7 +61,7 @@ public:
   /**
    * @return the capacity of the buffer measured in number of Scalar elements
    */
-  inline int GetScalarCapacity() const { return int(data.capacity()); }
+  inline int GetScalarCapacity() const { return data.capacity(); }
 
   /**
    * @return the capacity of the buffer measured in number of Vec elements
