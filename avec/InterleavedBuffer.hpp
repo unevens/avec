@@ -263,6 +263,16 @@ public:
    * &scalarBuffer[channel][sample] on a ScalarBuffer or a Scalar**
    */
   Scalar* At(int channel, int sample);
+
+  /**
+   * Copies the first numSamples of an other interleaved buffer, optionally up
+   * to a specified channel.
+   * @param numChannels the number of channels to copy. If negative, all
+   * channels will be copied.
+   */
+  void CopyFrom(InterleavedBuffer const& other,
+                int numSamples,
+                int numChannels = -1);
 };
 
 static_assert(
@@ -601,6 +611,55 @@ InterleavedBuffer<Scalar>::At(int channel, int sample)
 {
   return const_cast<Scalar*>(
     const_cast<InterleavedBuffer<Scalar> const*>(this)->At(channel, sample));
+}
+
+template<typename Scalar>
+inline void
+InterleavedBuffer<Scalar>::CopyFrom(InterleavedBuffer const& other,
+                                    int numSamples,
+                                    int numChannelsToCopy)
+{
+  if (numChannelsToCopy < 0) {
+    numChannelsToCopy = other.GetNumChannels();
+  }
+  if (numChannels < numChannelsToCopy) {
+    SetNumChannels(other.GetNumChannels());
+  }
+  assert(numSamples <= other.GetNumSamples());
+  SetNumSamples(numSamples);
+  if constexpr (VEC8_AVAILABLE) {
+    for (int i = 0; i < buffers8.size(); ++i) {
+      std::copy(&other.buffers8[i](0),
+                &other.buffers8[i](0) + 8 * numSamples,
+                &buffers8[i](0));
+      numChannelsToCopy -= 8;
+      if (numChannelsToCopy <= 0) {
+        return;
+      }
+    }
+  }
+  if constexpr (VEC4_AVAILABLE) {
+    for (int i = 0; i < buffers4.size(); ++i) {
+      std::copy(&other.buffers4[i](0),
+                &other.buffers4[i](0) + 4 * numSamples,
+                &buffers4[i](0));
+      numChannelsToCopy -= 4;
+      if (numChannelsToCopy <= 0) {
+        return;
+      }
+    }
+  }
+  else {
+    for (int i = 0; i < buffers2.size(); ++i) {
+      std::copy(&other.buffers2[i](0),
+                &other.buffers2[i](0) + 2 * numSamples,
+                &buffers2[i](0));
+      numChannelsToCopy -= 2;
+      if (numChannelsToCopy <= 0) {
+        return;
+      }
+    }
+  }
 }
 
 } // namespace avec
