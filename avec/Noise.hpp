@@ -25,6 +25,28 @@ class VecNoiseGenerator final
 {};
 
 template<>
+class VecNoiseGenerator<Vec8f> final
+{
+  aligned_vector<uint16_t> state;
+
+public:
+  VecNoiseGenerator(
+    aligned_vector<uint16_t> const& seed = { 1, 2, 3, 4, 5, 6, 7, 8 })
+  {
+    assert(seed.size() == 8);
+    for (int i = 0; i < 2; ++i) {
+      state.insert(state.end(), seed.begin(), seed.begin() + 4);
+    }
+    for (int i = 0; i < 2; ++i) {
+      state.insert(state.end(), seed.begin() + 4, seed.end());
+    }
+  }
+  void Generate(VecBuffer<Vec8f>& output, int numSamples)
+  {
+    xorshift32_16bit_simd_f8(&state[0], &output(0), numSamples);
+  }
+};
+template<>
 class VecNoiseGenerator<Vec4f> final
 {
   aligned_vector<uint16_t> state;
@@ -45,7 +67,7 @@ public:
 };
 
 template<>
-class VecNoiseGenerator<Vec8f> final
+class VecNoiseGenerator<Vec8d> final
 {
   aligned_vector<uint16_t> state;
 
@@ -61,9 +83,13 @@ public:
       state.insert(state.end(), seed.begin() + 4, seed.end());
     }
   }
-  void Generate(VecBuffer<Vec8f>& output, int numSamples)
+  void Generate(VecBuffer<Vec8d>& output, int numSamples)
   {
-    xorshift32_16bit_simd_f8(&state[0], &output(0), numSamples);
+    float* asFloats = (float*)&output(0);
+    xorshift32_16bit_simd_f8(&state[0], asFloats, numSamples);
+    for (int i = numSamples - 1; i > -1; --i) {
+      output(i) = asFloats[i];
+    }
   }
 };
 
@@ -180,6 +206,7 @@ public:
       generators2.push_back(VecNoiseGenerator<Vec2>({ s++, s++, s++, s++ }));
     }
   }
+
   void Generate(InterleavedBuffer<Scalar>& outputBuffer,
                 int numSamples,
                 int numChannelsToGenerate)
