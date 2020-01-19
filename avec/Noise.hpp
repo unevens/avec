@@ -74,6 +74,7 @@ public:
   /**
    * Gets the state/seed of a channel.
    * @param channel the channel whose state should be returned.
+   * @return the state of the channel.
    */
   uint16_t GetState(int channel) const { return state[channel]; }
 };
@@ -120,6 +121,7 @@ public:
   /**
    * Gets the state/seed of a channel.
    * @param channel the channel whose state should be returned.
+   * @return the state of the channel.
    */
   uint16_t GetState(int channel) const { return state[channel]; }
 };
@@ -174,6 +176,7 @@ public:
   /**
    * Gets the state/seed of a channel.
    * @param channel the channel whose state should be returned.
+   * @return the state of the channel.
    */
   uint16_t GetState(int channel) const { return state[channel]; }
 };
@@ -224,6 +227,7 @@ public:
   /**
    * Gets the state/seed of a channel.
    * @param channel the channel whose state should be returned.
+   * @return the state of the channel.
    */
   uint16_t GetState(int channel) const { return state[channel]; }
 };
@@ -283,6 +287,7 @@ public:
   /**
    * Gets the state/seed of a channel.
    * @param channel the channel whose state should be returned.
+   * @return the state of the channel.
    */
   uint16_t GetState(int channel) const { return state[channel]; }
 };
@@ -331,6 +336,7 @@ public:
   /**
    * Gets the state/seed of a channel.
    * @param channel the channel whose state should be returned.
+   * @return the state of the channel.
    */
   uint16_t GetState(int channel) const;
 
