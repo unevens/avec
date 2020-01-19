@@ -48,6 +48,7 @@ public:
   void SetState(int channel, uint16_t value) { state[channel] = value; }
   uint16_t GetState(int channel) const { return state[channel]; }
 };
+
 template<>
 class VecNoiseGenerator<Vec4f> final
 {
@@ -61,7 +62,6 @@ public:
       state.insert(state.end(), seed.begin(), seed.end());
     }
   }
-
   void Generate(VecBuffer<Vec4f>& output, int numSamples)
   {
     xorshift32_16bit_simd_f4(&state[0], &output(0), numSamples);
@@ -172,158 +172,183 @@ class NoiseGenerator final
   std::vector<VecNoiseGenerator<Vec2>> generators2;
 
 public:
-  NoiseGenerator(int numChannels, uint16_t seed = 1)
-    : numChannels(numChannels)
-  {
-    int num8, num4, num2;
-    if constexpr (VEC8_AVAILABLE) {
-      auto d8 = std::div(numChannels, 8);
-#if AVEC_MIX_VEC_SIZES
-      num8 = (int)d8.quot + (d8.rem > 4 ? 1 : 0);
-      num4 = (d8.rem <= 4) ? 1 : 0;
-#else
-      num8 = (int)d8.quot + (d8.rem > 0 ? 1 : 0);
-      num4 = 0;
-#endif
-      num2 = 0;
-    }
-    else if constexpr (VEC4_AVAILABLE) {
-      auto d4 = std::div(numChannels, 4);
-      num8 = 0;
-      num4 = (int)d4.quot + (d4.rem > 0 ? 1 : 0);
-      num2 = 0;
-    }
-    else {
-      auto d4 = std::div(numChannels, 4);
-      num8 = 0;
-      num2 = (int)d4.quot + (d4.rem > 0 ? 1 : 0);
-      num4 = 0;
-    }
-    generators8.reserve(num8);
-    generators4.reserve(num4);
-    generators2.reserve(num2);
-    uint16_t s = seed;
-    for (int i = 0; i < num8; ++i) {
-      generators8.push_back(
-        VecNoiseGenerator<Vec8>({ s++, s++, s++, s++, s++, s++, s++, s++ }));
-    }
-    for (int i = 0; i < num4; ++i) {
-      generators4.push_back(VecNoiseGenerator<Vec4>({ s++, s++, s++, s++ }));
-    }
-    for (int i = 0; i < num2; ++i) {
-      generators2.push_back(VecNoiseGenerator<Vec2>({ s++, s++, s++, s++ }));
-    }
-  }
-  void SetState(int channel, uint16_t value)
-  {
-    if constexpr (VEC8_AVAILABLE) {
-      auto d = std::div(channel, 8);
-#if AVEC_MIX_VEC_SIZES
-      if (d.quot < generators8.size()) {
-        generators8[d.quot].SetState(d.rem, value);
-      }
-      else {
-        assert(d.quot == generators8.size());
-        generators4[0].SetState(d.rem, value);
-      }
-#else
-      generators8[d.quot].SetState(d.rem, value);
-#endif
-    }
-    else if constexpr (VEC4_AVAILABLE) {
-      auto d = std::div(channel, 4);
-      generators4[d.quot].SetState(d.rem, value);
-    }
-    else {
-      auto d = std::div(channel, 2);
-      generators2[d.quot].SetState(d.rem, value);
-    }
-  }
-  uint16_t GetState(int channel)
-  {
-    if constexpr (VEC8_AVAILABLE) {
-      auto d = std::div(channel, 8);
-#if AVEC_MIX_VEC_SIZES
-      if (d.quot < generators8.size()) {
-        return generators8[d.quot].GetState(d.rem);
-      }
-      else {
-        assert(d.quot == generators8.size());
-        return generators4[0].GetState(d.rem);
-      }
-#else
-      return generators8[d.quot].GetState(d.rem);
-#endif
-    }
-    else if constexpr (VEC4_AVAILABLE) {
-      auto d = std::div(channel, 4);
-      return generators4[d.quot].GetState(d.rem);
-    }
-    else {
-      auto d = std::div(channel, 2);
-      return generators2[d.quot].GetState(d.rem);
-    }
-  }
-  void SetState(uint16_t s)
-  {
-    for (auto& gen : generators8) {
-      for (int i = 0; i < 8; ++i) {
-        gen.SetState(i, s++);
-      }
-    }
-    for (auto& gen : generators4) {
-      for (int i = 0; i < 4; ++i) {
-        gen.SetState(i, s++);
-      }
-    }
-    for (auto& gen : generators2) {
-      for (int i = 0; i < 4; ++i) {
-        gen.SetState(i, s++);
-      }
-    }
-  }
+  NoiseGenerator(int numChannels, uint16_t seed = 1);
+  void SetState(uint16_t s);
+  void SetState(int channel, uint16_t value);
+  uint16_t GetState(int channel) const;
   void Generate(InterleavedBuffer<Scalar>& outputBuffer,
                 int numSamples,
-                int numChannelsToGenerate)
-  {
-    assert(numChannelsToGenerate <= numChannels);
+                int numChannelsToGenerate);
+};
 
-    outputBuffer.SetNumSamples(numSamples);
-    if constexpr (VEC8_AVAILABLE) {
-      for (int i = 0; i < generators8.size(); ++i) {
-        generators8[i].Generate(outputBuffer.GetBuffer8(i), numSamples);
-        numChannelsToGenerate -= 8;
-        if (numChannelsToGenerate <= 0) {
-          return;
-        }
-      }
-      if (generators4.size() > 0) {
-        generators4[0].Generate(outputBuffer.GetBuffer4(0), numSamples);
-        numChannelsToGenerate -= 4;
-      }
+// implementation
+
+template<typename Scalar>
+inline NoiseGenerator<Scalar>::NoiseGenerator(int numChannels, uint16_t seed)
+  : numChannels(numChannels)
+{
+  int num8, num4, num2;
+  if constexpr (VEC8_AVAILABLE) {
+    auto d8 = std::div(numChannels, 8);
+#if AVEC_MIX_VEC_SIZES
+    num8 = (int)d8.quot + (d8.rem > 4 ? 1 : 0);
+    num4 = (d8.rem <= 4) ? 1 : 0;
+#else
+    num8 = (int)d8.quot + (d8.rem > 0 ? 1 : 0);
+    num4 = 0;
+#endif
+    num2 = 0;
+  }
+  else if constexpr (VEC4_AVAILABLE) {
+    auto d4 = std::div(numChannels, 4);
+    num8 = 0;
+    num4 = (int)d4.quot + (d4.rem > 0 ? 1 : 0);
+    num2 = 0;
+  }
+  else {
+    auto d4 = std::div(numChannels, 4);
+    num8 = 0;
+    num2 = (int)d4.quot + (d4.rem > 0 ? 1 : 0);
+    num4 = 0;
+  }
+  generators8.reserve(num8);
+  generators4.reserve(num4);
+  generators2.reserve(num2);
+  uint16_t s = seed;
+  for (int i = 0; i < num8; ++i) {
+    generators8.push_back(
+      VecNoiseGenerator<Vec8>({ s++, s++, s++, s++, s++, s++, s++, s++ }));
+  }
+  for (int i = 0; i < num4; ++i) {
+    generators4.push_back(VecNoiseGenerator<Vec4>({ s++, s++, s++, s++ }));
+  }
+  for (int i = 0; i < num2; ++i) {
+    generators2.push_back(VecNoiseGenerator<Vec2>({ s++, s++, s++, s++ }));
+  }
+}
+
+template<typename Scalar>
+inline void
+NoiseGenerator<Scalar>::SetState(uint16_t s)
+
+{
+  for (auto& gen : generators8) {
+    for (int i = 0; i < 8; ++i) {
+      gen.SetState(i, s++);
     }
-    else if constexpr (VEC4_AVAILABLE) {
-      for (int i = 0; i < generators4.size(); ++i) {
-        generators4[i].Generate(outputBuffer.GetBuffer4(i), numSamples);
-        numChannelsToGenerate -= 4;
-        if (numChannelsToGenerate <= 0) {
-          return;
-        }
-      }
+  }
+  for (auto& gen : generators4) {
+    for (int i = 0; i < 4; ++i) {
+      gen.SetState(i, s++);
+    }
+  }
+  for (auto& gen : generators2) {
+    for (int i = 0; i < 4; ++i) {
+      gen.SetState(i, s++);
+    }
+  }
+}
+
+template<typename Scalar>
+inline void
+NoiseGenerator<Scalar>::SetState(int channel, uint16_t value)
+
+{
+  if constexpr (VEC8_AVAILABLE) {
+    auto d = std::div(channel, 8);
+#if AVEC_MIX_VEC_SIZES
+    if (d.quot < generators8.size()) {
+      generators8[d.quot].SetState(d.rem, value);
     }
     else {
-      int lastBuffers2 = outputBuffer.GetNumBuffers2() - 1;
-      for (int i = 0; i < generators2.size(); ++i) {
-        VecBuffer<Vec2>* next =
-          (i < lastBuffers2) ? next : outputBuffer.GetBuffer2(i + 1);
-        generators2[i].Generate(outputBuffer.GetBuffer2(i), numSamples, next);
-        numChannelsToGenerate -= 4;
-        if (numChannelsToGenerate <= 0) {
-          return;
-        }
+      assert(d.quot == generators8.size());
+      generators4[0].SetState(d.rem, value);
+    }
+#else
+    generators8[d.quot].SetState(d.rem, value);
+#endif
+  }
+  else if constexpr (VEC4_AVAILABLE) {
+    auto d = std::div(channel, 4);
+    generators4[d.quot].SetState(d.rem, value);
+  }
+  else {
+    auto d = std::div(channel, 2);
+    generators2[d.quot].SetState(d.rem, value);
+  }
+}
+
+template<typename Scalar>
+inline uint16_t
+NoiseGenerator<Scalar>::GetState(int channel) const
+{
+  if constexpr (VEC8_AVAILABLE) {
+    auto d = std::div(channel, 8);
+#if AVEC_MIX_VEC_SIZES
+    if (d.quot < generators8.size()) {
+      return generators8[d.quot].GetState(d.rem);
+    }
+    else {
+      assert(d.quot == generators8.size());
+      return generators4[0].GetState(d.rem);
+    }
+#else
+    return generators8[d.quot].GetState(d.rem);
+#endif
+  }
+  else if constexpr (VEC4_AVAILABLE) {
+    auto d = std::div(channel, 4);
+    return generators4[d.quot].GetState(d.rem);
+  }
+  else {
+    auto d = std::div(channel, 2);
+    return generators2[d.quot].GetState(d.rem);
+  }
+}
+
+template<typename Scalar>
+inline void
+NoiseGenerator<Scalar>::Generate(InterleavedBuffer<Scalar>& outputBuffer,
+                                 int numSamples,
+                                 int numChannelsToGenerate)
+{
+  assert(numChannelsToGenerate <= numChannels);
+
+  outputBuffer.SetNumSamples(numSamples);
+  if constexpr (VEC8_AVAILABLE) {
+    for (int i = 0; i < generators8.size(); ++i) {
+      generators8[i].Generate(outputBuffer.GetBuffer8(i), numSamples);
+      numChannelsToGenerate -= 8;
+      if (numChannelsToGenerate <= 0) {
+        return;
+      }
+    }
+    if (generators4.size() > 0) {
+      generators4[0].Generate(outputBuffer.GetBuffer4(0), numSamples);
+      numChannelsToGenerate -= 4;
+    }
+  }
+  else if constexpr (VEC4_AVAILABLE) {
+    for (int i = 0; i < generators4.size(); ++i) {
+      generators4[i].Generate(outputBuffer.GetBuffer4(i), numSamples);
+      numChannelsToGenerate -= 4;
+      if (numChannelsToGenerate <= 0) {
+        return;
       }
     }
   }
-};
+  else {
+    int lastBuffers2 = outputBuffer.GetNumBuffers2() - 1;
+    for (int i = 0; i < generators2.size(); ++i) {
+      VecBuffer<Vec2>* next =
+        (i < lastBuffers2) ? next : outputBuffer.GetBuffer2(i + 1);
+      generators2[i].Generate(outputBuffer.GetBuffer2(i), numSamples, next);
+      numChannelsToGenerate -= 4;
+      if (numChannelsToGenerate <= 0) {
+        return;
+      }
+    }
+  }
+}
 
 } // namespace avec
