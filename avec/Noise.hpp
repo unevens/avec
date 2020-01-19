@@ -349,6 +349,11 @@ public:
   void Generate(InterleavedBuffer<Scalar>& outputBuffer,
                 int numSamples,
                 int numChannelsToGenerate);
+
+  /**
+   * @return the maximum number of channel that the generator can work with.
+   */
+  int GetNumChannels() const { return numChannels; }
 };
 
 // implementation
