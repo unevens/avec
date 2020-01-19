@@ -32,10 +32,22 @@ enum class BiquadFilterType
   AllPass
 };
 
+/**
+ * A simple biquad filter working with VecBuffers.
+ */
 template<typename Vec>
 class VecBiquadFilter
 {
 public:
+  /**
+   * Constructor.
+   * @param filterType_ the type of filter (low pass, high shelf, ... @see
+   * BiquadFilterType)
+   * @param frequency_ the cutoff (angular) frequency of the filter
+   * @param quality_ the quality (Q) of the filter, must be >= 0.5
+   * @param gain_ the gain of the filter - only used by shelves and peaking
+   * filter types
+   */
   VecBiquadFilter(BiquadFilterType filterType_,
                   double frequency_ = 0.1,
                   double quality_ = 0.79,
@@ -49,6 +61,12 @@ public:
     Setup();
   }
 
+  /**
+   * Applies the filter to the input and store the result in the output.
+   * @param input the input
+   * @param output the output
+   * @param numSamples the number of samples to process
+   */
   void ProcessBlock(VecBuffer<Vec> const& input,
                     VecBuffer<Vec>& output,
                     int numSamples)
@@ -72,66 +90,126 @@ public:
     buffer[6] = prev1;
   }
 
+  /**
+   * Resets the state of the filter, as if it was processing silence from an
+   * eternity.
+   */
   void Reset()
   {
     buffer[5] = 0.0;
     buffer[6] = 0.0;
   }
 
+  /**
+   * Sets the cutoff frequency on a specific channel
+   * @param channel the channel on which to change the cutoff frequency
+   * @param value the new cutoff frequency
+   */
   void SetFrequency(int channel, double value)
   {
     frequency[channel] = value;
     Setup();
   }
 
+  /**
+   * Sets the gain on a specific channel
+   * @param channel the channel on which to change the gain
+   * @param value the new gain
+   */
   void SetGain(int channel, double value)
   {
     gain[channel] = value;
     Setup();
   }
 
+  /**
+   * Sets the quality on a specific channel
+   * @param channel the channel on which to change the quality
+   * @param value the new quality
+   */
   void SetQuality(int channel, double value)
   {
     quality[channel] = value;
     Setup();
   }
 
+  /**
+   * Sets the filter type on a specific channel
+   * @param channel the channel on which to change the filter type
+   * @param value the new filter type
+   */
   void SetBiquadFilterType(int channel, BiquadFilterType value)
   {
     filterType[channel] = value;
     Setup();
   }
 
+  /**
+   * Sets the cutoff frequency on all the channels to the specified value.
+   * @param value the new cutoff frequency
+   */
   void SetFrequency(double value)
   {
     std::fill(frequency.begin(), frequency.end(), value);
     Setup();
   }
 
+  /**
+   * Sets the gain on all the channels to the specified value.
+   * @param value the new gain
+   */
   void SetGain(double value)
   {
     std::fill(gain.begin(), gain.end(), value);
     Setup();
   }
 
+  /**
+   * Sets the quality on all the channels to the specified value.
+   * @param value the new quality
+   */
   void SetQuality(double value)
   {
     std::fill(quality.begin(), quality.end(), value);
     Setup();
   }
 
+  /**
+   * Sets the filter type on all the channels to the specified value.
+   * @param value the new filter type
+   */
   void SetBiquadFilterType(BiquadFilterType value)
   {
     std::fill(filterType.begin(), filterType.end(), value);
     Setup();
   }
 
+  /**
+   * Gets the cutoff frequency used for the specified channel.
+   * @param channel the channel to get the cutoff frequency from
+   * @return the cutoff frequency of the specified channel.
+   */
   double GetFrequency(int channel) const { return frequency[channel]; }
 
+  /**
+   * Gets the gain used for the specified channel.
+   * @param channel the channel to get the gain from
+   * @return the gain of the specified channel.
+   */
   double GetGain(int channel) const { return gain[channel]; }
 
+  /**
+   * Gets the quality used for the specified channel.
+   * @param channel the channel to get the quality from
+   * @return the quality of the specified channel.
+   */
   double GetQuality(int channel) const { return quality[channel]; }
 
+  /**
+   * Gets the filter type used for the specified channel.
+   * @param channel the channel to get the filter type from
+   * @return the filter type of the specified channel.
+   */
   BiquadFilterType GetBiquadFilterType(int channel) const
   {
     return filterType[channel];
@@ -235,6 +313,9 @@ private:
   std::array<BiquadFilterType, Vec::size()> filterType;
 };
 
+/**
+ * A simple biquad filter working with InterleavedBuffers.
+ */
 template<typename Scalar>
 class BiquadFilter final
 {
@@ -249,6 +330,16 @@ class BiquadFilter final
   std::vector<VecBiquadFilter<Vec2>> filters2;
 
 public:
+  /**
+   * Constructor.
+   * @param numChannels the number of channels to allocate resources for
+   * @param filterType_ the type of filter (low pass, high shelf, ... @see
+   * BiquadFilterType)
+   * @param frequency_ the cutoff (angular) frequency of the filter
+   * @param quality_ the quality (Q) of the filter, must be >= 0.5
+   * @param gain_ the gain of the filter - only used by shelves and peaking
+   * filter types
+   */
   BiquadFilter(int numChannels,
                BiquadFilterType filterType_ = BiquadFilterType::LowPass,
                double frequency_ = 0.1,
@@ -297,6 +388,13 @@ public:
     }
   }
 
+  /**
+   * Applies the filter to the input and store the result in the output.
+   * @param input the input
+   * @param output the output
+   * @param numSamples the number of samples to process
+   * @param numChannelsToProcess the number of channels to process
+   */
   void ProcessBlock(InterleavedBuffer<Scalar> const& input,
                     InterleavedBuffer<Scalar>& output,
                     int numSamples,
@@ -344,6 +442,10 @@ public:
     }
   }
 
+  /**
+   * Resets the state of the filter, as if it was processing silence from an
+   * eternity.
+   */
   void Reset()
   {
     for (auto& f : filters8) {
@@ -357,6 +459,11 @@ public:
     }
   }
 
+  /**
+   * Sets the cutoff frequency on a specific channel
+   * @param channel the channel on which to change the cutoff frequency
+   * @param value the new cutoff frequency
+   */
   void SetFrequency(int channel, double value)
   {
     if constexpr (VEC8_AVAILABLE) {
@@ -383,6 +490,11 @@ public:
     }
   }
 
+  /**
+   * Sets the gain on a specific channel
+   * @param channel the channel on which to change the gain
+   * @param value the new gain
+   */
   void SetGain(int channel, double value)
   {
     if constexpr (VEC8_AVAILABLE) {
@@ -409,6 +521,11 @@ public:
     }
   }
 
+  /**
+   * Sets the quality on a specific channel
+   * @param channel the channel on which to change the quality
+   * @param value the new quality
+   */
   void SetQuality(int channel, double value)
   {
     if constexpr (VEC8_AVAILABLE) {
@@ -435,6 +552,11 @@ public:
     }
   }
 
+  /**
+   * Sets the filter type on a specific channel
+   * @param channel the channel on which to change the filter type
+   * @param value the new filter type
+   */
   void SetBiquadFilterType(int channel, BiquadFilterType value)
   {
     if constexpr (VEC8_AVAILABLE) {
@@ -461,6 +583,10 @@ public:
     }
   }
 
+  /**
+   * Sets the cutoff frequency on all the channels to the specified value.
+   * @param value the new cutoff frequency
+   */
   void SetFrequency(double value)
   {
     for (auto& f : filters8) {
@@ -474,6 +600,10 @@ public:
     }
   }
 
+  /**
+   * Sets the gain on all the channels to the specified value.
+   * @param value the new gain
+   */
   void SetGain(double value)
   {
     for (auto& f : filters8) {
@@ -487,6 +617,10 @@ public:
     }
   }
 
+  /**
+   * Sets the quality on all the channels to the specified value.
+   * @param value the new quality
+   */
   void SetQuality(double value)
   {
     for (auto& f : filters8) {
@@ -500,6 +634,10 @@ public:
     }
   }
 
+  /**
+   * Sets the filter type on all the channels to the specified value.
+   * @param value the new filter type
+   */
   void SetBiquadFilterType(BiquadFilterType value)
   {
     for (auto& f : filters8) {
@@ -513,6 +651,11 @@ public:
     }
   }
 
+  /**
+   * Gets the cutoff frequency used for the specified channel.
+   * @param channel the channel to get the cutoff frequency from
+   * @return the cutoff frequency of the specified channel.
+   */
   double GetFrequency(int channel) const
   {
     if constexpr (VEC8_AVAILABLE) {
@@ -539,6 +682,11 @@ public:
     }
   }
 
+  /**
+   * Gets the gain used for the specified channel.
+   * @param channel the channel to get the gain from
+   * @return the gain of the specified channel.
+   */
   double GetGain(int channel) const
   {
     if constexpr (VEC8_AVAILABLE) {
@@ -565,6 +713,11 @@ public:
     }
   }
 
+  /**
+   * Gets the quality used for the specified channel.
+   * @param channel the channel to get the quality from
+   * @return the quality of the specified channel.
+   */
   double GetQuality(int channel) const
   {
     if constexpr (VEC8_AVAILABLE) {
@@ -591,6 +744,11 @@ public:
     }
   }
 
+  /**
+   * Gets the filter type used for the specified channel.
+   * @param channel the channel to get the filter type from
+   * @return the filter type of the specified channel.
+   */
   BiquadFilterType GetBiquadFilterType(int channel) const
   {
     if constexpr (VEC8_AVAILABLE) {
