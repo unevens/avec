@@ -91,7 +91,7 @@ public:
 
   /**
    * Resize the buffer
-   * @param newSize the new size measured in number of Vec elements
+   * @param newCapacity the new size measured in number of Vec elements
    */
   void SetCapacityAsVec(int newCapacity)
   {

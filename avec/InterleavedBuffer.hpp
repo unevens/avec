@@ -202,6 +202,7 @@ public:
    * which are summed together into the output.
    * @param output ScalarBuffer in which to store the deinterleaved data.
    * @param numTracks number of tracks
+   * @param numOutputChannels the requested number of output channels
    * @return true if deinterleaving was successfull, false if the number of
    * channels of output multiplied by numTracks is greater than the
    * numChannel of the InterleavedBuffer

@@ -258,6 +258,8 @@ public:
    * Generates noise.
    * @param output the VecBuffer in which to generate the noise.
    * @param numSamples the number of samples to generate in each channel.
+   * @param output2 a pointer to an optional VecBuffer in which to generate two
+   * additional channels of noise. Ignored if nullptr
    */
   void Generate(VecBuffer<Vec2d>& output,
                 int numSamples,

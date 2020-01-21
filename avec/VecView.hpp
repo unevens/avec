@@ -51,13 +51,13 @@ public:
 
   /**
    * Resets the view to point to a different address.
-   * @param ptr pointer to the memory to view. It must be aligned to Vec::size()
-   * * sizeof(Scalar).
+   * @param ptr_ pointer to the memory to view. It must be aligned to
+   * Vec::size()*sizeof(Scalar).
    */
-  void SetPointer(Scalar* _ptr)
+  void SetPointer(Scalar* ptr_)
   {
-    assert(boost::alignment::is_aligned(_ptr, Vec::size() * sizeof(Scalar)));
-    ptr = _ptr;
+    assert(boost::alignment::is_aligned(ptr_, Vec::size() * sizeof(Scalar)));
+    ptr = ptr_;
     BOOST_ALIGN_ASSUME_ALIGNED(ptr, Vec::size() * sizeof(Scalar));
   }
 
@@ -98,14 +98,14 @@ public:
    * VecView's Scalar is also double.
    * @param other the view to copy from.
    */
-  VecView& operator=(VecView<Vec2d> const x)
+  VecView& operator=(VecView<Vec2d> const other)
   {
     if constexpr (!std::is_same<Scalar, double>::value) {
       // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
       assert(false);
       return *this;
     }
-    std::copy(x.ptr, x.ptr + Vec::size(), ptr);
+    std::copy(other.ptr, other.ptr + Vec::size(), ptr);
     return *this;
   }
 
@@ -114,14 +114,14 @@ public:
    * VecView's Scalar is also double.
    * @param other the view to copy from.
    */
-  VecView& operator=(VecView<Vec4d> const x)
+  VecView& operator=(VecView<Vec4d> const other)
   {
     if constexpr (!std::is_same<Scalar, double>::value) {
       // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
       assert(false);
       return *this;
     }
-    std::copy(x.ptr, x.ptr + Vec4d::size(), ptr);
+    std::copy(other.ptr, other.ptr + Vec4d::size(), ptr);
     return *this;
   }
 
@@ -130,14 +130,14 @@ public:
    * VecView's Scalar is also double.
    * @param other the view to copy from.
    */
-  VecView& operator=(VecView<Vec8d> const x)
+  VecView& operator=(VecView<Vec8d> const other)
   {
     if constexpr (!std::is_same<Scalar, double>::value) {
       // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
       assert(false);
       return *this;
     }
-    std::copy(x.ptr, x.ptr + Vec::size(), ptr);
+    std::copy(other.ptr, other.ptr + Vec::size(), ptr);
     return *this;
   }
 

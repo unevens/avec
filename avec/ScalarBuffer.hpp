@@ -45,7 +45,17 @@ class ScalarBuffer final
   }
 
 public:
+  /**
+   * Gets a reference to an element of the buffer.
+   * @param i the index of the element to retrieve
+   * @return a reference to the i-th element of buffer.
+   */
   aligned_vector<Scalar>& operator[](int i) { return data[i]; }
+  /**
+   * Gets a const reference to an element of the buffer.
+   * @param i the index of the element to retrieve
+   * @return a const reference to the i-th element of buffer.
+   */
   aligned_vector<Scalar> const& operator[](int i) const { return data[i]; }
 
   /**
