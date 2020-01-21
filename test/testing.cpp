@@ -87,7 +87,7 @@ TestInterleavedBuffer(int numChannels, int samplesPerBlock)
   for (int i = 0; i < numChannels; ++i) {
     for (int s = 0; s < samplesPerBlock; ++s) {
       // cout << inout[i][s] << "==" << buffer.At(i, s) << "\n";
-      VERIFY(inout[i][s] == buffer.At(i, s),
+      VERIFY(inout[i][s] == buffer.At(i, s)[0],
              "checking InterleaverBuffer::At\n");
     }
   }
