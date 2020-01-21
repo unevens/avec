@@ -37,7 +37,7 @@ Just add the folder `avec` to your project and `#include "avec/Avec.hpp` to get 
 
 ## Documentation
 
-The documentation can be generated with [Doxygen](http://doxygen.nl/) running
+The documentation, available at https://unevens.github.io/avec/, can be generated with [Doxygen](http://doxygen.nl/) running
 
 ```bash
 $ doxygen doxyfile.txt
