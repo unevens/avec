@@ -21,7 +21,7 @@ limitations under the License.
 #include <algorithm>
 
 #ifndef AVEC_MIX_VEC_SIZES
-#define AVEC_MIX_VEC_SIZES 0
+#define AVEC_MIX_VEC_SIZES 1
 #endif
 
 namespace avec {
