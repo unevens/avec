@@ -129,6 +129,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:ac441655b6c984c6ca1db97cc85857be9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f961b9ae84136d7a0002b10664d58f5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_biquad_filter.html#a1f961b9ae84136d7a0002b10664d58f5">GetNumChannels</a> () const</td></tr>
 <tr class="separator:a1f961b9ae84136d7a0002b10664d58f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5bf4fdd289f203c9ea07efd35d3ff38e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_biquad_filter.html#a5bf4fdd289f203c9ea07efd35d3ff38e">Reset</a> (int srcChannelStart, int numChannelsToReset)</td></tr>
+<tr class="memdesc:a5bf4fdd289f203c9ea07efd35d3ff38e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resets the state of the filter for a sequence of channels.  <a href="classavec_1_1_biquad_filter.html#a5bf4fdd289f203c9ea07efd35d3ff38e">More...</a><br /></td></tr>
+<tr class="separator:a5bf4fdd289f203c9ea07efd35d3ff38e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe3a60f2a92f7b036c6f8eeee07b2e37"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_biquad_filter.html#afe3a60f2a92f7b036c6f8eeee07b2e37">MoveChannelStates</a> (int srcChannelStart, int dstChannelStart, int numChannelsToMove)</td></tr>
+<tr class="memdesc:afe3a60f2a92f7b036c6f8eeee07b2e37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies the state and settings of the filter from sequence of channels to an other sequence of channels, and resets the latter.  <a href="classavec_1_1_biquad_filter.html#afe3a60f2a92f7b036c6f8eeee07b2e37">More...</a><br /></td></tr>
+<tr class="separator:afe3a60f2a92f7b036c6f8eeee07b2e37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar&gt;<br />
@@ -387,6 +393,60 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
+<a id="afe3a60f2a92f7b036c6f8eeee07b2e37"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe3a60f2a92f7b036c6f8eeee07b2e37">&#9670;&nbsp;</a></span>MoveChannelStates()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classavec_1_1_biquad_filter.html">avec::BiquadFilter</a>&lt; Scalar &gt;::MoveChannelStates </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>srcChannelStart</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>dstChannelStart</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>numChannelsToMove</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copies the state and settings of the filter from sequence of channels to an other sequence of channels, and resets the latter. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">srcChannelStart</td><td>the first channel to be moved </td></tr>
+    <tr><td class="paramname">dstChannelStart</td><td>the destination for the first channel to be moved </td></tr>
+    <tr><td class="paramname">numChannelsToMove</td><td>the number of channels to move </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a241f7df82291926c6cda39ab1ff46c3b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a241f7df82291926c6cda39ab1ff46c3b">&#9670;&nbsp;</a></span>ProcessBlock()</h2>
 
@@ -442,6 +502,53 @@ template&lt;typename Scalar &gt; </div>
     <tr><td class="paramname">output</td><td>the output </td></tr>
     <tr><td class="paramname">numSamples</td><td>the number of samples to process </td></tr>
     <tr><td class="paramname">numChannelsToProcess</td><td>the number of channels to process </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a5bf4fdd289f203c9ea07efd35d3ff38e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5bf4fdd289f203c9ea07efd35d3ff38e">&#9670;&nbsp;</a></span>Reset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classavec_1_1_biquad_filter.html">avec::BiquadFilter</a>&lt; Scalar &gt;::Reset </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>srcChannelStart</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>numChannelsToReset</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Resets the state of the filter for a sequence of channels. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">srcChannelStart</td><td>the first channel to be reset </td></tr>
+    <tr><td class="paramname">numChannelsToReset</td><td>the number of channels to reset </td></tr>
   </table>
   </dd>
 </dl>

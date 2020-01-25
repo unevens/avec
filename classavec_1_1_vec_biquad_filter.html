@@ -67,10 +67,11 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classavec_1_1_vec_biquad_filter-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">avec::VecBiquadFilter&lt; Vec &gt; Class Template Reference</div>  </div>
+<div class="title">avec::VecBiquadFilter&lt; Vec &gt; Class Template Reference<span class="mlabels"><span class="mlabel">final</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -78,7 +79,22 @@ $(function() {
  <a href="classavec_1_1_vec_biquad_filter.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_biquad_8hpp_source.html">Biquad.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for avec::VecBiquadFilter&lt; Vec &gt;:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classavec_1_1_vec_biquad_filter.png" usemap="#avec::VecBiquadFilter_3C_20Vec_20_3E_map" alt=""/>
+  <map id="avec::VecBiquadFilter_3C_20Vec_20_3E_map" name="avec::VecBiquadFilter_3C_20Vec_20_3E_map">
+<area href="classavec_1_1_vec_biquad_filter_interface.html" alt="avec::VecBiquadFilterInterface&lt; ScalarTypes&lt; Vec &gt;::Scalar &gt;" shape="rect" coords="0,0,371,24"/>
+  </map>
+</div></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:adf97313b1c20ce0cb204d565fba9e9cb"><td class="memItemLeft" align="right" valign="top"><a id="adf97313b1c20ce0cb204d565fba9e9cb"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>Scalar</b> = typename <a class="el" href="classavec_1_1_scalar_types.html">ScalarTypes</a>&lt; Vec &gt;::Scalar</td></tr>
+<tr class="separator:adf97313b1c20ce0cb204d565fba9e9cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a843d58efc95aebeffe99fa54efa5614d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#a843d58efc95aebeffe99fa54efa5614d">VecBiquadFilter</a> (BiquadFilterType filterType_, double frequency_=0.1, double quality_=0.79, double gain_=0.0)</td></tr>
@@ -91,18 +107,21 @@ Public Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#a32b2d345985c32a3196f8cd7ad1e6ac7">Reset</a> ()</td></tr>
 <tr class="memdesc:a32b2d345985c32a3196f8cd7ad1e6ac7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resets the state of the filter, as if it was processing silence from an eternity. <br /></td></tr>
 <tr class="separator:a32b2d345985c32a3196f8cd7ad1e6ac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b20d3da6b2644da1781ab12316d8821"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#a4b20d3da6b2644da1781ab12316d8821">SetFrequency</a> (int channel, double value)</td></tr>
-<tr class="memdesc:a4b20d3da6b2644da1781ab12316d8821"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the cutoff frequency on a specific channel.  <a href="classavec_1_1_vec_biquad_filter.html#a4b20d3da6b2644da1781ab12316d8821">More...</a><br /></td></tr>
-<tr class="separator:a4b20d3da6b2644da1781ab12316d8821"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a74ea4f85ef93fdfca87fc5f9deeb2fe8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#a74ea4f85ef93fdfca87fc5f9deeb2fe8">SetGain</a> (int channel, double value)</td></tr>
-<tr class="memdesc:a74ea4f85ef93fdfca87fc5f9deeb2fe8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the gain on a specific channel.  <a href="classavec_1_1_vec_biquad_filter.html#a74ea4f85ef93fdfca87fc5f9deeb2fe8">More...</a><br /></td></tr>
-<tr class="separator:a74ea4f85ef93fdfca87fc5f9deeb2fe8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a215b9413fc59cb4796b28ec6bb56c247"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#a215b9413fc59cb4796b28ec6bb56c247">SetQuality</a> (int channel, double value)</td></tr>
-<tr class="memdesc:a215b9413fc59cb4796b28ec6bb56c247"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the quality on a specific channel.  <a href="classavec_1_1_vec_biquad_filter.html#a215b9413fc59cb4796b28ec6bb56c247">More...</a><br /></td></tr>
-<tr class="separator:a215b9413fc59cb4796b28ec6bb56c247"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af64e384d470c36a8fb6909ce958d4de7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#af64e384d470c36a8fb6909ce958d4de7">SetBiquadFilterType</a> (int channel, BiquadFilterType value)</td></tr>
-<tr class="memdesc:af64e384d470c36a8fb6909ce958d4de7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the filter type on a specific channel.  <a href="classavec_1_1_vec_biquad_filter.html#af64e384d470c36a8fb6909ce958d4de7">More...</a><br /></td></tr>
-<tr class="separator:af64e384d470c36a8fb6909ce958d4de7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3667a23db58dd18f63812e8b2232c8a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#ad3667a23db58dd18f63812e8b2232c8a">Reset</a> (int channel) override</td></tr>
+<tr class="memdesc:ad3667a23db58dd18f63812e8b2232c8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resets the state of the filter for the specified channel, as if it was processing silence from an eternity.  <a href="classavec_1_1_vec_biquad_filter.html#ad3667a23db58dd18f63812e8b2232c8a">More...</a><br /></td></tr>
+<tr class="separator:ad3667a23db58dd18f63812e8b2232c8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae868e3d8143629de3cb8a9957489245d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#ae868e3d8143629de3cb8a9957489245d">SetFrequency</a> (int channel, double value, bool update=true) override</td></tr>
+<tr class="memdesc:ae868e3d8143629de3cb8a9957489245d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the cutoff frequency on a specific channel.  <a href="classavec_1_1_vec_biquad_filter.html#ae868e3d8143629de3cb8a9957489245d">More...</a><br /></td></tr>
+<tr class="separator:ae868e3d8143629de3cb8a9957489245d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33b6173a8a4e04a67612d7f8661f4235"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#a33b6173a8a4e04a67612d7f8661f4235">SetGain</a> (int channel, double value, bool update=true) override</td></tr>
+<tr class="memdesc:a33b6173a8a4e04a67612d7f8661f4235"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the gain on a specific channel.  <a href="classavec_1_1_vec_biquad_filter.html#a33b6173a8a4e04a67612d7f8661f4235">More...</a><br /></td></tr>
+<tr class="separator:a33b6173a8a4e04a67612d7f8661f4235"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04b2cfebf36a686f3a48c9e21dac1ca6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#a04b2cfebf36a686f3a48c9e21dac1ca6">SetQuality</a> (int channel, double value, bool update=true) override</td></tr>
+<tr class="memdesc:a04b2cfebf36a686f3a48c9e21dac1ca6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the quality on a specific channel.  <a href="classavec_1_1_vec_biquad_filter.html#a04b2cfebf36a686f3a48c9e21dac1ca6">More...</a><br /></td></tr>
+<tr class="separator:a04b2cfebf36a686f3a48c9e21dac1ca6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec7f49e5eb77bb08ac672dc26afbc700"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#aec7f49e5eb77bb08ac672dc26afbc700">SetBiquadFilterType</a> (int channel, BiquadFilterType value, bool update=true) override</td></tr>
+<tr class="memdesc:aec7f49e5eb77bb08ac672dc26afbc700"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the filter type on a specific channel.  <a href="classavec_1_1_vec_biquad_filter.html#aec7f49e5eb77bb08ac672dc26afbc700">More...</a><br /></td></tr>
+<tr class="separator:aec7f49e5eb77bb08ac672dc26afbc700"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af6eff1631550eeab09dab930f99e5909"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#af6eff1631550eeab09dab930f99e5909">SetFrequency</a> (double value)</td></tr>
 <tr class="memdesc:af6eff1631550eeab09dab930f99e5909"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the cutoff frequency on all the channels to the specified value.  <a href="classavec_1_1_vec_biquad_filter.html#af6eff1631550eeab09dab930f99e5909">More...</a><br /></td></tr>
 <tr class="separator:af6eff1631550eeab09dab930f99e5909"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -115,21 +134,40 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:ab13f4521e6ecb2396a5d82b83747d4e0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#ab13f4521e6ecb2396a5d82b83747d4e0">SetBiquadFilterType</a> (BiquadFilterType value)</td></tr>
 <tr class="memdesc:ab13f4521e6ecb2396a5d82b83747d4e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the filter type on all the channels to the specified value.  <a href="classavec_1_1_vec_biquad_filter.html#ab13f4521e6ecb2396a5d82b83747d4e0">More...</a><br /></td></tr>
 <tr class="separator:ab13f4521e6ecb2396a5d82b83747d4e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1f7ee477b14a42e019739df3fcb93a6"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#af1f7ee477b14a42e019739df3fcb93a6">GetFrequency</a> (int channel) const</td></tr>
-<tr class="memdesc:af1f7ee477b14a42e019739df3fcb93a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the cutoff frequency used for the specified channel.  <a href="classavec_1_1_vec_biquad_filter.html#af1f7ee477b14a42e019739df3fcb93a6">More...</a><br /></td></tr>
-<tr class="separator:af1f7ee477b14a42e019739df3fcb93a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8857d189e280a4b43e14a2d7611b1ab7"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#a8857d189e280a4b43e14a2d7611b1ab7">GetGain</a> (int channel) const</td></tr>
-<tr class="memdesc:a8857d189e280a4b43e14a2d7611b1ab7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the gain used for the specified channel.  <a href="classavec_1_1_vec_biquad_filter.html#a8857d189e280a4b43e14a2d7611b1ab7">More...</a><br /></td></tr>
-<tr class="separator:a8857d189e280a4b43e14a2d7611b1ab7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6462499c989ca9f20b35956e213ea425"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#a6462499c989ca9f20b35956e213ea425">GetQuality</a> (int channel) const</td></tr>
-<tr class="memdesc:a6462499c989ca9f20b35956e213ea425"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the quality used for the specified channel.  <a href="classavec_1_1_vec_biquad_filter.html#a6462499c989ca9f20b35956e213ea425">More...</a><br /></td></tr>
-<tr class="separator:a6462499c989ca9f20b35956e213ea425"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a612cfc6b153f50ca40c325c8c8dc47d2"><td class="memItemLeft" align="right" valign="top">BiquadFilterType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#a612cfc6b153f50ca40c325c8c8dc47d2">GetBiquadFilterType</a> (int channel) const</td></tr>
-<tr class="memdesc:a612cfc6b153f50ca40c325c8c8dc47d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the filter type used for the specified channel.  <a href="classavec_1_1_vec_biquad_filter.html#a612cfc6b153f50ca40c325c8c8dc47d2">More...</a><br /></td></tr>
-<tr class="separator:a612cfc6b153f50ca40c325c8c8dc47d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2dbb075b348fd7625e3b446f969c49e8"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#a2dbb075b348fd7625e3b446f969c49e8">GetFrequency</a> (int channel) const override</td></tr>
+<tr class="memdesc:a2dbb075b348fd7625e3b446f969c49e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the cutoff frequency used for the specified channel.  <a href="classavec_1_1_vec_biquad_filter.html#a2dbb075b348fd7625e3b446f969c49e8">More...</a><br /></td></tr>
+<tr class="separator:a2dbb075b348fd7625e3b446f969c49e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0764c81a6baf38463de57222137232bc"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#a0764c81a6baf38463de57222137232bc">GetGain</a> (int channel) const override</td></tr>
+<tr class="memdesc:a0764c81a6baf38463de57222137232bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the gain used for the specified channel.  <a href="classavec_1_1_vec_biquad_filter.html#a0764c81a6baf38463de57222137232bc">More...</a><br /></td></tr>
+<tr class="separator:a0764c81a6baf38463de57222137232bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1fd688830bd7855dfbe055e6f0691a5"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#ab1fd688830bd7855dfbe055e6f0691a5">GetQuality</a> (int channel) const override</td></tr>
+<tr class="memdesc:ab1fd688830bd7855dfbe055e6f0691a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the quality used for the specified channel.  <a href="classavec_1_1_vec_biquad_filter.html#ab1fd688830bd7855dfbe055e6f0691a5">More...</a><br /></td></tr>
+<tr class="separator:ab1fd688830bd7855dfbe055e6f0691a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a74e4ffc2bad0ef0e03b34b77f588c3"><td class="memItemLeft" align="right" valign="top">BiquadFilterType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#a3a74e4ffc2bad0ef0e03b34b77f588c3">GetBiquadFilterType</a> (int channel) const override</td></tr>
+<tr class="memdesc:a3a74e4ffc2bad0ef0e03b34b77f588c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the filter type used for the specified channel.  <a href="classavec_1_1_vec_biquad_filter.html#a3a74e4ffc2bad0ef0e03b34b77f588c3">More...</a><br /></td></tr>
+<tr class="separator:a3a74e4ffc2bad0ef0e03b34b77f588c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeea3f5aa08d3526f165ae9a265e0b6c2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#aeea3f5aa08d3526f165ae9a265e0b6c2">Setup</a> (int channel, bool reset=true) override</td></tr>
+<tr class="memdesc:aeea3f5aa08d3526f165ae9a265e0b6c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the filter coefficients for a specified channel.  <a href="classavec_1_1_vec_biquad_filter.html#aeea3f5aa08d3526f165ae9a265e0b6c2">More...</a><br /></td></tr>
+<tr class="separator:aeea3f5aa08d3526f165ae9a265e0b6c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3dd7dfefe4b697a4ddcb8a452b2225c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#ac3dd7dfefe4b697a4ddcb8a452b2225c">Setup</a> (bool reset=true)</td></tr>
+<tr class="memdesc:ac3dd7dfefe4b697a4ddcb8a452b2225c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the filter coefficients.  <a href="classavec_1_1_vec_biquad_filter.html#ac3dd7dfefe4b697a4ddcb8a452b2225c">More...</a><br /></td></tr>
+<tr class="separator:ac3dd7dfefe4b697a4ddcb8a452b2225c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c191a7eebca5ddb8bbdef1b19959c19"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#a7c191a7eebca5ddb8bbdef1b19959c19">SetState</a> (int channel, Scalar state0, Scalar state1) override</td></tr>
+<tr class="memdesc:a7c191a7eebca5ddb8bbdef1b19959c19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the state of the filter for a specified channel.  <a href="classavec_1_1_vec_biquad_filter.html#a7c191a7eebca5ddb8bbdef1b19959c19">More...</a><br /></td></tr>
+<tr class="separator:a7c191a7eebca5ddb8bbdef1b19959c19"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec25d742ccb54b07028660f0ba4ae645"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_vec_biquad_filter.html#aec25d742ccb54b07028660f0ba4ae645">GetState</a> (int channel, Scalar &amp;state0, Scalar &amp;state1) const override</td></tr>
+<tr class="memdesc:aec25d742ccb54b07028660f0ba4ae645"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the state of the filter for a specified channel.  <a href="classavec_1_1_vec_biquad_filter.html#aec25d742ccb54b07028660f0ba4ae645">More...</a><br /></td></tr>
+<tr class="separator:aec25d742ccb54b07028660f0ba4ae645"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classavec_1_1_vec_biquad_filter_interface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classavec_1_1_vec_biquad_filter_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classavec_1_1_vec_biquad_filter_interface.html">avec::VecBiquadFilterInterface&lt; ScalarTypes&lt; Vec &gt;::Scalar &gt;</a></td></tr>
+<tr class="memitem:ac72df5d263ed097296ef02040c9f3cdf inherit pub_methods_classavec_1_1_vec_biquad_filter_interface"><td class="memItemLeft" align="right" valign="top"><a id="ac72df5d263ed097296ef02040c9f3cdf"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>SetState</b> (int channel, <a class="el" href="classavec_1_1_scalar_types.html">ScalarTypes</a>&lt; Vec &gt;::Scalar state0, <a class="el" href="classavec_1_1_scalar_types.html">ScalarTypes</a>&lt; Vec &gt;::Scalar state1)=0</td></tr>
+<tr class="separator:ac72df5d263ed097296ef02040c9f3cdf inherit pub_methods_classavec_1_1_vec_biquad_filter_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeda5d03751adc774ddc476edc574044c inherit pub_methods_classavec_1_1_vec_biquad_filter_interface"><td class="memItemLeft" align="right" valign="top"><a id="aeda5d03751adc774ddc476edc574044c"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>GetState</b> (int channel, <a class="el" href="classavec_1_1_scalar_types.html">ScalarTypes</a>&lt; Vec &gt;::Scalar &amp;state0, <a class="el" href="classavec_1_1_scalar_types.html">ScalarTypes</a>&lt; Vec &gt;::Scalar &amp;state1) const=0</td></tr>
+<tr class="separator:aeda5d03751adc774ddc476edc574044c inherit pub_methods_classavec_1_1_vec_biquad_filter_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename Vec&gt;<br />
+<div class="textblock"><h3>template&lt;class Vec&gt;<br />
 class avec::VecBiquadFilter&lt; Vec &gt;</h3>
 
 <p>A simple biquad filter working with VecBuffers. </p>
@@ -140,7 +178,7 @@ class avec::VecBiquadFilter&lt; Vec &gt;</h3>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Vec &gt; </div>
+template&lt;class Vec&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -202,13 +240,13 @@ template&lt;typename Vec &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a612cfc6b153f50ca40c325c8c8dc47d2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a612cfc6b153f50ca40c325c8c8dc47d2">&#9670;&nbsp;</a></span>GetBiquadFilterType()</h2>
+<a id="a3a74e4ffc2bad0ef0e03b34b77f588c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a74e4ffc2bad0ef0e03b34b77f588c3">&#9670;&nbsp;</a></span>GetBiquadFilterType()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Vec &gt; </div>
+template&lt;class Vec&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -223,7 +261,7 @@ template&lt;typename Vec &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -237,15 +275,17 @@ template&lt;typename Vec &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the filter type of the specified channel. </dd></dl>
 
+<p>Implements <a class="el" href="classavec_1_1_vec_biquad_filter_interface.html">avec::VecBiquadFilterInterface&lt; ScalarTypes&lt; Vec &gt;::Scalar &gt;</a>.</p>
+
 </div>
 </div>
-<a id="af1f7ee477b14a42e019739df3fcb93a6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af1f7ee477b14a42e019739df3fcb93a6">&#9670;&nbsp;</a></span>GetFrequency()</h2>
+<a id="a2dbb075b348fd7625e3b446f969c49e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2dbb075b348fd7625e3b446f969c49e8">&#9670;&nbsp;</a></span>GetFrequency()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Vec &gt; </div>
+template&lt;class Vec&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -260,7 +300,7 @@ template&lt;typename Vec &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -274,15 +314,17 @@ template&lt;typename Vec &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the cutoff frequency of the specified channel. </dd></dl>
 
+<p>Implements <a class="el" href="classavec_1_1_vec_biquad_filter_interface.html">avec::VecBiquadFilterInterface&lt; ScalarTypes&lt; Vec &gt;::Scalar &gt;</a>.</p>
+
 </div>
 </div>
-<a id="a8857d189e280a4b43e14a2d7611b1ab7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8857d189e280a4b43e14a2d7611b1ab7">&#9670;&nbsp;</a></span>GetGain()</h2>
+<a id="a0764c81a6baf38463de57222137232bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0764c81a6baf38463de57222137232bc">&#9670;&nbsp;</a></span>GetGain()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Vec &gt; </div>
+template&lt;class Vec&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -297,7 +339,7 @@ template&lt;typename Vec &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -311,15 +353,17 @@ template&lt;typename Vec &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the gain of the specified channel. </dd></dl>
 
+<p>Implements <a class="el" href="classavec_1_1_vec_biquad_filter_interface.html">avec::VecBiquadFilterInterface&lt; ScalarTypes&lt; Vec &gt;::Scalar &gt;</a>.</p>
+
 </div>
 </div>
-<a id="a6462499c989ca9f20b35956e213ea425"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6462499c989ca9f20b35956e213ea425">&#9670;&nbsp;</a></span>GetQuality()</h2>
+<a id="ab1fd688830bd7855dfbe055e6f0691a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab1fd688830bd7855dfbe055e6f0691a5">&#9670;&nbsp;</a></span>GetQuality()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Vec &gt; </div>
+template&lt;class Vec&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -334,7 +378,7 @@ template&lt;typename Vec &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -348,6 +392,62 @@ template&lt;typename Vec &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the quality of the specified channel. </dd></dl>
 
+<p>Implements <a class="el" href="classavec_1_1_vec_biquad_filter_interface.html">avec::VecBiquadFilterInterface&lt; ScalarTypes&lt; Vec &gt;::Scalar &gt;</a>.</p>
+
+</div>
+</div>
+<a id="aec25d742ccb54b07028660f0ba4ae645"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec25d742ccb54b07028660f0ba4ae645">&#9670;&nbsp;</a></span>GetState()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Vec&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classavec_1_1_vec_biquad_filter.html">avec::VecBiquadFilter</a>&lt; Vec &gt;::GetState </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>channel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar &amp;&#160;</td>
+          <td class="paramname"><em>state0</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar &amp;&#160;</td>
+          <td class="paramname"><em>state1</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the state of the filter for a specified channel. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>the channel for which to set the state of the filter </td></tr>
+    <tr><td class="paramname">state0</td><td>the first number of the state of the filter </td></tr>
+    <tr><td class="paramname">state1</td><td>the second number of the state of the filter </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="aca0c39edeab7a47c24848a766ccba358"></a>
@@ -356,7 +456,7 @@ template&lt;typename Vec &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Vec &gt; </div>
+template&lt;class Vec&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -404,13 +504,51 @@ template&lt;typename Vec &gt; </div>
 
 </div>
 </div>
+<a id="ad3667a23db58dd18f63812e8b2232c8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3667a23db58dd18f63812e8b2232c8a">&#9670;&nbsp;</a></span>Reset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Vec&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classavec_1_1_vec_biquad_filter.html">avec::VecBiquadFilter</a>&lt; Vec &gt;::Reset </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>channel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Resets the state of the filter for the specified channel, as if it was processing silence from an eternity. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>the channel to reset </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="classavec_1_1_vec_biquad_filter_interface.html">avec::VecBiquadFilterInterface&lt; ScalarTypes&lt; Vec &gt;::Scalar &gt;</a>.</p>
+
+</div>
+</div>
 <a id="ab13f4521e6ecb2396a5d82b83747d4e0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab13f4521e6ecb2396a5d82b83747d4e0">&#9670;&nbsp;</a></span>SetBiquadFilterType() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Vec &gt; </div>
+template&lt;class Vec&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -440,13 +578,13 @@ template&lt;typename Vec &gt; </div>
 
 </div>
 </div>
-<a id="af64e384d470c36a8fb6909ce958d4de7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af64e384d470c36a8fb6909ce958d4de7">&#9670;&nbsp;</a></span>SetBiquadFilterType() <span class="overload">[2/2]</span></h2>
+<a id="aec7f49e5eb77bb08ac672dc26afbc700"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec7f49e5eb77bb08ac672dc26afbc700">&#9670;&nbsp;</a></span>SetBiquadFilterType() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Vec &gt; </div>
+template&lt;class Vec&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -461,7 +599,13 @@ template&lt;typename Vec &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">BiquadFilterType&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>update</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -471,7 +615,7 @@ template&lt;typename Vec &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -481,9 +625,12 @@ template&lt;typename Vec &gt; </div>
   <table class="params">
     <tr><td class="paramname">channel</td><td>the channel on which to change the filter type </td></tr>
     <tr><td class="paramname">value</td><td>the new filter type </td></tr>
+    <tr><td class="paramname">update</td><td>if true, as it is by default, the new filter coefficients will be computed. Otherwise they will not be computed. </td></tr>
   </table>
   </dd>
 </dl>
+
+<p>Implements <a class="el" href="classavec_1_1_vec_biquad_filter_interface.html">avec::VecBiquadFilterInterface&lt; ScalarTypes&lt; Vec &gt;::Scalar &gt;</a>.</p>
 
 </div>
 </div>
@@ -493,7 +640,7 @@ template&lt;typename Vec &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Vec &gt; </div>
+template&lt;class Vec&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -523,13 +670,13 @@ template&lt;typename Vec &gt; </div>
 
 </div>
 </div>
-<a id="a4b20d3da6b2644da1781ab12316d8821"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4b20d3da6b2644da1781ab12316d8821">&#9670;&nbsp;</a></span>SetFrequency() <span class="overload">[2/2]</span></h2>
+<a id="ae868e3d8143629de3cb8a9957489245d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae868e3d8143629de3cb8a9957489245d">&#9670;&nbsp;</a></span>SetFrequency() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Vec &gt; </div>
+template&lt;class Vec&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -544,7 +691,13 @@ template&lt;typename Vec &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>update</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -554,7 +707,7 @@ template&lt;typename Vec &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -564,9 +717,12 @@ template&lt;typename Vec &gt; </div>
   <table class="params">
     <tr><td class="paramname">channel</td><td>the channel on which to change the cutoff frequency </td></tr>
     <tr><td class="paramname">value</td><td>the new cutoff frequency </td></tr>
+    <tr><td class="paramname">update</td><td>if true, as it is by default, the new filter coefficients will be computed. Otherwise they will not be computed. </td></tr>
   </table>
   </dd>
 </dl>
+
+<p>Implements <a class="el" href="classavec_1_1_vec_biquad_filter_interface.html">avec::VecBiquadFilterInterface&lt; ScalarTypes&lt; Vec &gt;::Scalar &gt;</a>.</p>
 
 </div>
 </div>
@@ -576,7 +732,7 @@ template&lt;typename Vec &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Vec &gt; </div>
+template&lt;class Vec&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -606,13 +762,13 @@ template&lt;typename Vec &gt; </div>
 
 </div>
 </div>
-<a id="a74ea4f85ef93fdfca87fc5f9deeb2fe8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a74ea4f85ef93fdfca87fc5f9deeb2fe8">&#9670;&nbsp;</a></span>SetGain() <span class="overload">[2/2]</span></h2>
+<a id="a33b6173a8a4e04a67612d7f8661f4235"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33b6173a8a4e04a67612d7f8661f4235">&#9670;&nbsp;</a></span>SetGain() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Vec &gt; </div>
+template&lt;class Vec&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -627,7 +783,13 @@ template&lt;typename Vec &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>update</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -637,7 +799,7 @@ template&lt;typename Vec &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -647,9 +809,12 @@ template&lt;typename Vec &gt; </div>
   <table class="params">
     <tr><td class="paramname">channel</td><td>the channel on which to change the gain </td></tr>
     <tr><td class="paramname">value</td><td>the new gain </td></tr>
+    <tr><td class="paramname">update</td><td>if true, as it is by default, the new filter coefficients will be computed. Otherwise they will not be computed. </td></tr>
   </table>
   </dd>
 </dl>
+
+<p>Implements <a class="el" href="classavec_1_1_vec_biquad_filter_interface.html">avec::VecBiquadFilterInterface&lt; ScalarTypes&lt; Vec &gt;::Scalar &gt;</a>.</p>
 
 </div>
 </div>
@@ -659,7 +824,7 @@ template&lt;typename Vec &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Vec &gt; </div>
+template&lt;class Vec&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -689,13 +854,13 @@ template&lt;typename Vec &gt; </div>
 
 </div>
 </div>
-<a id="a215b9413fc59cb4796b28ec6bb56c247"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a215b9413fc59cb4796b28ec6bb56c247">&#9670;&nbsp;</a></span>SetQuality() <span class="overload">[2/2]</span></h2>
+<a id="a04b2cfebf36a686f3a48c9e21dac1ca6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04b2cfebf36a686f3a48c9e21dac1ca6">&#9670;&nbsp;</a></span>SetQuality() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Vec &gt; </div>
+template&lt;class Vec&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -710,7 +875,13 @@ template&lt;typename Vec &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>update</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -720,7 +891,7 @@ template&lt;typename Vec &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -730,9 +901,151 @@ template&lt;typename Vec &gt; </div>
   <table class="params">
     <tr><td class="paramname">channel</td><td>the channel on which to change the quality </td></tr>
     <tr><td class="paramname">value</td><td>the new quality </td></tr>
+    <tr><td class="paramname">update</td><td>if true, as it is by default, the new filter coefficients will be computed. Otherwise they will not be computed. </td></tr>
   </table>
   </dd>
 </dl>
+
+<p>Implements <a class="el" href="classavec_1_1_vec_biquad_filter_interface.html">avec::VecBiquadFilterInterface&lt; ScalarTypes&lt; Vec &gt;::Scalar &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a7c191a7eebca5ddb8bbdef1b19959c19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c191a7eebca5ddb8bbdef1b19959c19">&#9670;&nbsp;</a></span>SetState()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Vec&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classavec_1_1_vec_biquad_filter.html">avec::VecBiquadFilter</a>&lt; Vec &gt;::SetState </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>channel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar&#160;</td>
+          <td class="paramname"><em>state0</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar&#160;</td>
+          <td class="paramname"><em>state1</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the state of the filter for a specified channel. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>the channel for which to set the state of the filter </td></tr>
+    <tr><td class="paramname">state0</td><td>the first number of the state of the filter </td></tr>
+    <tr><td class="paramname">state1</td><td>the second number of the state of the filter </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac3dd7dfefe4b697a4ddcb8a452b2225c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3dd7dfefe4b697a4ddcb8a452b2225c">&#9670;&nbsp;</a></span>Setup() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Vec&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classavec_1_1_vec_biquad_filter.html">avec::VecBiquadFilter</a>&lt; Vec &gt;::Setup </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>reset</em> = <code>true</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Computes the filter coefficients. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">reset</td><td>if true, as it is by default, resets the state of filter, calling <a class="el" href="classavec_1_1_vec_biquad_filter.html#a32b2d345985c32a3196f8cd7ad1e6ac7" title="Resets the state of the filter, as if it was processing silence from an eternity.">Reset()</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aeea3f5aa08d3526f165ae9a265e0b6c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeea3f5aa08d3526f165ae9a265e0b6c2">&#9670;&nbsp;</a></span>Setup() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Vec&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classavec_1_1_vec_biquad_filter.html">avec::VecBiquadFilter</a>&lt; Vec &gt;::Setup </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>channel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>reset</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Computes the filter coefficients for a specified channel. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>the channel to compute the coefficients the coeffcient for </td></tr>
+    <tr><td class="paramname">reset</td><td>if true, as it is by default, resets the state of filter, calling <a class="el" href="classavec_1_1_vec_biquad_filter.html#a32b2d345985c32a3196f8cd7ad1e6ac7" title="Resets the state of the filter, as if it was processing silence from an eternity.">Reset()</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="classavec_1_1_vec_biquad_filter_interface.html">avec::VecBiquadFilterInterface&lt; ScalarTypes&lt; Vec &gt;::Scalar &gt;</a>.</p>
 
 </div>
 </div>
