@@ -33,9 +33,9 @@ enum class BiquadFilterType
 };
 
 /**
- * An interface for @see VecBiquadFilter that abstracts over the simd register
- * size. The only method included in this interface are those to set and get the
- * state and settings of the filter.
+ * An interface for VecBiquadFilter that abstracts over the simd register
+ * size. The only methods included in this interface are those to set and get the
+ * state and settings of the filter. @see VecBiquadFilter
  */
 template<typename Scalar>
 class VecBiquadFilterInterface
