@@ -994,8 +994,8 @@ public:
         srcFilter->Reset(src);
       }
       else if constexpr (VEC4_AVAILABLE) {
-        auto s4 = std::div(src, 4);
-        auto d4 = std::div(dst, 4);
+        auto s4 = std::div(srcChannel, 4);
+        auto d4 = std::div(dstChannel, 4);
         auto& srcFilter = filters4[s4.quot];
         auto& dstFilter = filters4[d4.quot];
         int src = s4.rem;
@@ -1025,8 +1025,8 @@ public:
         srcFilter.Reset(src);
       }
       else {
-        auto s2 = std::div(src, 2);
-        auto d2 = std::div(dst, 2);
+        auto s2 = std::div(srcChannel, 2);
+        auto d2 = std::div(dstChannel, 2);
         auto& srcFilter = filters2[s2.quot];
         auto& dstFilter = filters2[d2.quot];
         int src = s2.rem;
