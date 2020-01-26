@@ -126,12 +126,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a599dc63b91efe21fdc077cdcbea6eb64"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_interleaved_buffer.html#a599dc63b91efe21fdc077cdcbea6eb64">Deinterleave</a> (<a class="el" href="classavec_1_1_scalar_buffer.html">ScalarBuffer</a>&lt; Scalar &gt; &amp;output) const</td></tr>
 <tr class="memdesc:a599dc63b91efe21fdc077cdcbea6eb64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinterleaves the data to an output.  <a href="classavec_1_1_interleaved_buffer.html#a599dc63b91efe21fdc077cdcbea6eb64">More...</a><br /></td></tr>
 <tr class="separator:a599dc63b91efe21fdc077cdcbea6eb64"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aabbbbc0641fc7eac7f2d2a09dd377658"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_interleaved_buffer.html#aabbbbc0641fc7eac7f2d2a09dd377658">DeinterleaveTracks</a> (Scalar **output, int numOutputChannels, int numInputSamples, int numTracks) const</td></tr>
-<tr class="memdesc:aabbbbc0641fc7eac7f2d2a09dd377658"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinterleaves the data to an output of numOutputChannels channels, treating the <a class="el" href="classavec_1_1_interleaved_buffer.html" title="A multi channel buffer holding interleaved data to be used with simd vector functions from vectorclas...">InterleavedBuffer</a> data as a sequence of numTracks parallel tracks, which are summed together into the output.  <a href="classavec_1_1_interleaved_buffer.html#aabbbbc0641fc7eac7f2d2a09dd377658">More...</a><br /></td></tr>
-<tr class="separator:aabbbbc0641fc7eac7f2d2a09dd377658"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad6f698455725190ccd855e2d3145adfc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_interleaved_buffer.html#ad6f698455725190ccd855e2d3145adfc">DeinterleaveTracks</a> (<a class="el" href="classavec_1_1_scalar_buffer.html">ScalarBuffer</a>&lt; Scalar &gt; &amp;output, int numOutputChannels, int numTracks) const</td></tr>
-<tr class="memdesc:ad6f698455725190ccd855e2d3145adfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinterleaves the data to an output of numOutputChannels channels, treating the <a class="el" href="classavec_1_1_interleaved_buffer.html" title="A multi channel buffer holding interleaved data to be used with simd vector functions from vectorclas...">InterleavedBuffer</a> data as a sequence of numTracks parallel tracks, which are summed together into the output.  <a href="classavec_1_1_interleaved_buffer.html#ad6f698455725190ccd855e2d3145adfc">More...</a><br /></td></tr>
-<tr class="separator:ad6f698455725190ccd855e2d3145adfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e2f82b4a2afcff9bc406ced66d214b4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_interleaved_buffer.html#a6e2f82b4a2afcff9bc406ced66d214b4">Interleave</a> (Scalar *const *input, int numInputChannels, int numInputSamples)</td></tr>
 <tr class="memdesc:a6e2f82b4a2afcff9bc406ced66d214b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interleaves input data to the VecBuffers.  <a href="classavec_1_1_interleaved_buffer.html#a6e2f82b4a2afcff9bc406ced66d214b4">More...</a><br /></td></tr>
 <tr class="separator:a6e2f82b4a2afcff9bc406ced66d214b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -421,118 +415,6 @@ template&lt;typename Scalar&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if deinterleaving was successfull, false if the number of channel of the output is greater to the numChannel of the <a class="el" href="classavec_1_1_interleaved_buffer.html" title="A multi channel buffer holding interleaved data to be used with simd vector functions from vectorclas...">InterleavedBuffer</a> </dd></dl>
-
-</div>
-</div>
-<a id="aabbbbc0641fc7eac7f2d2a09dd377658"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aabbbbc0641fc7eac7f2d2a09dd377658">&#9670;&nbsp;</a></span>DeinterleaveTracks() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classavec_1_1_interleaved_buffer.html">avec::InterleavedBuffer</a>&lt; Scalar &gt;::DeinterleaveTracks </td>
-          <td>(</td>
-          <td class="paramtype">Scalar **&#160;</td>
-          <td class="paramname"><em>output</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>numOutputChannels</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>numInputSamples</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>numTracks</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Deinterleaves the data to an output of numOutputChannels channels, treating the <a class="el" href="classavec_1_1_interleaved_buffer.html" title="A multi channel buffer holding interleaved data to be used with simd vector functions from vectorclas...">InterleavedBuffer</a> data as a sequence of numTracks parallel tracks, which are summed together into the output. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">output</td><td>pointer to the memory in which to store the deinterleaved data. </td></tr>
-    <tr><td class="paramname">numOutputChannels</td><td>number of channels to deinterleave, should be less or equal to the numChannel of the <a class="el" href="classavec_1_1_interleaved_buffer.html" title="A multi channel buffer holding interleaved data to be used with simd vector functions from vectorclas...">InterleavedBuffer</a> </td></tr>
-    <tr><td class="paramname">numInputSamples</td><td>number of samples of each channel of the output </td></tr>
-    <tr><td class="paramname">numTracks</td><td>number of tracks </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>true if deinterleaving was successfull, false if numOutputChannels<ul>
-<li>numTracks is greater than the numChannel of the <a class="el" href="classavec_1_1_interleaved_buffer.html" title="A multi channel buffer holding interleaved data to be used with simd vector functions from vectorclas...">InterleavedBuffer</a> </li>
-</ul>
-</dd></dl>
-
-</div>
-</div>
-<a id="ad6f698455725190ccd855e2d3145adfc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad6f698455725190ccd855e2d3145adfc">&#9670;&nbsp;</a></span>DeinterleaveTracks() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classavec_1_1_interleaved_buffer.html">avec::InterleavedBuffer</a>&lt; Scalar &gt;::DeinterleaveTracks </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classavec_1_1_scalar_buffer.html">ScalarBuffer</a>&lt; Scalar &gt; &amp;&#160;</td>
-          <td class="paramname"><em>output</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>numOutputChannels</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>numTracks</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Deinterleaves the data to an output of numOutputChannels channels, treating the <a class="el" href="classavec_1_1_interleaved_buffer.html" title="A multi channel buffer holding interleaved data to be used with simd vector functions from vectorclas...">InterleavedBuffer</a> data as a sequence of numTracks parallel tracks, which are summed together into the output. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">output</td><td><a class="el" href="classavec_1_1_scalar_buffer.html" title="Multi channel buffer, holding an aligned_vector&lt;Scalar&gt; for each channel.">ScalarBuffer</a> in which to store the deinterleaved data. </td></tr>
-    <tr><td class="paramname">numTracks</td><td>number of tracks </td></tr>
-    <tr><td class="paramname">numOutputChannels</td><td>the requested number of output channels </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>true if deinterleaving was successfull, false if the number of channels of output multiplied by numTracks is greater than the numChannel of the <a class="el" href="classavec_1_1_interleaved_buffer.html" title="A multi channel buffer holding interleaved data to be used with simd vector functions from vectorclas...">InterleavedBuffer</a> </dd></dl>
 
 </div>
 </div>
