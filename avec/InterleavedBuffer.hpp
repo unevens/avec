@@ -179,43 +179,6 @@ public:
   }
 
   /**
-   * Deinterleaves the data to an output of numOutputChannels channels, treating
-   * the InterleavedBuffer data as a sequence of numTracks parallel tracks,
-   * which are summed together into the output.
-   * @param output pointer to the memory in which to store the deinterleaved
-   * data.
-   * @param numOutputChannels number of channels to deinterleave, should be less
-   * or equal to the numChannel of the InterleavedBuffer
-   * @param numInputSamples number of samples of each channel of the output
-   * @param numTracks number of tracks
-   * @return true if deinterleaving was successfull, false if numOutputChannels
-   * * numTracks is greater than the numChannel of the InterleavedBuffer
-   */
-  bool DeinterleaveTracks(Scalar** output,
-                          int numOutputChannels,
-                          int numInputSamples,
-                          int numTracks) const;
-
-  /**
-   * Deinterleaves the data to an output of numOutputChannels channels, treating
-   * the InterleavedBuffer data as a sequence of numTracks parallel tracks,
-   * which are summed together into the output.
-   * @param output ScalarBuffer in which to store the deinterleaved data.
-   * @param numTracks number of tracks
-   * @param numOutputChannels the requested number of output channels
-   * @return true if deinterleaving was successfull, false if the number of
-   * channels of output multiplied by numTracks is greater than the
-   * numChannel of the InterleavedBuffer
-   */
-  bool DeinterleaveTracks(ScalarBuffer<Scalar>& output,
-                          int numOutputChannels,
-                          int numTracks) const
-  {
-    return DeinterleaveTracks(
-      output.Get(), numOutputChannels, output.GetSize(), numTracks);
-  }
-
-  /**
    * Interleaves input data to the VecBuffers.
    * @param input pointer to the data to interleave.
    * @param numInputChannels number of channels to interleave, should be less
@@ -420,67 +383,6 @@ InterleavedBuffer<Scalar>::Deinterleave(Scalar** output,
       }
     }
     ++b;
-  }
-  return true;
-}
-
-template<typename Scalar>
-bool
-InterleavedBuffer<Scalar>::DeinterleaveTracks(Scalar** output,
-                                              int numOutputChannels,
-                                              int numOutputSamples,
-                                              int numTracks) const
-{
-  if (numOutputChannels * numTracks > numChannels ||
-      numOutputSamples > numSamples) {
-    return false;
-  }
-  for (int i = 0; i < numOutputChannels; ++i) {
-    std::fill_n(output[i], numOutputSamples, 0.f);
-  }
-  int b = 0;
-  for (int n = 0; n < numTracks; ++n) {
-    for (int c = 0; c < numOutputChannels; ++c) {
-
-      if constexpr (VEC8_AVAILABLE) {
-        auto d = std::div(b, 8);
-#if AVEC_MIX_VEC_SIZES
-        assert(d.quot <= buffers8.size());
-        if (d.quot == buffers8.size()) {
-          assert(buffers4.size() > 0);
-          for (int i = 0; i < numOutputSamples; ++i) {
-            output[c][i] += buffers4[0](4 * i + d.rem);
-          }
-        }
-        else {
-          for (int i = 0; i < numOutputSamples; ++i) {
-            output[c][i] += buffers8[d.quot](8 * i + d.rem);
-          }
-        }
-#else
-        assert(d.quot < buffers8.size());
-        for (int i = 0; i < numOutputSamples; ++i) {
-          output[c][i] += buffers8[d.quot](8 * i + d.rem);
-        }
-#endif
-      }
-
-      else if constexpr (VEC4_AVAILABLE) {
-        auto d = std::div(b, 4);
-        assert(d.quot < buffers4.size());
-        for (int i = 0; i < numOutputSamples; ++i) {
-          output[c][i] += buffers4[d.quot](4 * i + d.rem);
-        }
-      }
-      else {
-        auto d = std::div(b, 2);
-        assert(d.quot < buffers2.size());
-        for (int i = 0; i < numOutputSamples; ++i) {
-          output[c][i] += buffers2[d.quot](2 * i + d.rem);
-        }
-      }
-      ++b;
-    }
   }
   return true;
 }
