@@ -516,7 +516,7 @@ NoiseGenerator<Scalar>::Generate(InterleavedBuffer<Scalar>& outputBuffer,
     int lastBuffers2 = outputBuffer.GetNumBuffers2() - 1;
     for (int i = 0; i < generators2.size(); ++i) {
       VecBuffer<Vec2>* next =
-        (i < lastBuffers2) ? next : outputBuffer.GetBuffer2(i + 1);
+        (i < lastBuffers2) ? &outputBuffer.GetBuffer2(i + 1) : nullptr;
       generators2[i].Generate(outputBuffer.GetBuffer2(i), numSamples, next);
       numChannelsToGenerate -= 4;
       if (numChannelsToGenerate <= 0) {
