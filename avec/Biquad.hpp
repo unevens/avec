@@ -80,7 +80,7 @@ public:
                   double frequency_ = 0.1,
                   double quality_ = 0.79,
                   double gain_ = 0.0)
-    : buffer(14 * Vec::size())
+    : buffer(12 * Vec::size())
     , isSetupNeeded(Vec::size(), 0)
   {
     std::fill(filterType.begin(), filterType.end(), filterType_);
@@ -128,8 +128,8 @@ public:
       Vec b0_aut = buffer[9];
       Vec b1_aut = buffer[10];
       Vec b2_aut = buffer[11];
-      Vec prev0_aut = buffer[12];
-      Vec prev1_aut = buffer[13];
+      Vec prev0_aut = 0.0;
+      Vec prev1_aut = 0.0;
 
       Vec alpha = 0.f;
       Vec inc = 1.f / (float)numSamples;
@@ -152,8 +152,9 @@ public:
         alpha += inc;
       }
 
-      std::copy(
-        &buffer(7 * Vec::size()), &buffer(12 * Vec::size()), &buffer(0));
+      std::copy(&buffer(7 * Vec::size()),
+                &buffer(7 * Vec::size()) + 5 * Vec::size(),
+                &buffer(0));
       buffer[5] = prev0_aut;
       buffer[6] = prev1_aut;
     }
@@ -167,12 +168,11 @@ public:
   {
     buffer[5] = 0.0;
     buffer[6] = 0.0;
-    buffer[12] = 0.0;
-    buffer[13] = 0.0;
     if (isAutomating) {
       isAutomating = false;
-      std::copy(
-        &buffer(7 * Vec::size()), &buffer(12 * Vec::size()), &buffer(0));
+      std::copy(&buffer(7 * Vec::size()),
+                &buffer(7 * Vec::size()) + 5 * Vec::size(),
+                &buffer(0));
     }
   }
 
@@ -185,8 +185,6 @@ public:
   {
     buffer[5][channel] = 0.0;
     buffer[6][channel] = 0.0;
-    buffer[12][channel] = 0.0;
-    buffer[13][channel] = 0.0;
     if (isAutomating) {
       for (int i = 0; i < 5; ++i) {
         buffer[i] = buffer[7 + i];
@@ -508,8 +506,6 @@ public:
   {
     buffer[5][channel] = state0;
     buffer[6][channel] = state1;
-    buffer[12][channel] = state1;
-    buffer[13][channel] = state1;
   }
 
   /**
