@@ -634,43 +634,9 @@ public:
                double gain_ = 0.0)
     : numChannels(numChannels)
   {
-    int num8, num4, num2;
-    if constexpr (VEC8_AVAILABLE) {
-      if (numChannels <= 4) {
-        num4 = 1;
-        num8 = num2 = 0;
-      }
-      else {
-        auto d8 = std::div(numChannels, 8);
-        num8 = (int)d8.quot + (d8.rem > 4 ? 1 : 0);
-        num4 = (d8.rem > 0 && d8.rem <= 4) ? 1 : 0;
-        num2 = 0;
-      }
-    }
-    else if constexpr (VEC4_AVAILABLE) {
-      auto d4 = std::div(numChannels, 4);
-      num8 = 0;
-      if constexpr (VEC2_AVAILABLE) {
-        if (numChannels <= 2) {
-          num2 = 1;
-          num4 = 0;
-        }
-        else {
-          num4 = (int)d4.quot + (d4.rem > 2 ? 1 : 0);
-          num2 = (d4.rem > 0 d4.rem <= 2) ? 1 : 0;
-        }
-      }
-      else {
-        num4 = (int)d4.quot + (d4.rem > 0 ? 1 : 0);
-        num2 = 0;
-      }
-    }
-    else {
-      auto d4 = std::div(numChannels, 4);
-      num8 = 0;
-      num2 = (int)d4.quot + (d4.rem > 0 ? 1 : 0);
-      num4 = 0;
-    }
+    int num2, num4, num8;
+    GetNumOfVecBuffersUsedByInterleavedBuffer<Scalar>(
+      numChannels, num2, num4, num8);
     filters8.reserve(num8);
     filters4.reserve(num4);
     filters2.reserve(num2);

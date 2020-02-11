@@ -243,6 +243,62 @@ static_assert(
 static_assert(std::is_nothrow_move_assignable<InterleavedBuffer<float>>::value,
               "InterleavedBuffer should be noexcept move assignable");
 
+/**
+ * Computes the number of VecBuffer of sizes 2, 4, and 8 used by an
+ * InterleavedBuffer the supplied number of channels.
+ * @param numChannels the total number of channels
+ * @param num2 the number of VecBuffer<Vec2> used
+ * @param num4 the number of VecBuffer<Vec4> used
+ * @param num8 the number of VecBuffer<Vec8> used
+ */
+template<typename Scalar>
+inline void
+GetNumOfVecBuffersUsedByInterleavedBuffer(int numChannels,
+                                          int& num2,
+                                          int& num4,
+                                          int& num8)
+{
+  constexpr bool VEC8_AVAILABLE = SimdTypes<Scalar>::VEC8_AVAILABLE;
+  constexpr bool VEC4_AVAILABLE = SimdTypes<Scalar>::VEC4_AVAILABLE;
+  constexpr bool VEC2_AVAILABLE = SimdTypes<Scalar>::VEC2_AVAILABLE;
+  if constexpr (VEC8_AVAILABLE) {
+    if (numChannels <= 4) {
+      num4 = 1;
+      num8 = num2 = 0;
+    }
+    else {
+      auto d8 = std::div(numChannels, 8);
+      num8 = (int)d8.quot + (d8.rem > 4 ? 1 : 0);
+      num4 = (d8.rem > 0 && d8.rem <= 4) ? 1 : 0;
+      num2 = 0;
+    }
+  }
+  else if constexpr (VEC4_AVAILABLE) {
+    auto d4 = std::div(numChannels, 4);
+    num8 = 0;
+    if constexpr (VEC2_AVAILABLE) {
+      if (numChannels <= 2) {
+        num2 = 1;
+        num4 = 0;
+      }
+      else {
+        num4 = (int)d4.quot + (d4.rem > 2 ? 1 : 0);
+        num2 = (d4.rem > 0 && d4.rem <= 2) ? 1 : 0;
+      }
+    }
+    else {
+      num4 = (int)d4.quot + (d4.rem > 0 ? 1 : 0);
+      num2 = 0;
+    }
+  }
+  else {
+    auto d4 = std::div(numChannels, 4);
+    num8 = 0;
+    num2 = (int)d4.quot + (d4.rem > 0 ? 1 : 0);
+    num4 = 0;
+  }
+}
+
 // implementation
 
 template<typename Scalar>
@@ -286,43 +342,12 @@ void
 InterleavedBuffer<Scalar>::SetNumChannels(int value)
 {
   numChannels = value;
-  if constexpr (VEC8_AVAILABLE) {
-    if (numChannels <= 4) {
-      buffers4.resize(1);
-      buffers8.resize(0);
-      buffers2.resize(0);
-    }
-    else {
-      auto d8 = std::div(numChannels, 8);
-      buffers8.resize((std::size_t)d8.quot + (d8.rem > 4 ? 1 : 0));
-      buffers4.resize((d8.rem <= 4 && d8.rem > 0) ? 1 : 0);
-      buffers2.resize(0);
-    }
-  }
-  else if constexpr (VEC4_AVAILABLE) {
-    buffers8.resize(0);
-    auto d4 = std::div(numChannels, 4);
-    if constexpr (VEC2_AVAILABLE) {
-      if (numChannels <= 2) {
-        buffers2.resize(1);
-        buffers4.resize(0);
-      }
-      else {
-        buffers4.resize((std::size_t)d4.quot + (d4.rem > 2 ? 1 : 0));
-        buffers2.resize((d4.rem <= 2 && d4.rem > 0) ? 1 : 0);
-      }
-    }
-    else {
-      buffers4.resize((std::size_t)d4.quot + (d4.rem > 0 ? 1 : 0));
-      buffers2.resize(0);
-    }
-  }
-  else {
-    auto d2 = std::div(numChannels, 2);
-    buffers2.resize((std::size_t)d2.quot + (d2.rem > 0 ? 1 : 0));
-    buffers8.resize(0);
-    buffers4.resize(0);
-  }
+  int num2, num4, num8;
+  GetNumOfVecBuffersUsedByInterleavedBuffer<Scalar>(
+    numChannels, num2, num4, num8);
+  buffers8.resize(num8);
+  buffers4.resize(num4);
+  buffers2.resize(num2);
   Reserve(capacity);
   SetNumSamples(numSamples);
 }
