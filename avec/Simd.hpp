@@ -114,7 +114,38 @@ public:
 
   static_assert(std::is_same<Scalar, float>::value ||
                   std::is_same<Scalar, double>::value,
-                "Only floating point types are allowed here.");
+                "Only Vec8f Vec4f Vec8d Vec4d and Vec2d are allowed here.");
+};
+
+/**
+ * Static template class with an alias to deduce the mask type from
+ * vectorclass type.
+ * @tparam Vec the simd vector type.
+ */
+template<typename Vec>
+class MaskTypes
+{
+public:
+  /**
+   * The Mask type deduced from Vec.
+   */
+  using Mask = typename std::conditional<
+    std::is_same<Vec, Vec8f>::value,
+    Vec8fb,
+    std::conditional<
+      std::is_same<Vec, Vec4f>::value,
+      Vec4fb,
+      std::conditional<
+        std::is_same<Vec, Vec8d>::value,
+        Vec8db,
+        std::conditional<
+          std::is_same<Vec, Vec4d>::value,
+          Vec4db,
+          std::conditional<std::is_same<Vec, Vec2d>::value, Vec2db, bool>>>>>::
+    type;
+
+  static_assert(!std::is_same<Mask, bool>::value,
+                "Only Vec8f Vec4f Vec8d Vec4d and Vec2d are allowed here.");
 };
 
 } // namespace avec
