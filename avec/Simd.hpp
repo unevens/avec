@@ -141,8 +141,8 @@ public:
         std::conditional<
           std::is_same<Vec, Vec4d>::value,
           Vec4db,
-          std::conditional<std::is_same<Vec, Vec2d>::value, Vec2db, bool>>>>>::
-    type;
+          std::conditional<std::is_same<Vec, Vec2d>::value, Vec2db, bool>::
+            type>::type>::type>::type>::type;
 
   static_assert(!std::is_same<Mask, bool>::value,
                 "Only Vec8f Vec4f Vec8d Vec4d and Vec2d are allowed here.");

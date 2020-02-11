@@ -38,6 +38,9 @@ using SimdTypes = avec::SimdTypes<Scalar>;
 template<typename Vec>
 using ScalarTypes = avec::ScalarTypes<Vec>;
 
+template<typename Vec>
+using MaskTypes = avec::MaskTypes<Vec>;
+
 constexpr bool AVX_AVAILABLE = avec::AVX_AVAILABLE;
 constexpr bool AVX512_AVAILABLE = avec::AVX512_AVAILABLE;
 constexpr bool SSE2_AVAILABLE = avec::SSE2_AVAILABLE;
