@@ -554,12 +554,67 @@ class BiquadFilter final
   using Vec2 = typename SimdTypes<Scalar>::Vec2;
   static constexpr bool VEC8_AVAILABLE = SimdTypes<Scalar>::VEC8_AVAILABLE;
   static constexpr bool VEC4_AVAILABLE = SimdTypes<Scalar>::VEC4_AVAILABLE;
+  static constexpr bool VEC2_AVAILABLE = SimdTypes<Scalar>::VEC2_AVAILABLE;
 
   int numChannels;
 
   std::vector<VecBiquadFilter<Vec8>> filters8;
   std::vector<VecBiquadFilter<Vec4>> filters4;
   std::vector<VecBiquadFilter<Vec2>> filters2;
+
+  template<class Action, typename ValueType>
+  ValueType OnChannel(Action action, int channel)
+  {
+    if constexpr (VEC8_AVAILABLE) {
+      if (filters4.size() > 0) {
+        if (channel < 4) {
+          return action(static_cast<VecBiquadFilterInterface*>(&filters4[0]),
+                        channel);
+        }
+        else {
+          auto d8 = std::div(channel - 4, 8);
+          return action(
+            static_cast<VecBiquadFilterInterface*>(&filters8[d8.quot]), d8.rem);
+        }
+      }
+      else {
+        auto d8 = std::div(channel, 8);
+        return action(
+          static_cast<VecBiquadFilterInterface*>(&filters8[d8.quot]), d8.rem);
+      }
+    }
+    else if constexpr (VEC4_AVAILABLE) {
+      if constexpr (VEC2_AVAILABLE) {
+        if (filters2.size() > 0) {
+          if (channel < 2) {
+            return action(static_cast<VecBiquadFilterInterface*>(&filters2[0]),
+                          channel;
+          }
+          else {
+            auto d4 = std::div(channel - 2, 4);
+            return action(
+              static_cast<VecBiquadFilterInterface*>(&filters4[d4.quot]),
+              d4.rem);
+          }
+        }
+        else {
+          auto d4 = std::div(channel, 4);
+          return action(
+            static_cast<VecBiquadFilterInterface*>(&filters4[d4.quot]), d4.rem);
+        }
+      }
+      else {
+        auto d4 = std::div(channel, 4);
+        return action(
+          static_cast<VecBiquadFilterInterface*>(&filters4[d4.quot]), d4.rem);
+      }
+    }
+    else {
+      auto d2 = std::div(channel, 2);
+      return action(static_cast<VecBiquadFilterInterface*>(&filters2[d2.quot]),
+                    d2.rem);
+    }
+  }
 
 public:
   /**
@@ -581,21 +636,34 @@ public:
   {
     int num8, num4, num2;
     if constexpr (VEC8_AVAILABLE) {
-      auto d8 = std::div(numChannels, 8);
-#if AVEC_MIX_VEC_SIZES
-      num8 = (int)d8.quot + (d8.rem > 4 ? 1 : 0);
-      num4 = (d8.rem <= 4) ? 1 : 0;
-#else
-      num8 = (int)d8.quot + (d8.rem > 0 ? 1 : 0);
-      num4 = 0;
-#endif
-      num2 = 0;
+      if (numChannels <= 4) {
+        num4 = 1;
+        num8 = num2 = 0;
+      }
+      else {
+        auto d8 = std::div(numChannels, 8);
+        num8 = (int)d8.quot + (d8.rem > 4 ? 1 : 0);
+        num4 = (d8.rem > 0 && d8.rem <= 4) ? 1 : 0;
+        num2 = 0;
+      }
     }
     else if constexpr (VEC4_AVAILABLE) {
       auto d4 = std::div(numChannels, 4);
       num8 = 0;
-      num4 = (int)d4.quot + (d4.rem > 0 ? 1 : 0);
-      num2 = 0;
+      if constexpr (VEC2_AVAILABLE) {
+        if (numChannels <= 2) {
+          num2 = 1;
+          num4 = 0;
+        }
+        else {
+          num4 = (int)d4.quot + (d4.rem > 2 ? 1 : 0);
+          num2 = (d4.rem > 0 d4.rem <= 2) ? 1 : 0;
+        }
+      }
+      else {
+        num4 = (int)d4.quot + (d4.rem > 0 ? 1 : 0);
+        num2 = 0;
+      }
     }
     else {
       auto d4 = std::div(numChannels, 4);
@@ -638,22 +706,19 @@ public:
     int channelsCount = numChannelsToProcess;
 
     output.SetNumSamples(numSamples);
-    if constexpr (VEC8_AVAILABLE) {
-      for (int i = 0; i < filters8.size(); ++i) {
-        filters8[i].ProcessBlock(
-          input.GetBuffer8(i), output.GetBuffer8(i), numSamples);
-        channelsCount -= 8;
+
+    if constexpr (VEC2_AVAILABLE) {
+      int lastBuffers2 = output.GetNumBuffers2() - 1;
+      for (int i = 0; i < filters2.size(); ++i) {
+        filters2[i].ProcessBlock(
+          input.GetBuffer2(i), output.GetBuffer2(i), numSamples);
+        channelsCount -= 2;
         if (channelsCount <= 0) {
           break;
         }
       }
-      if (filters4.size() > 0) {
-        filters4[0].ProcessBlock(
-          input.GetBuffer4(0), output.GetBuffer4(0), numSamples);
-        channelsCount -= 4;
-      }
     }
-    else if constexpr (VEC4_AVAILABLE) {
+    if constexpr (VEC4_AVAILABLE) {
       for (int i = 0; i < filters4.size(); ++i) {
         filters4[i].ProcessBlock(
           input.GetBuffer4(i), output.GetBuffer4(i), numSamples);
@@ -663,12 +728,11 @@ public:
         }
       }
     }
-    else {
-      int lastBuffers2 = output.GetNumBuffers2() - 1;
-      for (int i = 0; i < filters2.size(); ++i) {
-        filters2[i].ProcessBlock(
-          input.GetBuffer2(i), output.GetBuffer2(i), numSamples);
-        channelsCount -= 2;
+    if constexpr (VEC8_AVAILABLE) {
+      for (int i = 0; i < filters8.size(); ++i) {
+        filters8[i].ProcessBlock(
+          input.GetBuffer8(i), output.GetBuffer8(i), numSamples);
+        channelsCount -= 8;
         if (channelsCount <= 0) {
           break;
         }
@@ -702,28 +766,12 @@ public:
    */
   void SetFrequency(int channel, double value, bool update = true)
   {
-    if constexpr (VEC8_AVAILABLE) {
-      auto d = std::div(channel, 8);
-#if AVEC_MIX_VEC_SIZES
-      if (d.quot < filters8.size()) {
-        filters8[d.quot].SetFrequency(d.rem, value, update);
-      }
-      else {
-        assert(d.quot == filters8.size());
-        filters4[0].SetFrequency(d.rem, value, update);
-      }
-#else
-      filters8[d.quot].SetFrequency(d.rem, value, update);
-#endif
-    }
-    else if constexpr (VEC4_AVAILABLE) {
-      auto d = std::div(channel, 4);
-      filters4[d.quot].SetFrequency(d.rem, value, update);
-    }
-    else {
-      auto d = std::div(channel, 2);
-      filters2[d.quot].SetFrequency(d.rem, value, update);
-    }
+    OnChannel(
+      [value, update](auto* filter, int channel) {
+        filter->SetFrequency(channel, value, update);
+        return 0.0;
+      },
+      channel);
   }
 
   /**
@@ -735,28 +783,12 @@ public:
    */
   void SetGain(int channel, double value, bool update = true)
   {
-    if constexpr (VEC8_AVAILABLE) {
-      auto d = std::div(channel, 8);
-#if AVEC_MIX_VEC_SIZES
-      if (d.quot < filters8.size()) {
-        filters8[d.quot].SetGain(d.rem, value, update);
-      }
-      else {
-        assert(d.quot == filters8.size());
-        filters4[0].SetGain(d.rem, value, update);
-      }
-#else
-      filters8[d.quot].SetGain(d.rem, value, update);
-#endif
-    }
-    else if constexpr (VEC4_AVAILABLE) {
-      auto d = std::div(channel, 4);
-      filters4[d.quot].SetGain(d.rem, value, update);
-    }
-    else {
-      auto d = std::div(channel, 2);
-      filters2[d.quot].SetGain(d.rem, value, update);
-    }
+    OnChannel(
+      [value, update](auto* filter, int channel) {
+        filter->SetGain(channel, value, update);
+        return 0.0;
+      },
+      channel);
   }
 
   /**
@@ -768,28 +800,12 @@ public:
    */
   void SetQuality(int channel, double value, bool update = true)
   {
-    if constexpr (VEC8_AVAILABLE) {
-      auto d = std::div(channel, 8);
-#if AVEC_MIX_VEC_SIZES
-      if (d.quot < filters8.size()) {
-        filters8[d.quot].SetQuality(d.rem, value, update);
-      }
-      else {
-        assert(d.quot == filters8.size());
-        filters4[0].SetQuality(d.rem, value, update);
-      }
-#else
-      filters8[d.quot].SetQuality(d.rem, value, update);
-#endif
-    }
-    else if constexpr (VEC4_AVAILABLE) {
-      auto d = std::div(channel, 4);
-      filters4[d.quot].SetQuality(d.rem, value, update);
-    }
-    else {
-      auto d = std::div(channel, 2);
-      filters2[d.quot].SetQuality(d.rem, value, update);
-    }
+    OnChannel(
+      [value, update](auto* filter, int channel) {
+        filter->SetQuality(channel, value, update);
+        return 0.0;
+      },
+      channel);
   }
 
   /**
@@ -803,28 +819,12 @@ public:
                            BiquadFilterType value,
                            bool update = true)
   {
-    if constexpr (VEC8_AVAILABLE) {
-      auto d = std::div(channel, 8);
-#if AVEC_MIX_VEC_SIZES
-      if (d.quot < filters8.size()) {
-        filters8[d.quot].SetBiquadFilterType(d.rem, value, update);
-      }
-      else {
-        assert(d.quot == filters8.size());
-        filters4[0].SetBiquadFilterType(d.rem, value, update);
-      }
-#else
-      filters8[d.quot].SetBiquadFilterType(d.rem, value, update);
-#endif
-    }
-    else if constexpr (VEC4_AVAILABLE) {
-      auto d = std::div(channel, 4);
-      filters4[d.quot].SetBiquadFilterType(d.rem, value, update);
-    }
-    else {
-      auto d = std::div(channel, 2);
-      filters2[d.quot].SetBiquadFilterType(d.rem, value, update);
-    }
+    OnChannel(
+      [value, update](auto* filter, int channel) {
+        filter->SetBiquadFilterType(channel, value, update);
+        return 0.0;
+      },
+      channel);
   }
 
   /**
@@ -910,28 +910,9 @@ public:
    */
   double GetFrequency(int channel) const
   {
-    if constexpr (VEC8_AVAILABLE) {
-      auto d = std::div(channel, 8);
-#if AVEC_MIX_VEC_SIZES
-      if (d.quot < filters8.size()) {
-        return filters8[d.quot].GetFrequency(d.rem);
-      }
-      else {
-        assert(d.quot == filters8.size());
-        return filters4[0].GetFrequency(d.rem);
-      }
-#else
-      return filters8[d.quot].GetFrequency(d.rem);
-#endif
-    }
-    else if constexpr (VEC4_AVAILABLE) {
-      auto d = std::div(channel, 4);
-      return filters4[d.quot].GetFrequency(d.rem);
-    }
-    else {
-      auto d = std::div(channel, 2);
-      return filters2[d.quot].GetFrequency(d.rem);
-    }
+    OnChannel(
+      [](auto* filter, int channel) { return filter->GetFrequency(channel); },
+      channel);
   }
 
   /**
@@ -941,28 +922,9 @@ public:
    */
   double GetGain(int channel) const
   {
-    if constexpr (VEC8_AVAILABLE) {
-      auto d = std::div(channel, 8);
-#if AVEC_MIX_VEC_SIZES
-      if (d.quot < filters8.size()) {
-        return filters8[d.quot].GetGain(d.rem);
-      }
-      else {
-        assert(d.quot == filters8.size());
-        return filters4[0].GetGain(d.rem);
-      }
-#else
-      return filters8[d.quot].GetGain(d.rem);
-#endif
-    }
-    else if constexpr (VEC4_AVAILABLE) {
-      auto d = std::div(channel, 4);
-      return filters4[d.quot].GetGain(d.rem);
-    }
-    else {
-      auto d = std::div(channel, 2);
-      return filters2[d.quot].GetGain(d.rem);
-    }
+    OnChannel(
+      [](auto* filter, int channel) { return filter->GetGain(channel); },
+      channel);
   }
 
   /**
@@ -972,28 +934,9 @@ public:
    */
   double GetQuality(int channel) const
   {
-    if constexpr (VEC8_AVAILABLE) {
-      auto d = std::div(channel, 8);
-#if AVEC_MIX_VEC_SIZES
-      if (d.quot < filters8.size()) {
-        return filters8[d.quot].GetQuality(d.rem);
-      }
-      else {
-        assert(d.quot == filters8.size());
-        return filters4[0].GetQuality(d.rem);
-      }
-#else
-      return filters8[d.quot].GetQuality(d.rem);
-#endif
-    }
-    else if constexpr (VEC4_AVAILABLE) {
-      auto d = std::div(channel, 4);
-      return filters4[d.quot].GetQuality(d.rem);
-    }
-    else {
-      auto d = std::div(channel, 2);
-      return filters2[d.quot].GetQuality(d.rem);
-    }
+    OnChannel(
+      [](auto* filter, int channel) { return filter->GetQuality(channel); },
+      channel);
   }
 
   /**
@@ -1003,73 +946,15 @@ public:
    */
   BiquadFilterType GetBiquadFilterType(int channel) const
   {
-    if constexpr (VEC8_AVAILABLE) {
-      auto d = std::div(channel, 8);
-#if AVEC_MIX_VEC_SIZES
-      if (d.quot < filters8.size()) {
-        return filters8[d.quot].GetBiquadFilterType(d.rem);
-      }
-      else {
-        assert(d.quot == filters8.size());
-        return filters4[0].GetBiquadFilterType(d.rem);
-      }
-#else
-      return filters8[d.quot].GetBiquadFilterType(d.rem);
-#endif
-    }
-    else if constexpr (VEC4_AVAILABLE) {
-      auto d = std::div(channel, 4);
-      return filters4[d.quot].GetBiquadFilterType(d.rem);
-    }
-    else {
-      auto d = std::div(channel, 2);
-      return filters2[d.quot].GetBiquadFilterType(d.rem);
-    }
+    OnChannel([](auto* filter,
+                 int channel) { return filter->GetBiquadFilterType(channel); },
+              channel);
   }
 
   /**
    * @return the maximum number of channel that the generator can work with.
    */
   int GetNumChannels() const { return numChannels; }
-
-  /**
-   * Resets the state of the filter for a sequence of channels.
-   * @param srcChannelStart the first channel to be reset
-   * @param numChannelsToReset the number of channels to reset
-   */
-  void Reset(int srcChannelStart, int numChannelsToReset)
-  {
-    for (int i = srcChannelStart; i < srcChannelStart + numChannelsToReset;
-         ++i) {
-
-      if constexpr (VEC8_AVAILABLE) {
-        auto d8 = std::div(i, 8);
-
-#if AVEC_MIX_VEC_SIZES
-
-        VecBiquadFilterInterface<Scalar>* filter =
-          d8.quot < filters8.size()
-            ? static_cast<VecBiquadFilterInterface<Scalar>*>(&filters8[d8.quot])
-            : static_cast<VecBiquadFilterInterface<Scalar>*>(&filters4[0]);
-
-#else
-
-        VecBiquadFilter<Vec8>* filter = &filters8[d8.quot];
-
-#endif
-
-        filter->Reset(d8.rem);
-      }
-      else if constexpr (VEC4_AVAILABLE) {
-        auto d4 = std::div(i, 4);
-        filters4[d4.quot].Reset(d4.rem);
-      }
-      else {
-        auto d2 = std::div(i, 2);
-        filters2[d4.quot].Reset(d2.rem);
-      }
-    }
-  }
 
   /**
    * Computes any the coefficients necessary for the computation that was not
@@ -1085,142 +970,6 @@ public:
     }
     for (auto& f : filters2) {
       f.MakeReady();
-    }
-  }
-
-  /**
-   * Copies the state and settings of the filter from sequence of channels to
-   * an other sequence of channels, and resets the latter.
-   * @param srcChannelStart the first channel to be moved
-   * @param dstChannelStart the destination for the first channel to be moved
-   * @param numChannelsToMove the number of channels to move
-   */
-  void MoveChannelStates(int srcChannelStart,
-                         int dstChannelStart,
-                         int numChannelsToMove)
-  {
-    double srcFrequency;
-    double srcQuality;
-    double srcGain;
-    BiquadFilterType srcType;
-
-    Scalar srcState0;
-    Scalar srcState1;
-
-    for (int i = 0; i < numChannelsToMove; ++i) {
-      int srcChannel = srcChannelStart + i;
-      int dstChannel = dstChannelStart + i;
-
-      if constexpr (VEC8_AVAILABLE) {
-        auto s8 = std::div(srcChannel, 8);
-        auto d8 = std::div(dstChannel, 8);
-
-#if AVEC_MIX_VEC_SIZES
-
-        VecBiquadFilterInterface<Scalar>* srcFilter =
-          s8.quot < filters8.size()
-            ? static_cast<VecBiquadFilterInterface<Scalar>*>(&filters8[s8.quot])
-            : static_cast<VecBiquadFilterInterface<Scalar>*>(&filters4[0]);
-        VecBiquadFilterInterface<Scalar>* dstFilter =
-          d8.quot < filters8.size()
-            ? static_cast<VecBiquadFilterInterface<Scalar>*>(&filters8[d8.quot])
-            : static_cast<VecBiquadFilterInterface<Scalar>*>(&filters4[0]);
-
-#else
-
-        VecBiquadFilter<Vec8>* srcFilter = &filters8[s8.quot];
-        VecBiquadFilter<Vec8>* dstFilter = &filters8[d8.quot];
-
-#endif
-
-        int src = s8.rem;
-        int dst = d8.rem;
-
-        srcFrequency = srcFilter->GetFrequency(src);
-        srcQuality = srcFilter->GetQuality(src);
-        srcGain = srcFilter->GetGain(src);
-        srcType = srcFilter->GetBiquadFilterType(src);
-
-        bool needsSetup = (srcFrequency != dstFilter->GetFrequency(dst)) ||
-                          (srcQuality != dstFilter->GetQuality(dst)) ||
-                          (srcGain != dstFilter->GetGain(dst)) ||
-                          (srcType != dstFilter->GetBiquadFilterType(dst));
-
-        dstFilter->SetFrequency(dst, srcFrequency, false);
-        dstFilter->SetQuality(dst, srcQuality, false);
-        dstFilter->SetGain(dst, srcGain, false);
-        dstFilter->SetBiquadFilterType(dst, srcType, false);
-
-        if (needsSetup) {
-          dstFilter->Setup(dst, false, false);
-        }
-
-        srcFilter->GetState(src, srcState0, srcState1);
-        dstFilter->SetState(dst, srcState0, srcState1);
-        srcFilter->Reset(src);
-      }
-      else if constexpr (VEC4_AVAILABLE) {
-        auto s4 = std::div(srcChannel, 4);
-        auto d4 = std::div(dstChannel, 4);
-        auto& srcFilter = filters4[s4.quot];
-        auto& dstFilter = filters4[d4.quot];
-        int src = s4.rem;
-        int dst = d4.rem;
-
-        srcFrequency = srcFilter.GetFrequency(src);
-        srcQuality = srcFilter.GetQuality(src);
-        srcGain = srcFilter.GetGain(src);
-        srcType = srcFilter.GetBiquadFilterType(src);
-
-        bool needsSetup = (srcFrequency != dstFilter.GetFrequency(dst)) ||
-                          (srcQuality != dstFilter.GetQuality(dst)) ||
-                          (srcGain != dstFilter.GetGain(dst)) ||
-                          (srcType != dstFilter.GetBiquadFilterType(dst));
-
-        dstFilter.SetFrequency(dst, srcFrequency, false);
-        dstFilter.SetQuality(dst, srcQuality, false);
-        dstFilter.SetGain(dst, srcGain, false);
-        dstFilter.SetBiquadFilterType(dst, srcType, false);
-
-        if (needsSetup) {
-          dstFilter.Setup(dst, false, false);
-        }
-
-        srcFilter.GetState(src, srcState0, srcState1);
-        dstFilter.SetState(dst, srcState0, srcState1);
-        srcFilter.Reset(src);
-      }
-      else {
-        auto s2 = std::div(srcChannel, 2);
-        auto d2 = std::div(dstChannel, 2);
-        auto& srcFilter = filters2[s2.quot];
-        auto& dstFilter = filters2[d2.quot];
-        int src = s2.rem;
-        int dst = d2.rem;
-
-        srcFrequency = srcFilter.GetFrequency(src);
-        srcQuality = srcFilter.GetQuality(src);
-        srcGain = srcFilter.GetGain(src);
-        srcType = srcFilter.GetBiquadFilterType(src);
-
-        bool needsSetup = (srcFrequency != dstFilter.GetFrequency(dst)) ||
-                          (srcQuality != dstFilter.GetQuality(dst)) ||
-                          (srcGain != dstFilter.GetGain(dst)) ||
-                          (srcType != dstFilter.GetBiquadFilterType(dst));
-
-        dstFilter.SetFrequency(dst, srcFrequency, false);
-        dstFilter.SetQuality(dst, srcQuality, false);
-        dstFilter.SetGain(dst, srcGain, false);
-        dstFilter.SetBiquadFilterType(dst, srcType, false);
-
-        if (needsSetup) {
-          dstFilter.Setup(dst, false, false);
-        }
-
-        srcFilter.GetState(src, srcState0, srcState1);
-        dstFilter.SetState(dst, srcState0, srcState1);
-        srcFilter.Reset(src);
-      }
     }
   }
 };

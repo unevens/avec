@@ -65,6 +65,11 @@ struct SimdTypes
    */
   static constexpr bool VEC4_AVAILABLE =
     std::is_same<Scalar, float>::value ? true : AVX_AVAILABLE;
+  /**
+   * bool constexpr, true if 2 elements vector are available.
+   */
+  static constexpr bool VEC2_AVAILABLE =
+    std::is_same<Scalar, double>::value ? true : false;
 };
 
 /**

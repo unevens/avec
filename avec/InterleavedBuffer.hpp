@@ -20,10 +20,6 @@ limitations under the License.
 #include "avec/VecBuffer.hpp"
 #include <algorithm>
 
-#ifndef AVEC_MIX_VEC_SIZES
-#define AVEC_MIX_VEC_SIZES 1
-#endif
-
 namespace avec {
 
 /**
@@ -41,6 +37,7 @@ class InterleavedBuffer final
 
   static constexpr bool VEC8_AVAILABLE = SimdTypes<Scalar>::VEC8_AVAILABLE;
   static constexpr bool VEC4_AVAILABLE = SimdTypes<Scalar>::VEC4_AVAILABLE;
+  static constexpr bool VEC2_AVAILABLE = SimdTypes<Scalar>::VEC2_AVAILABLE;
 
   std::vector<VecBuffer<Vec8>> buffers8;
   std::vector<VecBuffer<Vec4>> buffers4;
@@ -290,23 +287,35 @@ InterleavedBuffer<Scalar>::SetNumChannels(int value)
 {
   numChannels = value;
   if constexpr (VEC8_AVAILABLE) {
-    auto d8 = std::div(numChannels, 8);
-#if AVEC_MIX_VEC_SIZES
-    buffers8.resize((std::size_t)d8.quot + (d8.rem > 4 ? 1 : 0));
-
-    buffers4.resize((d8.rem <= 4 && d8.rem > 0) ? 1 : 0);
-    buffers2.resize(0);
-#else
-    buffers8.resize((std::size_t)d8.quot + (d8.rem > 0 ? 1 : 0));
-    buffers4.resize(0);
-    buffers2.resize(0);
-#endif
+    if (numChannels <= 4) {
+      buffers4.resize(1);
+      buffers8.resize(0);
+      buffers2.resize(0);
+    }
+    else {
+      auto d8 = std::div(numChannels, 8);
+      buffers8.resize((std::size_t)d8.quot + (d8.rem > 4 ? 1 : 0));
+      buffers4.resize((d8.rem <= 4 && d8.rem > 0) ? 1 : 0);
+      buffers2.resize(0);
+    }
   }
   else if constexpr (VEC4_AVAILABLE) {
-    auto d4 = std::div(numChannels, 4);
     buffers8.resize(0);
-    buffers4.resize((std::size_t)d4.quot + (d4.rem > 0 ? 1 : 0));
-    buffers2.resize(0);
+    auto d4 = std::div(numChannels, 4);
+    if constexpr (VEC2_AVAILABLE) {
+      if (numChannels <= 2) {
+        buffers2.resize(1);
+        buffers4.resize(0);
+      }
+      else {
+        buffers4.resize((std::size_t)d4.quot + (d4.rem > 2 ? 1 : 0));
+        buffers2.resize((d4.rem <= 2 && d4.rem > 0) ? 1 : 0);
+      }
+    }
+    else {
+      buffers4.resize((std::size_t)d4.quot + (d4.rem > 0 ? 1 : 0));
+      buffers2.resize(0);
+    }
   }
   else {
     auto d2 = std::div(numChannels, 2);
@@ -342,49 +351,74 @@ InterleavedBuffer<Scalar>::Deinterleave(Scalar** output,
   if (numOutputChannels > numChannels || numOutputSamples > numSamples) {
     return false;
   }
-  int b = 0;
-  for (int c = 0; c < numOutputChannels; ++c) {
 
-    if constexpr (VEC8_AVAILABLE) {
-      auto d = std::div(b, 8);
-#if AVEC_MIX_VEC_SIZES
-      assert(d.quot <= buffers8.size());
-      if (d.quot == buffers8.size()) {
-        assert(buffers4.size() > 0);
-        for (int i = 0; i < numOutputSamples; ++i) {
-          output[c][i] = buffers4[0](4 * i + d.rem);
+  int processedChannels = 0;
+
+  if constexpr (VEC2_AVAILABLE) {
+    if (buffers2.size() > 0) {
+      auto d2 = std::div(numOutputChannels, 2);
+      for (int b = 0;
+           b < std::min(d2.quot + (d2.rem > 0 ? 1 : 0), (int)buffers2.size());
+           ++b) {
+        int r = std::min(2, numOutputChannels - processedChannels);
+        for (int i = 0; i < r; ++i) {
+          auto c = i + processedChannels;
+          for (int j = 0; j < numOutputSamples; ++j) {
+            output[c][j] = buffers2[b](j * 2 + i);
+          }
+        }
+        processedChannels += r;
+        assert(processedChannels <= numOutputChannels);
+        if (processedChannels == numOutputChannels) {
+          return true;
         }
       }
-      else {
-        for (int i = 0; i < numOutputSamples; ++i) {
-          output[c][i] = buffers8[d.quot](8 * i + d.rem);
-        }
-      }
-#else
-      assert(d.quot < buffers8.size());
-      for (int i = 0; i < numOutputSamples; ++i) {
-        output[c][i] = buffers8[d.quot](8 * i + d.rem);
-      }
-#endif
     }
-
-    else if constexpr (VEC4_AVAILABLE) {
-      auto d = std::div(b, 4);
-      assert(d.quot < buffers4.size());
-      for (int i = 0; i < numOutputSamples; ++i) {
-        output[c][i] = buffers4[d.quot](4 * i + d.rem);
-      }
-    }
-    else {
-      auto d = std::div(b, 2);
-      assert(d.quot < buffers2.size());
-      for (int i = 0; i < numOutputSamples; ++i) {
-        output[c][i] = buffers2[d.quot](2 * i + d.rem);
-      }
-    }
-    ++b;
   }
-  return true;
+  if constexpr (VEC4_AVAILABLE) {
+    if (buffers4.size() > 0) {
+      auto d4 = std::div(numOutputChannels, 4);
+      for (int b = 0;
+           b < std::min(d4.quot + (d4.rem > 0 ? 1 : 0), (int)buffers4.size());
+           ++b) {
+        int r = std::min(4, numOutputChannels - processedChannels);
+        for (int i = 0; i < r; ++i) {
+          auto c = i + processedChannels;
+          for (int j = 0; j < numOutputSamples; ++j) {
+            output[c][j] = buffers4[b](j * 4 + i);
+          }
+        }
+        processedChannels += r;
+        assert(processedChannels <= numOutputChannels);
+        if (processedChannels == numOutputChannels) {
+          return true;
+        }
+      }
+    }
+  }
+  if constexpr (VEC8_AVAILABLE) {
+    if (buffers8.size() > 0) {
+      auto d8 = std::div(numOutputChannels, 8);
+      for (int b = 0;
+           b < std::min(d8.quot + (d8.rem > 0), (int)buffers8.size());
+           ++b) {
+        int r = std::min(8, numOutputChannels - processedChannels);
+        for (int i = 0; i < r; ++i) {
+          auto c = i + processedChannels;
+          for (int j = 0; j < numOutputSamples; ++j) {
+            output[c][j] = buffers8[b](j * 8 + i);
+          }
+        }
+        processedChannels += r;
+        assert(processedChannels <= numOutputChannels);
+        if (processedChannels == numOutputChannels) {
+          return true;
+        }
+      }
+    }
+  }
+  assert(false);
+  return false;
 }
 
 template<typename Scalar>
@@ -416,66 +450,70 @@ InterleavedBuffer<Scalar>::Interleave(Scalar* const* input,
   }
 
   int processedChannels = 0;
-  if constexpr (VEC8_AVAILABLE) {
-    auto d8 = std::div(numInputChannels, 8);
 
-    for (int b = 0; b < std::min(d8.quot + (d8.rem > 0), (int)buffers8.size());
-         ++b) {
-      int r = std::min(8, numInputChannels - processedChannels);
-      for (int i = 0; i < r; ++i) {
-        auto c = b * 8 + i;
-        for (int j = 0; j < numInputSamples; ++j) {
-          buffers8[b](j * 8 + i) = input[c][j];
+  if constexpr (VEC2_AVAILABLE) {
+    if (buffers2.size() > 0) {
+      auto d2 = std::div(numInputChannels, 2);
+      for (int b = 0;
+           b < std::min(d2.quot + (d2.rem > 0 ? 1 : 0), (int)buffers2.size());
+           ++b) {
+        int r = std::min(2, numInputChannels - processedChannels);
+        for (int i = 0; i < r; ++i) {
+          auto c = i + processedChannels;
+          for (int j = 0; j < numInputSamples; ++j) {
+            buffers2[b](j * 2 + i) = input[c][j];
+          }
         }
-      }
-      processedChannels += r;
-      assert(processedChannels <= numInputChannels);
-      if (processedChannels == numInputChannels) {
-        return true;
+        processedChannels += r;
+        assert(processedChannels <= numInputChannels);
+        if (processedChannels == numInputChannels) {
+          return true;
+        }
       }
     }
   }
-
   if constexpr (VEC4_AVAILABLE) {
-    auto d4 = std::div(numInputChannels, 4);
-    for (int b = 0;
-         b < std::min(d4.quot + (d4.rem > 0 ? 1 : 0), (int)buffers4.size());
-         ++b) {
-      int r = std::min(4, numInputChannels - processedChannels);
-      for (int i = 0; i < r; ++i) {
-        auto c = b * 4 + i;
-        for (int j = 0; j < numInputSamples; ++j) {
-          buffers4[b](j * 4 + i) = input[c][j];
+    if (buffers4.size() > 0) {
+      auto d4 = std::div(numInputChannels, 4);
+      for (int b = 0;
+           b < std::min(d4.quot + (d4.rem > 0 ? 1 : 0), (int)buffers4.size());
+           ++b) {
+        int r = std::min(4, numInputChannels - processedChannels);
+        for (int i = 0; i < r; ++i) {
+          auto c = i + processedChannels;
+          for (int j = 0; j < numInputSamples; ++j) {
+            buffers4[b](j * 4 + i) = input[c][j];
+          }
         }
-      }
-      processedChannels += r;
-      assert(processedChannels <= numInputChannels);
-      if (processedChannels == numInputChannels) {
-        return true;
+        processedChannels += r;
+        assert(processedChannels <= numInputChannels);
+        if (processedChannels == numInputChannels) {
+          return true;
+        }
       }
     }
   }
-
-  else {
-    auto d2 = std::div(numInputChannels, 2);
-    for (int b = 0;
-         b < std::min(d2.quot + (d2.rem > 0 ? 1 : 0), (int)buffers2.size());
-         ++b) {
-      int r = std::min(2, numInputChannels - processedChannels);
-      for (int i = 0; i < r; ++i) {
-        auto c = b * 2 + i;
-        for (int j = 0; j < numInputSamples; ++j) {
-          buffers2[b](j * 2 + i) = input[c][j];
+  if constexpr (VEC8_AVAILABLE) {
+    if (buffers8.size() > 0) {
+      auto d8 = std::div(numInputChannels, 8);
+      for (int b = 0;
+           b < std::min(d8.quot + (d8.rem > 0), (int)buffers8.size());
+           ++b) {
+        int r = std::min(8, numInputChannels - processedChannels);
+        for (int i = 0; i < r; ++i) {
+          auto c = i + processedChannels;
+          for (int j = 0; j < numInputSamples; ++j) {
+            buffers8[b](j * 8 + i) = input[c][j];
+          }
         }
-      }
-      processedChannels += r;
-      assert(processedChannels <= numInputChannels);
-      if (processedChannels == numInputChannels) {
-        return true;
+        processedChannels += r;
+        assert(processedChannels <= numInputChannels);
+        if (processedChannels == numInputChannels) {
+          return true;
+        }
       }
     }
   }
-
   assert(false);
   return false;
 }
@@ -485,22 +523,40 @@ Scalar const*
 InterleavedBuffer<Scalar>::At(int channel, int sample) const
 {
   if constexpr (VEC8_AVAILABLE) {
-#if AVEC_MIX_VEC_SIZES
-    auto d8 = std::div(channel, 8);
-    if (d8.quot < buffers8.size()) {
-      return &buffers8[d8.quot](8 * sample + d8.rem);
+    if (buffers4.size() > 0) {
+      if (channel < 4) {
+        return &buffers4[0](4 * sample + channel);
+      }
+      else {
+        auto d8 = std::div(channel - 4, 8);
+        return &buffers8[d8.quot](8 * sample + d8.rem);
+      }
     }
     else {
-      return &buffers4[0](4 * sample + d8.rem);
+      auto d8 = std::div(channel, 8);
+      return &buffers8[d8.quot](8 * sample + d8.rem);
     }
-#else
-    auto d8 = std::div(channel, 8);
-    return &buffers8[d8.quot](8 * sample + d8.rem);
-#endif
   }
   else if constexpr (VEC4_AVAILABLE) {
-    auto d4 = std::div(channel, 4);
-    return &buffers4[d4.quot](4 * sample + d4.rem);
+    if constexpr (VEC2_AVAILABLE) {
+      if (buffers2.size() > 0) {
+        if (channel < 2) {
+          return &buffers2[0](2 * sample + channel);
+        }
+        else {
+          auto d4 = std::div(channel - 2, 4);
+          return &buffers4[d4.quot](4 * sample + d4.rem);
+        }
+      }
+      else {
+        auto d4 = std::div(channel, 4);
+        return &buffers4[d4.quot](4 * sample + d4.rem);
+      }
+    }
+    else {
+      auto d4 = std::div(channel, 4);
+      return &buffers4[d4.quot](4 * sample + d4.rem);
+    }
   }
   else {
     auto d2 = std::div(channel, 2);

@@ -69,16 +69,16 @@ template<typename Scalar>
 void
 TestInterleavedBuffer(int numChannels, int samplesPerBlock)
 {
-  cout << "Testing InterleavedBuffer with " << numChannels
-       << "channels and "
+  cout << "Testing InterleavedBuffer with " << numChannels << "channels and "
        << (typeid(Scalar) == typeid(float) ? "single" : "double")
        << " precision\n";
   // prepare data
+  int v = 0;
   Scalar** inout = new Scalar*[numChannels];
   for (int i = 0; i < numChannels; ++i) {
     inout[i] = new Scalar[samplesPerBlock];
     for (int s = 0; s < samplesPerBlock; ++s) {
-      inout[i][s] = (Scalar)s;
+      inout[i][s] = (Scalar)v++;
     }
   }
   // interleaver test
@@ -100,10 +100,11 @@ TestInterleavedBuffer(int numChannels, int samplesPerBlock)
   }
   buffer.Deinterleave(inout, numChannels, samplesPerBlock);
   // check
+  v = 0;
   for (int i = 0; i < numChannels; ++i) {
     for (int s = 0; s < samplesPerBlock; ++s) {
       // cout << inout[i][s] << "==" << s << "\n";
-      VERIFY(inout[i][s] == (Scalar)(s), "checking deinterleaving\n");
+      VERIFY(inout[i][s] == (Scalar)v++, "checking deinterleaving\n");
     }
   }
   cout << "deinterleaving test completed\n";
