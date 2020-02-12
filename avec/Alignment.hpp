@@ -34,4 +34,29 @@ template<class T>
 using aligned_vector =
   std::vector<T, boost::alignment::aligned_allocator<T, ALIGNMENT>>;
 
+/*
+Template class that provides static methods to construct aligned unique_ptr or
+aligned_vector of the class specified as its template argument.
+*/
+template<class Class>
+class AlignedNew final
+{
+  struct Deleter
+  {
+    void operator()(Class* ptr) { boost::alignment::aligned_free(ptr); }
+  };
+
+public:
+  static std::unique_ptr<Class> New()
+  {
+    auto ptr = boost::alignment::aligned_alloc(ALIGNMENT, sizeof(Class));
+    return std::unique_ptr<Class, Deleter>(new (ptr) Class);
+  }
+
+  static aligned_vector<Class> New(int num)
+  {
+    return aligned_vector<Class>(num);
+  }
+};
+
 } // namespace avec

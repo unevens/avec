@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 #pragma once
-#include "avec/AlignedVector.hpp"
+#include "avec/Alignment.hpp"
 #include "avec/Simd.hpp"
 
 namespace avec {
