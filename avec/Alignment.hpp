@@ -39,7 +39,7 @@ Template class that provides static methods to construct aligned unique_ptr or
 aligned_vector of the class specified as its template argument.
 */
 template<class Class>
-class AlignedNew final
+class AlignedNew
 {
   struct Deleter
   {
