@@ -132,17 +132,18 @@ public:
   using Mask = typename std::conditional<
     std::is_same<Vec, Vec8f>::value,
     Vec8fb,
-    std::conditional<
+    typename std::conditional<
       std::is_same<Vec, Vec4f>::value,
       Vec4fb,
-      std::conditional<
+      typename std::conditional<
         std::is_same<Vec, Vec8d>::value,
         Vec8db,
-        std::conditional<
+        typename std::conditional<
           std::is_same<Vec, Vec4d>::value,
           Vec4db,
-          std::conditional<std::is_same<Vec, Vec2d>::value, Vec2db, bool>::
-            type>::type>::type>::type>::type;
+          typename std::conditional<std::is_same<Vec, Vec2d>::value,
+                                    Vec2db,
+                                    bool>::type>::type>::type>::type>::type;
 
   static_assert(!std::is_same<Mask, bool>::value,
                 "Only Vec8f Vec4f Vec8d Vec4d and Vec2d are allowed here.");
