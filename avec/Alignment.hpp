@@ -43,19 +43,26 @@ struct AlignedDeleter
   void operator()(void* ptr) { boost::alignment::aligned_free(ptr); }
 };
 
+
+/**
+ * Alias for unique_ptr using AlignedDeleter
+ */
+template<class T>
+using aligned_ptr = std::unique_ptr<T, AlignedDeleter>;
+
 /*
 Template class that provides static methods to construct aligned unique_ptr or
 aligned_vector of the class specified as its template argument.
 */
 template<class Class>
-class AlignedNew
+class Aligned
 {
 public:
   template<class HolderClass = Class>
-  static std::unique_ptr<HolderClass, AlignedDeleter> New()
+  static aligned_ptr<HolderClass> New()
   {
     auto ptr = boost::alignment::aligned_alloc(ALIGNMENT, sizeof(Class));
-    return std::unique_ptr<HolderClass, AlignedDeleter>(new (ptr) Class);
+    return aligned_ptr<HolderClass>(new (ptr) Class);
   }
 
   static aligned_vector<Class> New(int num)
