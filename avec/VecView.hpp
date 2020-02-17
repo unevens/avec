@@ -56,9 +56,9 @@ public:
    */
   void SetPointer(Scalar* ptr_)
   {
-    assert(boost::alignment::is_aligned(ptr_, Vec::size() * sizeof(Scalar)));
+    AVEC_ASSERT_ALIGNMENT(ptr_, Vec);
     ptr = ptr_;
-    BOOST_ALIGN_ASSUME_ALIGNED(ptr, Vec::size() * sizeof(Scalar));
+    AVEC_ASSUME_ALIGNMENT(ptr, Vec);
   }
 
   /**

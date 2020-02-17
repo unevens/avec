@@ -149,4 +149,12 @@ public:
                 "Only Vec8f Vec4f Vec8d Vec4d and Vec2d are allowed here.");
 };
 
+#define AVEC_ASSERT_ALIGNMENT(ptr, Vec)                                        \
+  assert(boost::alignment::is_aligned(                                         \
+    ptr, Vec::size() * sizeof(ScalarTypes<Vec>::Scalar)));
+
+#define AVEC_ASSUME_ALIGNMENT(ptr, Vec)                                        \
+  BOOST_ALIGN_ASSUME_ALIGNED(ptr,                                              \
+                             Vec::size() * sizeof(ScalarTypes<Vec>::Scalar));
+
 } // namespace avec

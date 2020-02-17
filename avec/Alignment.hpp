@@ -43,7 +43,6 @@ struct AlignedDeleter
   void operator()(void* ptr) { boost::alignment::aligned_free(ptr); }
 };
 
-
 /**
  * Alias for unique_ptr using AlignedDeleter
  */
