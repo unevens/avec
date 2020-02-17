@@ -20,6 +20,9 @@ limitations under the License.
 template<class T>
 using aligned_vector = avec::aligned_vector<T>;
 
+template<class T>
+using aligned_ptr = avec::aligned_ptr<T>;
+
 template<class Scalar>
 using ScalarBuffer = avec::ScalarBuffer<Scalar>;
 
