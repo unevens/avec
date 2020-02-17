@@ -327,13 +327,13 @@ InterleavedBuffer<Scalar>::SetNumSamples(int value)
   numSamples = value;
   Reserve(value);
   for (auto& b8 : buffers8) {
-    b8.SetSizeAsVec(value);
+    b8.SetNumSamples(value);
   }
   for (auto& b4 : buffers4) {
-    b4.SetSizeAsVec(value);
+    b4.SetNumSamples(value);
   }
   for (auto& b2 : buffers2) {
-    b2.SetSizeAsVec(value);
+    b2.SetNumSamples(value);
   }
 }
 
