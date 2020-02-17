@@ -40,12 +40,13 @@ private:
 public:
   /**
    * Constructor
-   * @param size the size of the buffer
+   * @param numSamples the number of samples to initialize the buffer with
    * @param value value to initialize the memory to
    */
-  explicit VecBuffer(int size = 0, Scalar value = 0.f)
+  VecBuffer(int numSamples = 0, Scalar value = 0.f)
   {
-    data.resize(size, value);
+    SetNumSamples(numSamples);
+    Fill(value);
   }
 
   /**
