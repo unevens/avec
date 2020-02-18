@@ -23,6 +23,9 @@ using aligned_vector = avec::aligned_vector<T>;
 template<class T>
 using aligned_ptr = avec::aligned_ptr<T>;
 
+template<class T>
+using Aligned = avec::Aligned<T>;
+
 template<class Scalar>
 using ScalarBuffer = avec::ScalarBuffer<Scalar>;
 

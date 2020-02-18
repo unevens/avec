@@ -49,12 +49,12 @@ struct AlignedDeleter
 template<class T>
 using aligned_ptr = std::unique_ptr<T, AlignedDeleter>;
 
-/*
-Template class that provides static methods to construct aligned unique_ptr or
-aligned_vector of the class specified as its template argument.
-*/
+/**
+ *Template class that provides static methods to construct aligned unique_ptr or
+ *aligned_vector of the class specified as its template argument.
+ */
 template<class Class>
-class Aligned
+class Aligned final
 {
 public:
   template<class HolderClass = Class>
