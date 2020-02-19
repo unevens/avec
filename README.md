@@ -1,6 +1,6 @@
 # [*avec*](https://github.com/unevens/avec)
 
-*avec* is a collection of classes for using SIMD instructions in audio applications. 
+*avec* is a collection of classes using SIMD instructions for audio applications. 
 It features containers and views for aligned memory, with an API designed to work seamlessly with Agner Fog's [vectorclass](https://github.com/vectorclass/version2), which is included as a submodule.
 
 ## Containers and views
@@ -11,7 +11,20 @@ In *avec* are implemented the template classes `VecBuffer<Vec>` and `VecView<Vec
 
 The template class `InterleavedBuffer<Scalar>` (where `Scalar` can be either `float` or `double`) can be used to interleave a buffer of any number of audio channels into a set of `VecBuffer<Vec8f>` and `VecBuffer<Vec4f>` (when `Scalar` is `float`), or of `VecBuffer<Vec4d>` and `VecBuffer<Vec2d>` (when `Scalar` is `double`). 
 
-## Noise Generator
+
+## DSP
+
+The directory `avec/dsp` contains SIMD implementation of some audio filters/generators.
+
+### Splines
+
+The file `"Spline.hpp"` implements cubic Hermite splines with smoothly automatable control points.
+
+### GammaEnv
+
+The file `"GammaEnv.hpp"` implements Aleksey Vaneev's [gammaenv](https://github.com/avaneev/gammaenv) using SIMD instructions.
+
+### Noise Generator
 
 The file `Noise.hpp` implements a (white) noise generator which can populate VecBuffers and InterleavedBuffers with noise, with a different seed for each channel.
 It uses [a SIMD implementation](https://github.com/unevens/xorshift32_16bit_simd) of a [16 bit xorshift32 random number generator](https://b2d-f9r.blogspot.com/2010/08/16-bit-xorshift-rng-now-with-more.html
@@ -19,13 +32,9 @@ It uses [a SIMD implementation](https://github.com/unevens/xorshift32_16bit_simd
 
 It is the only part of *avec* which is not header only, as it needs to compile the file `xorshift32_16bit_simd.c`.
 
-The header `Noise.hpp` is not included by `Avec.hpp`. Consider it an optional feature.
-
-## Biquad Filters
+### Biquad Filters
 
 The file `Biquad.hpp` implements simple biquad filters which take either VecBuffers or InterleavedBuffers as input and output. They use SIMD instructions to process all the channels interleaved in each VecBuffer at the same time.
-
-The header `Biquad.hpp` is not included by `Avec.hpp`. Consider it an optional feature.
 
 ## Usage
 
