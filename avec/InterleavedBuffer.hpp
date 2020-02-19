@@ -172,7 +172,7 @@ public:
   bool Deinterleave(ScalarBuffer<Scalar>& output) const
   {
     return Deinterleave(
-      output.Get(), output.GetNumChannels(), output.GetSize());
+      output.Get(), output.GetNumChannels(), output.GetNumSamples());
   }
 
   /**
@@ -202,7 +202,7 @@ public:
     if (numInputChannels > input.GetNumChannels()) {
       return false;
     }
-    return Interleave(input.Get(), numInputChannels, input.GetSize());
+    return Interleave(input.Get(), numInputChannels, input.GetNumSamples());
   }
 
   /**

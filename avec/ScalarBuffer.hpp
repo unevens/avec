@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Dario Mambro
+Copyright 2019-2020 Dario Mambro
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ public:
   /**
    * @return the size of each channel of the buffer.
    */
-  int GetSize() const { return size; }
+  int GetNumSamples() const { return size; }
 
   /**
    * @return the capacity of each channel of the buffer - capacity = size of
@@ -111,16 +111,16 @@ public:
 
   /**
    * Preallocates memory for each channel of the buffer.
-   * @param requiredSize the amount of samples to allocate memory for.
+   * @param numSamples the amount of samples to allocate memory for.
    */
-  void Reserve(int requiredSize)
+  void Reserve(int numSamples)
   {
-    if (capacity >= requiredSize) {
+    if (capacity >= numSamples) {
       return;
     }
-    capacity = requiredSize;
+    capacity = numSamples;
     for (int i = 0; i < data.size(); ++i) {
-      data[i].reserve(requiredSize);
+      data[i].reserve(numSamples);
     }
     UpdatePointers();
   }
@@ -131,12 +131,12 @@ public:
    * @param shrink if true, the buffer asks each std::vector to release any
    * previously allocated memory that is no longer neeeded.
    */
-  void SetSize(int requiredSize, bool shrink = false)
+  void SetNumSamples(int numSamples, bool shrink = false)
   {
-    Reserve(requiredSize);
-    size = requiredSize;
+    Reserve(numSamples);
+    size = numSamples;
     for (int i = 0; i < data.size(); ++i) {
-      data[i].resize(requiredSize, 0.0);
+      data[i].resize(numSamples, 0.0);
     }
     if (shrink) {
       Shrink();
@@ -145,37 +145,19 @@ public:
   }
 
   /**
-   * Set the size of each channel of the buffer, only if there already is enough
-   * memory allocated to do so.
-   * @param requiredSize the amount of samples to set the size to.
-   * @return true if the resizing was succesfull, false if there was not enough
-   * allocated memory
-   * @see GetCapacity
-   * @see Reserve
-   */
-  bool SetSizeIfPreallocated(int requiredSize)
-  {
-    if (requiredSize <= GetCapacity()) {
-      SetSize(requiredSize, false);
-      return true;
-    }
-    return false;
-  }
-
-  /**
    * Set the number of channels and the size of each channel.
    * @param numRequiredChannels the new number of channels.
-   * @param requiredSize the amount of samples to set the size of each channel
-   * to.
+   * @param numRequiredSamples the amount of samples to set the size of each
+   * channel to.
    * @param shrink if true, the buffer asks each std::vector to release any
    * previously allocated memory that is no longer neeeded.
    */
-  void SetNumChannelsAndSize(int numRequiredChannels,
-                             int requiredSize,
-                             bool shrink = false)
+  void SetNumChannelsAndSamples(int numRequiredChannels,
+                                int numRequiredSamples,
+                                bool shrink = false)
   {
     SetNumChannels(numRequiredChannels);
-    SetSize(requiredSize, shrink);
+    SetNumSamples(numRequiredSamples, shrink);
   }
 
   /**
@@ -201,7 +183,7 @@ public:
    */
   ScalarBuffer(int numChannels = 2, int size = 256)
   {
-    SetNumChannelsAndSize(numChannels, size);
+    SetNumChannelsAndSamples(numChannels, size);
   }
 };
 
@@ -214,9 +196,10 @@ CopyScalarBuffer(ScalarBuffer<InScalar> const& input,
   if (numChannels < 0) {
     numChannels = input.GetNumChannels();
   }
-  output.SetNumChannelsAndSize(numChannels, input.GetSize());
+  output.SetNumChannelsAndSamples(numChannels, input.GetNumSamples());
   for (int c = 0; c < numChannels; ++c) {
-    std::copy(&input[c][0], &input[c][0] + input.GetSize(), &output[c][0]);
+    std::copy(
+      &input[c][0], &input[c][0] + input.GetNumSamples(), &output[c][0]);
   }
 }
 
