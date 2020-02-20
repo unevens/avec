@@ -55,10 +55,21 @@ struct SplineInterface
 template<class Vec>
 struct WaveShaperInterface : public SplineInterface<Vec>
 {
-
   virtual void SetHighPassFrequency(Scalar frequency) = 0;
 
   virtual void SetHighPassFrequency(Scalar frequency, int channel) = 0;
+
+  virtual void SetDc(Scalar frequency) = 0;
+
+  virtual void SetDc(Scalar frequency, int channel) = 0;
+
+  virtual void SetWet(Scalar frequency) = 0;
+
+  virtual void SetWet(Scalar frequency, int channel) = 0;
+
+  virtual void SetIsSymmetric(bool isSymmetric) = 0;
+
+  virtual void SetIsSymmetric(Scalar isSymmetric, int channel) = 0;
 
   virtual Scalar* GetHighPassAlpha() = 0;
 
@@ -70,6 +81,8 @@ struct WaveShaperInterface : public SplineInterface<Vec>
 
   virtual Scalar* GetHighPassIn() = 0;
   virtual Scalar* GetHighPassOut() = 0;
+
+  virtual Scalar* GetIsSymmetric() = 0;
 };
 
 template<class Vec, int numNodes_>
@@ -81,10 +94,8 @@ struct Spline final : public SplineInterface<Vec>
 
   struct Data final
   {
-    AutomatableNode nodes[numNodes];
     Scalar smoothingAlpha[Vec::size()];
-    Scalar underRange[Vec::size()];
-    Scalar overRange[Vec::size()];
+    AutomatableNode nodes[numNodes];
   };
 
   aligned_ptr<Data> data;
@@ -114,7 +125,9 @@ struct Spline final : public SplineInterface<Vec>
 
   Spline()
     : data(avec::Aligned<Data>::New())
-  {}
+  {
+    std::fill_n(data->smoothingAlpha, sizeof(Data) / sizeof(Scalar), 0.0);
+  }
 };
 
 template<class Vec, int numNodes_>
@@ -138,8 +151,8 @@ struct WaveShaper final : public WaveShaperInterface<Vec>
 
   struct Data final
   {
-    AutomatableNode nodes[numNodes];
     Scalar smoothingAlpha[Vec::size()];
+    AutomatableNode nodes[numNodes];
     Scalar isSymmetric[Vec::size()];
     Settings settingsTarget;
     Settings settingsState;
@@ -148,7 +161,7 @@ struct WaveShaper final : public WaveShaperInterface<Vec>
 
   aligned_ptr<Data> data;
 
-  AutomatableNode* GetNodes() override { return nodes; }
+  AutomatableNode* GetNodes() override { return data->nodes; }
 
   int GetNumNodes() override { return numNodes; }
 
@@ -156,8 +169,6 @@ struct WaveShaper final : public WaveShaperInterface<Vec>
   {
     std::fill_n(data->smoothingAlpha, Vec::size(), exp(-frequency));
   }
-
-  Scalar* GetSmoothingAlpha() override { return data->smoothingAlpha; };
 
   void SetHighPassFrequency(Scalar frequency) override
   {
@@ -169,16 +180,50 @@ struct WaveShaper final : public WaveShaperInterface<Vec>
     data->highPass.alpha[channel] = exp(-frequency);
   }
 
+  void SetDc(Scalar dc) override
+  {
+    std::fill_n(data->settingsTarget.dc, Vec::size(), dc);
+  }
+
+  void SetDc(Scalar dc, int channel) override
+  {
+    data->settingsTarget.dc[channel] = dc;
+  }
+
+  void SetWet(Scalar wet) override
+  {
+    std::fill_n(data->settingsTarget.wet, Vec::size(), wet);
+  }
+
+  void SetWet(Scalar wet, int channel) override
+  {
+    data->settingsTarget.wet[channel] = wet;
+  }
+
+  void SetIsSymmetric(bool isSymmetric) override
+  {
+    std::fill_n(data->isSymmetric, Vec::size(), isSymmetric ? 1.0 : 0.0);
+  }
+
+  void SetIsSymmetric(Scalar isSymmetric, int channel) override
+  {
+    data->isSymmetric[channel] = isSymmetric;
+  }
+
+  Scalar* GetSmoothingAlpha() override { return data->smoothingAlpha; };
+
   Scalar* GetHighPassAlpha() override { return data->highPass.alpha; }
 
-  Scalar* GetDcState() { return data->settingsState.dc; }
-  Scalar* GetDcTarget() { return data->settingsTarget.dc; }
+  Scalar* GetDcState() override { return data->settingsState.dc; }
+  Scalar* GetDcTarget() override { return data->settingsTarget.dc; }
 
-  Scalar* GetWetState() { return data->settingsState.wet; }
-  Scalar* GetWetTarget() { return data->settingsTarget.wet; }
+  Scalar* GetWetState() override { return data->settingsState.wet; }
+  Scalar* GetWetTarget() override { return data->settingsTarget.wet; }
 
-  Scalar* GetHighPassIn() { return data->highPass.in; }
-  Scalar* GetHighPassOut() { return data->highPass.out; }
+  Scalar* GetHighPassIn() override { return data->highPass.in; }
+  Scalar* GetHighPassOut() override { return data->highPass.out; }
+
+  Scalar* GetIsSymmetric() override { return data->isSymmetric; }
 
   void ProcessBlock(VecBuffer<Vec> const& input,
                     VecBuffer<Vec>& output) override;
@@ -198,7 +243,9 @@ struct WaveShaper final : public WaveShaperInterface<Vec>
 
   WaveShaper()
     : data(avec::Aligned<Data>::New())
-  {}
+  {
+    std::fill_n(data->smoothingAlpha, sizeof(Data) / sizeof(Scalar), 0.0);
+  }
 };
 
 template<template<class, int> class SplineClass, class Vec>
@@ -401,8 +448,8 @@ inline void
 WaveShaper<Vec, numNodes_>::ProcessBlock(VecBuffer<Vec> const& input,
                                          VecBuffer<Vec>& output)
 {
-  int const numSamples = input.GetVecSize();
-  output.SetSizeAsVec(numSamples);
+  int const numSamples = input.GetNumSamples();
+  output.SetNumSamples(numSamples);
 
   Vec const alpha = this->data->smoothingAlpha[0];
 
@@ -426,7 +473,7 @@ WaveShaper<Vec, numNodes_>::ProcessBlock(VecBuffer<Vec> const& input,
   Vec ho = Vec().load_a(this->data->highPass.out);
   Vec ha = Vec().load_a(this->data->highPass.alpha);
 
-  auto symm = Vec().load_a(isSymmetric) != 0.0;
+  auto symm = Vec().load_a(this->data->isSymmetric) != 0.0;
 
   for (int n = 0; n < numNodes; ++n) {
     xs[n] = Vec().load_a(this->data->nodes[n].state.x);

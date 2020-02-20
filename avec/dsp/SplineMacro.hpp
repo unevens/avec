@@ -210,7 +210,7 @@ limitations under the License.
   Vec shaper##_hi = Vec().load_a(shaper->GetHighPassIn());                     \
   Vec shaper##_ho = Vec().load_a(shaper->GetHighPassOut());                    \
   Vec shaper##_ha = Vec().load_a(shaper->GetHighPassAlpha());                  \
-  auto const shaper##_symm = Vec().load_a(shaper->isSymmetric) != 0.0;
+  auto const shaper##_symm = Vec().load_a(shaper->GetIsSymmetric()) != 0.0;
 
 #define STORE_WAVESHAPER_STATE(shaper, numActiveNodes)                         \
   STORE_SPLINE_STATE(shaper, numActiveNodes)                                   \
