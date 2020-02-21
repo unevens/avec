@@ -151,10 +151,10 @@ public:
 
 #define AVEC_ASSERT_ALIGNMENT(ptr, Vec)                                        \
   assert(boost::alignment::is_aligned(                                         \
-    ptr, Vec::size() * sizeof(ScalarTypes<Vec>::Scalar)));
+    ptr, Vec::size() * sizeof(typename ScalarTypes<Vec>::Scalar)));
 
 #define AVEC_ASSUME_ALIGNMENT(ptr, Vec)                                        \
-  BOOST_ALIGN_ASSUME_ALIGNED(ptr,                                              \
-                             Vec::size() * sizeof(ScalarTypes<Vec>::Scalar));
+  BOOST_ALIGN_ASSUME_ALIGNED(                                                  \
+    ptr, Vec::size() * sizeof(typename ScalarTypes<Vec>::Scalar));
 
 } // namespace avec

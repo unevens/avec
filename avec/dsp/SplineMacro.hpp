@@ -105,7 +105,7 @@ limitations under the License.
     auto const is_high = x1 == std::numeric_limits<float>::max();              \
     auto const is_low = x0 == std::numeric_limits<float>::lowest();            \
                                                                                \
-    Vec const dx = max(x1 - x0, FLT_MIN);                                      \
+    Vec const dx = max(x1 - x0, std::numeric_limits<float>::min());            \
     Vec const dy = y1 - y0;                                                    \
     Vec const a = t0 * dx - dy;                                                \
     Vec const b = -t1 * dx + dy;                                               \
@@ -175,7 +175,7 @@ limitations under the License.
     auto const is_high = x1 == std::numeric_limits<float>::max();              \
     auto const is_low = x0 == std::numeric_limits<float>::lowest();            \
                                                                                \
-    Vec const dx = max(x1 - x0, FLT_MIN);                                      \
+    Vec const dx = max(x1 - x0, std::numeric_limits<float>::min());            \
     Vec const dy = y1 - y0;                                                    \
     Vec const a = t0 * dx - dy;                                                \
     Vec const b = -t1 * dx + dy;                                               \

@@ -178,7 +178,7 @@ struct GammaEnv final
       envr5 = select(increasing, resa, envr5);
       prevr = select(increasing, resa, prevr);
 
-      output[i] = to_db_coef * log(prevr + FLT_MIN);
+      output[i] = to_db_coef * log(prevr + std::numeric_limits<float>::min());
     }
 
     for (int i = 0; i < 4; ++i) {
@@ -235,7 +235,7 @@ struct GammaEnv final
       }
 
       Vec out = (env[i - 4] + env[i - 3] + env[i - 2] - env[i - 1] - env5);
-      output[i] = to_db_coef * log(out + FLT_MIN);
+      output[i] = to_db_coef * log(out + std::numeric_limits<float>::min());
     }
 
     for (int i = 0; i < 4; ++i) {

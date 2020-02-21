@@ -112,7 +112,8 @@
                                                                                \
     gamma##_envr5 = select(increasing, resa, gamma##_envr5);                   \
     gamma##_prevr = select(increasing, resa, gamma##_prevr);                   \
-    out = gamma##_to_db_coef * log(gamma##_prevr + FLT_MIN);                   \
+    out = gamma##_to_db_coef *                                                 \
+          log(gamma##_prevr + std::numeric_limits<float>::min());              \
   }
 
 #define STORE_GAMMAENV_STATE(gamma, Vec)                                       \

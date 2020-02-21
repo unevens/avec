@@ -55,6 +55,8 @@ struct SplineInterface
 template<class Vec>
 struct WaveShaperInterface : public SplineInterface<Vec>
 {
+  using Scalar = typename SplineInterface<Vec>::Scalar;
+
   virtual void SetHighPassFrequency(Scalar frequency) = 0;
 
   virtual void SetHighPassFrequency(Scalar frequency, int channel) = 0;
@@ -90,7 +92,9 @@ struct Spline final : public SplineInterface<Vec>
 {
   static constexpr int numNodes = numNodes_;
 
-  using Interface = typename SplineInterface<Vec>;
+  using Interface = SplineInterface<Vec>;
+  using Scalar = typename Interface::Scalar;
+  using AutomatableNode = typename Interface::AutomatableNode;
 
   struct Data final
   {
@@ -134,7 +138,9 @@ template<class Vec, int numNodes_>
 struct WaveShaper final : public WaveShaperInterface<Vec>
 {
   static constexpr int numNodes = numNodes_;
-  using Interface = typename WaveShaperInterface<Vec>;
+  using Interface = WaveShaperInterface<Vec>;
+  using Scalar = typename Interface::Scalar;
+  using AutomatableNode = typename Interface::AutomatableNode;
 
   struct Settings final
   {
@@ -265,20 +271,7 @@ struct SplineHolder final
   }
 
   template<int numNodes>
-  void Initialize()
-  {
-    static_assert(numNodes > 0, "numNodes must be positive");
-    splines.resize(std::max(splines.size(), (std::size_t)numNodes));
-    splines[numNodes - 1] =
-      std::unique_ptr<SplineInterface>(new SplineClass<Vec, numNodes>);
-    Initialize<numNodes - 1>();
-  }
-
-  template<>
-  void Initialize<0>()
-  {
-    // stops the recursion
-  }
+  void Initialize();
 
   void Reset()
   {
@@ -288,13 +281,62 @@ struct SplineHolder final
   }
 
   template<int numNodes>
-  static SplineHolder New()
+  static SplineHolder New();
+};
+
+template<template<class, int> class SplineClass, class Vec, int maxNumNodes>
+struct SplineFactory
+{
+  static void Initialize(SplineHolder<SplineClass, Vec>& holder)
   {
-    auto spline = SplineHolder{};
-    spline.Initialize<numNodes>();
-    return spline;
+    using Interface = typename SplineClass<Vec, maxNumNodes>::Interface;
+
+    holder.splines.resize(
+      std::max(holder.splines.size(), (std::size_t)maxNumNodes));
+
+    holder.splines[maxNumNodes - 1] =
+      std::unique_ptr<Interface>(new SplineClass<Vec, maxNumNodes>);
+
+    SplineFactory<SplineClass, Vec, maxNumNodes - 1>::Initialize(holder);
+  }
+
+  static SplineHolder<SplineClass, Vec> New()
+  {
+    auto holder = SplineHolder<SplineClass, Vec>{};
+    Initialize(holder);
+    return holder;
   }
 };
+
+template<template<class, int> class SplineClass, class Vec>
+struct SplineFactory<SplineClass, Vec, 0>
+{
+  static void Initialize(SplineHolder<SplineClass, Vec>& holder)
+  {
+    // stops the recursion
+  }
+
+  static SplineHolder<SplineClass, Vec> New()
+  {
+    return SplineHolder<SplineClass, Vec>{};
+  }
+};
+
+template<template<class, int> class SplineClass, class Vec>
+template<int numNodes>
+void
+SplineHolder<SplineClass, Vec>::Initialize()
+{
+  SplineFactory<SplineClass, Vec, numNodes>::Initialize(*this);
+}
+
+template<template<class, int> class SplineClass, class Vec>
+template<int numNodes>
+SplineHolder<SplineClass, Vec>
+SplineHolder<SplineClass, Vec>::New()
+{
+  return SplineFactory<SplineClass, Vec, numNodes>::New();
+}
 
 // implementation
 
@@ -397,7 +439,7 @@ Spline<Vec, numNodes_>::ProcessBlock(VecBuffer<Vec> const& input,
 
     // compute spline and segment coeffcients
 
-    Vec const dx = max(x1 - x0, FLT_MIN);
+    Vec const dx = max(x1 - x0, std::numeric_limits<float>::min());
     Vec const dy = y1 - y0;
     Vec const a = t0 * dx - dy;
     Vec const b = -t1 * dx + dy;
@@ -562,7 +604,7 @@ WaveShaper<Vec, numNodes_>::ProcessBlock(VecBuffer<Vec> const& input,
 
     // compute spline and segment coefficients
 
-    Vec const dx = max(x1 - x0, FLT_MIN);
+    Vec const dx = max(x1 - x0, std::numeric_limits<float>::min());
     Vec const dy = y1 - y0;
     Vec const a = t0 * dx - dy;
     Vec const b = -t1 * dx + dy;
