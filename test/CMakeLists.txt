@@ -23,9 +23,9 @@ endif(WIN32)
 
 if(UNIX)
 
-add_executable(simd-test-native testing.cpp)
-add_executable(simd-test testing.cpp)
+add_executable(avec-test-native testing.cpp)
+add_executable(avec-test testing.cpp)
 
-target_compile_options (simd-test-native PRIVATE -march=native)
+target_compile_options (avec-test-native PRIVATE -march=native)
 
 endif(UNIX)
