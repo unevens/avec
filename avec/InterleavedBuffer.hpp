@@ -299,6 +299,76 @@ GetNumOfVecBuffersUsedByInterleavedBuffer(int numChannels,
   }
 }
 
+/**
+ * Consider the At(int channel, int sample) method of the InterleavedBuffer.
+ * It has to find in what VecBuffer the speficied channel is stored, and what
+ * to what channel of the VecBuffer it is mapped. This class provides the
+ * logic necessary to get the buffer and the relative channel, abstracted from
+ * the InterleavedBuffer so that it can be used by other classes that use the
+ * same memory layout of the InterleavedBuffer.
+ */
+template<typename Scalar>
+struct InterleavedChannel final
+{
+  /**
+   * Executes a functor on a spefici channel of a structure layed out as the
+   * InterleavedBuffer.
+   * @param the channel to execute the functor on
+   * @param v2 the container of the Vec2 objects
+   * @param v4 the container of the Vec4 objects
+   * @param v8 the container of the Vec8 objects
+   * @param action the functor to execute
+   */
+  template<class Action, class T2, class T4, class T8>
+  static auto Do(int channel, T2& v2, T4& v4, T8& v8, Action action)
+  {
+    constexpr bool VEC8_AVAILABLE = SimdTypes<Scalar>::VEC8_AVAILABLE;
+    constexpr bool VEC4_AVAILABLE = SimdTypes<Scalar>::VEC4_AVAILABLE;
+    constexpr bool VEC2_AVAILABLE = SimdTypes<Scalar>::VEC2_AVAILABLE;
+
+    if constexpr (VEC8_AVAILABLE) {
+      if (v4.size() > 0) {
+        if (channel < 4) {
+          return action(v4[0], channel, 4);
+        }
+        else {
+          auto d8 = std::div(channel - 4, 8);
+          return action(v8[d8.quot], d8.rem, 8);
+        }
+      }
+      else {
+        auto d8 = std::div(channel, 8);
+        return action(v8[d8.quot], d8.rem, 8);
+      }
+    }
+    else if constexpr (VEC4_AVAILABLE) {
+      if constexpr (VEC2_AVAILABLE) {
+        if (v2.size() > 0) {
+          if (channel < 2) {
+            return action(v2[0], channel, 2);
+          }
+          else {
+            auto d4 = std::div(channel - 2, 4);
+            return action(v4[d4.quot], d4.rem, 4);
+          }
+        }
+        else {
+          auto d4 = std::div(channel, 4);
+          return action(v4[d4.quot], d4.rem, 4);
+        }
+      }
+      else {
+        auto d4 = std::div(channel, 4);
+        return action(v4[d4.quot], d4.rem, 4);
+      }
+    }
+    else {
+      auto d2 = std::div(channel, 2);
+      return action(v2[d2.quot], d2.rem, 4);
+    }
+  }
+};
+
 // implementation
 
 template<typename Scalar>
@@ -547,54 +617,22 @@ template<typename Scalar>
 Scalar const*
 InterleavedBuffer<Scalar>::At(int channel, int sample) const
 {
-  if constexpr (VEC8_AVAILABLE) {
-    if (buffers4.size() > 0) {
-      if (channel < 4) {
-        return &buffers4[0](4 * sample + channel);
-      }
-      else {
-        auto d8 = std::div(channel - 4, 8);
-        return &buffers8[d8.quot](8 * sample + d8.rem);
-      }
-    }
-    else {
-      auto d8 = std::div(channel, 8);
-      return &buffers8[d8.quot](8 * sample + d8.rem);
-    }
-  }
-  else if constexpr (VEC4_AVAILABLE) {
-    if constexpr (VEC2_AVAILABLE) {
-      if (buffers2.size() > 0) {
-        if (channel < 2) {
-          return &buffers2[0](2 * sample + channel);
-        }
-        else {
-          auto d4 = std::div(channel - 2, 4);
-          return &buffers4[d4.quot](4 * sample + d4.rem);
-        }
-      }
-      else {
-        auto d4 = std::div(channel, 4);
-        return &buffers4[d4.quot](4 * sample + d4.rem);
-      }
-    }
-    else {
-      auto d4 = std::div(channel, 4);
-      return &buffers4[d4.quot](4 * sample + d4.rem);
-    }
-  }
-  else {
-    auto d2 = std::div(channel, 2);
-    return &buffers2[d2.quot](2 * sample + d2.rem);
-  }
+  return const_cast<Scalar const*>(
+    const_cast<InterleavedBuffer<Scalar>*>(this)->At(channel, sample));
 }
 
 template<typename Scalar>
 Scalar*
 InterleavedBuffer<Scalar>::At(int channel, int sample)
 {
-  return const_cast<Scalar*>(
-    const_cast<InterleavedBuffer<Scalar> const*>(this)->At(channel, sample));
+  return InterleavedChannel<Scalar>::Do(
+    channel,
+    buffers2,
+    buffers4,
+    buffers8,
+    [sample](auto& buffer, int channel, int numChannels) {
+      return &buffer(numChannels * sample + channel);
+    });
 }
 
 template<typename Scalar>
