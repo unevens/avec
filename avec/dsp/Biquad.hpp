@@ -687,6 +687,65 @@ public:
       f.reset();
     }
   }
+  /**
+   * Resets the state of the filter for the specified channels
+   * param firstChannelToReset the first channel to reset
+   * param numChannelsToReset the number of channels to reset
+   */
+  void resetChannnelStates(int firstChannelToReset, int numChannelsToReset)
+  {
+    for (int i = firstChannelToReset;
+         i <
+         std::min(filters2.size(), firstChannelToReset + numChannelsToReset);
+         ++i) {
+      filters2[i].reset();
+    }
+    for (int i = firstChannelToReset;
+         i <
+         std::min(filters4.size(), firstChannelToReset + numChannelsToReset);
+         ++i) {
+      filters4[i].reset();
+    }
+    for (int i = firstChannelToReset;
+         i <
+         std::min(filters8.size(), firstChannelToReset + numChannelsToReset);
+         ++i) {
+      filters8[i].reset();
+    }
+  }
+
+  /**
+   * Moves the state of the filter at the specied channels to other channels
+   * param srcChannel the first channel to move from
+   * param dstChannel the first to move to
+   * param numChannelsToMove the number of channels to move
+   */
+  void moveChannnelStates(int srcChannel, int dstChannel, int numChannelsToMove)
+  {
+    assert(srcChannel + numChannelsToMove < numChannels);
+    assert(dstChannel + numChannelsToMove < numChannels);
+    assert(std::abs(dstChannel - srChannel) <= numChannelsToMove);
+
+    for (int i = 0; i < numChannelsToMove; ++i) {
+      Scalar state0, state1;
+      InterleavedChannel<Scalar>::doAtChannel(
+        i + srcChannel,
+        filters2,
+        filters4,
+        filters8,
+        [&](auto& filter, int channel, int numChannels) {
+          filter.getState(channel, state0, state1);
+        });
+      InterleavedChannel<Scalar>::doAtChannel(
+        i + dstChannel,
+        filters2,
+        filters4,
+        filters8,
+        [&](auto& filter, int channel, int numChannels) {
+          filter.setState(channel, state0, state1);
+        });
+    }
+  }
 
   /**
    * Sets the cutoff frequency on a specific channel
