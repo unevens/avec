@@ -292,9 +292,9 @@ GetNumOfVecBuffersUsedByInterleavedBuffer(int numChannels,
     }
   }
   else {
-    auto d4 = std::div(numChannels, 4);
+    auto d2 = std::div(numChannels, 2);
     num8 = 0;
-    num2 = (int)d4.quot + (d4.rem > 0 ? 1 : 0);
+    num2 = (int)d2.quot + (d2.rem > 0 ? 1 : 0);
     num4 = 0;
   }
 }
