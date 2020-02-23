@@ -34,7 +34,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <http://unlicense.org/>
 */
 
-#include "avec/xorshift32_16bit_simd.h"
+#include "avec/dsp/xorshift32_16bit_simd.h"
 #include <immintrin.h>
 
 #define PXORSHIFT3216(x)                                                       \

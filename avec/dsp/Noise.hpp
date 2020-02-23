@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 #include "avec/InterleavedBuffer.hpp"
-#include "avec/xorshift32_16bit_simd.h"
+#include "avec/dsp/xorshift32_16bit_simd.h"
 
 namespace avec {
 
