@@ -45,65 +45,65 @@ public:
    */
   VecBuffer(int numSamples = 0, Scalar value = 0.f)
   {
-    SetNumSamples(numSamples);
-    Fill(value);
+    setNumSamples(numSamples);
+    fill(value);
   }
 
   /**
    * @return the size of the buffer measured in number of Scalar elements
    */
-  inline int GetScalarSize() const { return data.size(); }
+  inline int getScalarSize() const { return data.size(); }
 
   /**
    * @return the size of the buffer measured in number of Vec elements
    */
-  inline int GetNumSamples() const { return data.size() / Vec::size(); }
+  inline int getNumSamples() const { return data.size() / Vec::size(); }
 
   /**
    * @return the capacity of the buffer measured in number of Scalar elements
    */
-  inline int GetScalarCapacity() const { return data.capacity(); }
+  inline int getScalarCapacity() const { return data.capacity(); }
 
   /**
    * @return the capacity of the buffer measured in number of Vec elements
    */
-  inline int GetVecCapacity() const
+  inline int getVecCapacity() const
   {
-    return GetScalarCapacity() / Vec::size();
+    return getScalarCapacity() / Vec::size();
   }
 
   /**
    * Resize the buffer
    * @param newSize the new size measured in number of Scalar elements
    */
-  void SetSizeAsScalar(int newSize) { data.resize(newSize); }
+  void setScalarSize(int newSize) { data.resize(newSize); }
 
   /**
    * Resize the buffer
    * @param newSize the new size measured in number of Vec elements
    */
-  void SetNumSamples(int newSize) { SetSizeAsScalar(newSize * Vec::size()); }
+  void setNumSamples(int newSize) { setScalarSize(newSize * Vec::size()); }
 
   /**
    * Set the capacity of the buffer
    * @param newCapacity the new capacity measured in number of Scalar elements
    */
-  void SetCapacityAsScalar(int newCapacity) { data.reserve(newCapacity); }
+  void reserveScalar(int newCapacity) { data.reserve(newCapacity); }
 
   /**
    * Resize the buffer
    * @param newCapacity the new size measured in number of Vec elements
    */
-  void SetCapacityAsVec(int newCapacity)
+  void reserveVec(int newCapacity)
   {
-    SetCapacityAsScalar(newCapacity * Vec::size());
+    reserveScalar(newCapacity * Vec::size());
   }
 
   /**
    * Fills the buffer with the supplied value
    * @param value value to set all the elements of the buffer to.
    */
-  void Fill(Scalar value = 0.f) { std::fill(data.begin(), data.end(), value); }
+  void fill(Scalar value = 0.f) { std::fill(data.begin(), data.end(), value); }
 
   /**
    * @return a reference to the i-th Scalar elements of the buffer.

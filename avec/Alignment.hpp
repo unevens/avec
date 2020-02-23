@@ -58,13 +58,13 @@ class Aligned final
 {
 public:
   template<class HolderClass = Class>
-  static aligned_ptr<HolderClass> New()
+  static aligned_ptr<HolderClass> make()
   {
     auto ptr = boost::alignment::aligned_alloc(ALIGNMENT, sizeof(Class));
     return aligned_ptr<HolderClass>(new (ptr) Class);
   }
 
-  static aligned_vector<Class> New(int num)
+  static aligned_vector<Class> make(int num)
   {
     return aligned_vector<Class>(num);
   }

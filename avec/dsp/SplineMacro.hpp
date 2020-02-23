@@ -18,7 +18,7 @@ limitations under the License.
 #include "Spline.hpp"
 
 #define LOAD_SPLINE_STATE(spline, numActiveNodes, Vec, maxNumNodes)            \
-  Vec const spline##_alpha = spline->GetSmoothingAlpha()[0];                   \
+  Vec const spline##_alpha = spline->getSmoothingAlpha()[0];                   \
   Vec spline##_xs[maxNumNodes];                                                \
   Vec spline##_ys[maxNumNodes];                                                \
   Vec spline##_ts[maxNumNodes];                                                \
@@ -28,22 +28,22 @@ limitations under the License.
   Vec spline##_tt[maxNumNodes];                                                \
   Vec spline##_st[maxNumNodes];                                                \
   for (int n = 0; n < numActiveNodes; ++n) {                                   \
-    spline##_xs[n] = Vec().load_a(spline->GetNodes()[n].state.x);              \
-    spline##_ys[n] = Vec().load_a(spline->GetNodes()[n].state.y);              \
-    spline##_ts[n] = Vec().load_a(spline->GetNodes()[n].state.t);              \
-    spline##_ss[n] = Vec().load_a(spline->GetNodes()[n].state.s);              \
-    spline##_xt[n] = Vec().load_a(spline->GetNodes()[n].target.x);             \
-    spline##_yt[n] = Vec().load_a(spline->GetNodes()[n].target.y);             \
-    spline##_tt[n] = Vec().load_a(spline->GetNodes()[n].target.t);             \
-    spline##_st[n] = Vec().load_a(spline->GetNodes()[n].target.s);             \
+    spline##_xs[n] = Vec().load_a(spline->getNodes()[n].state.x);              \
+    spline##_ys[n] = Vec().load_a(spline->getNodes()[n].state.y);              \
+    spline##_ts[n] = Vec().load_a(spline->getNodes()[n].state.t);              \
+    spline##_ss[n] = Vec().load_a(spline->getNodes()[n].state.s);              \
+    spline##_xt[n] = Vec().load_a(spline->getNodes()[n].target.x);             \
+    spline##_yt[n] = Vec().load_a(spline->getNodes()[n].target.y);             \
+    spline##_tt[n] = Vec().load_a(spline->getNodes()[n].target.t);             \
+    spline##_st[n] = Vec().load_a(spline->getNodes()[n].target.s);             \
   }
 
 #define STORE_SPLINE_STATE(spline, numActiveNodes)                             \
   for (int n = 0; n < numActiveNodes; ++n) {                                   \
-    spline##_xs[n].store_a(spline->GetNodes()[n].state.x);                     \
-    spline##_ys[n].store_a(spline->GetNodes()[n].state.y);                     \
-    spline##_ts[n].store_a(spline->GetNodes()[n].state.t);                     \
-    spline##_ss[n].store_a(spline->GetNodes()[n].state.s);                     \
+    spline##_xs[n].store_a(spline->getNodes()[n].state.x);                     \
+    spline##_ys[n].store_a(spline->getNodes()[n].state.y);                     \
+    spline##_ts[n].store_a(spline->getNodes()[n].state.t);                     \
+    spline##_ss[n].store_a(spline->getNodes()[n].state.s);                     \
   }
 
 #define SPILINE_AUTOMATION(spline, numActiveNodes, Vec)                        \
@@ -203,21 +203,21 @@ limitations under the License.
 
 #define LOAD_WAVESHAPER_STATE(shaper, numActiveNodes, Vec, maxNumNodes)        \
   LOAD_SPLINE_STATE(shaper, numActiveNodes, Vec, maxNumNodes);                 \
-  Vec shaper##_ds = Vec().load_a(shaper->GetDcState());                        \
-  Vec shaper##_dt = Vec().load_a(shaper->GetDcTarget());                       \
-  Vec shaper##_ws = Vec().load_a(shaper->GetWetState());                       \
-  Vec shaper##_wt = Vec().load_a(shaper->GetWetTarget());                      \
-  Vec shaper##_hi = Vec().load_a(shaper->GetHighPassIn());                     \
-  Vec shaper##_ho = Vec().load_a(shaper->GetHighPassOut());                    \
-  Vec shaper##_ha = Vec().load_a(shaper->GetHighPassAlpha());                  \
-  auto const shaper##_symm = Vec().load_a(shaper->GetIsSymmetric()) != 0.0;
+  Vec shaper##_ds = Vec().load_a(shaper->getDcState());                        \
+  Vec shaper##_dt = Vec().load_a(shaper->getDcTarget());                       \
+  Vec shaper##_ws = Vec().load_a(shaper->getWetState());                       \
+  Vec shaper##_wt = Vec().load_a(shaper->getWetTarget());                      \
+  Vec shaper##_hi = Vec().load_a(shaper->getHighPassIn());                     \
+  Vec shaper##_ho = Vec().load_a(shaper->getHighPassOut());                    \
+  Vec shaper##_ha = Vec().load_a(shaper->getHighPassAlpha());                  \
+  auto const shaper##_symm = Vec().load_a(shaper->getIsSymmetric()) != 0.0;
 
 #define STORE_WAVESHAPER_STATE(shaper, numActiveNodes)                         \
   STORE_SPLINE_STATE(shaper, numActiveNodes)                                   \
-  shaper##_ds.store_a(shaper->GetDcState());                                   \
-  shaper##_ws.store_a(shaper->GetWetState());                                  \
-  shaper##_hi.store_a(shaper->GetHighPassIn());                                \
-  shaper##_ho.store_a(shaper->GetHighPassOut());
+  shaper##_ds.store_a(shaper->getDcState());                                   \
+  shaper##_ws.store_a(shaper->getWetState());                                  \
+  shaper##_hi.store_a(shaper->getHighPassIn());                                \
+  shaper##_ho.store_a(shaper->getHighPassOut());
 
 #define WAVESHAPER_AUTOMATION(shaper, numActiveNodes, Vec)                     \
   SPILINE_AUTOMATION(shaper, numActiveNodes, Vec);                             \

@@ -55,80 +55,80 @@ public:
   /**
    * @return the i-th VecBuffer of 8 channel, by reference
    */
-  VecBuffer<Vec8>& GetBuffer8(int i) { return buffers8[i]; }
+  VecBuffer<Vec8>& getBuffer8(int i) { return buffers8[i]; }
 
   /**
    * @return the i-th VecBuffer of 4 channel, by reference
    */
-  VecBuffer<Vec4>& GetBuffer4(int i) { return buffers4[i]; }
+  VecBuffer<Vec4>& getBuffer4(int i) { return buffers4[i]; }
 
   /**
    * @return the i-th VecBuffer of 2 channel, by reference
    */
-  VecBuffer<Vec2>& GetBuffer2(int i) { return buffers2[i]; }
+  VecBuffer<Vec2>& getBuffer2(int i) { return buffers2[i]; }
 
   /**
    * @return the i-th VecBuffer of 8 channel, by const reference
    */
-  VecBuffer<Vec8> const& GetBuffer8(int i) const { return buffers8[i]; }
+  VecBuffer<Vec8> const& getBuffer8(int i) const { return buffers8[i]; }
 
   /**
    * @return the i-th VecBuffer of 4 channel, by const reference
    */
-  VecBuffer<Vec4> const& GetBuffer4(int i) const { return buffers4[i]; }
+  VecBuffer<Vec4> const& getBuffer4(int i) const { return buffers4[i]; }
 
   /**
    * @return the i-th VecBuffer of 2 channel, by const reference
    */
-  VecBuffer<Vec2> const& GetBuffer2(int i) const { return buffers2[i]; }
+  VecBuffer<Vec2> const& getBuffer2(int i) const { return buffers2[i]; }
 
   /**
    * @return the number of 8 channels VecBuffers
    */
-  int GetNumBuffers8() const { return (int)buffers8.size(); }
+  int getNumBuffers8() const { return (int)buffers8.size(); }
 
   /**
    * @return the number of 4 channels VecBuffers
    */
-  int GetNumBuffers4() const { return (int)buffers4.size(); }
+  int getNumBuffers4() const { return (int)buffers4.size(); }
 
   /**
    * @return the number of 2 channels VecBuffers
    */
-  int GetNumBuffers2() const { return (int)buffers2.size(); }
+  int getNumBuffers2() const { return (int)buffers2.size(); }
 
   /**
    * @return the numSamples of each VecBuffer
    */
-  int GetNumSamples() const { return numSamples; }
+  int getNumSamples() const { return numSamples; }
 
   /**
    * @return the number of channels
    */
-  int GetNumChannels() const { return numChannels; }
+  int getNumChannels() const { return numChannels; }
 
   /**
    * Sets the numSamples of each VecBuffer
    * @param value the new numSamples
    */
-  void SetNumSamples(int value);
+  void setNumSamples(int value);
 
   /**
    * Sets the number of channels
    * @param value the new number of channels
    */
-  void SetNumChannels(int value);
+  void setNumChannels(int value);
 
   /**
    * @return the allocated capacity of each VecBuffer
    */
-  int GetCapacity() const { return capacity; }
+  int getCapacity() const { return capacity; }
 
   /**
    * Reserves memory to store up to maxNumSamples samples on each channel
    * @param maxNumSamples the number of samples to allocate memory for
    */
-  void Reserve(int maxNumSamples);
+  void reserve(int maxNumSamples);
 
   /**
    * Constructor.
@@ -140,14 +140,14 @@ public:
     : numSamples(numSamples)
     , capacity(numSamples)
   {
-    SetNumChannels(numChannels);
+    setNumChannels(numChannels);
   }
 
   /**
    * Fills each buffer with the supplied value
    * @param value value to set all the elements of the buffers to.
    */
-  void Fill(Scalar value = 0.f);
+  void fill(Scalar value = 0.f);
 
   /**
    * Deinterleaves the data to an output.
@@ -159,7 +159,7 @@ public:
    * @return true if deinterleaving was successfull, false if numOutputChannels
    * is greater to the numChannel of the InterleavedBuffer
    */
-  bool Deinterleave(Scalar** output,
+  bool deinterleave(Scalar** output,
                     int numOutputChannels,
                     int numSamples) const;
 
@@ -169,10 +169,10 @@ public:
    * @return true if deinterleaving was successfull, false if the number of
    * channel of the output is greater to the numChannel of the InterleavedBuffer
    */
-  bool Deinterleave(ScalarBuffer<Scalar>& output) const
+  bool deinterleave(ScalarBuffer<Scalar>& output) const
   {
-    return Deinterleave(
-      output.Get(), output.GetNumChannels(), output.GetNumSamples());
+    return deinterleave(
+      output.get(), output.getNumChannels(), output.getNumSamples());
   }
 
   /**
@@ -185,7 +185,7 @@ public:
    * @return true if interleaving was successfull, false if numInputChannels
    * is greater to the numChannel of the InterleavedBuffer
    */
-  bool Interleave(Scalar* const* input,
+  bool interleave(Scalar* const* input,
                   int numInputChannels,
                   int numInputSamples);
 
@@ -197,12 +197,12 @@ public:
    * @return true if interleaving was successfull, false if numInputChannels
    * is greater to the numChannel of the InterleavedBuffer
    */
-  bool Interleave(ScalarBuffer<Scalar> const& input, int numInputChannels)
+  bool interleave(ScalarBuffer<Scalar> const& input, int numInputChannels)
   {
-    if (numInputChannels > input.GetNumChannels()) {
+    if (numInputChannels > input.getNumChannels()) {
       return false;
     }
-    return Interleave(input.Get(), numInputChannels, input.GetNumSamples());
+    return interleave(input.get(), numInputChannels, input.getNumSamples());
   }
 
   /**
@@ -213,7 +213,7 @@ public:
    * @return a pointer to the const value of the sample of the channel, same as
    * doing &scalarBuffer[channel][sample] on a ScalarBuffer or a Scalar**
    */
-  Scalar const* At(int channel, int sample) const;
+  Scalar const* at(int channel, int sample) const;
 
   /**
    * Returns the value of a a specific sample of a specific channel of the
@@ -223,7 +223,7 @@ public:
    * @return a pointer to the value of the sample of the channel, same as doing
    * &scalarBuffer[channel][sample] on a ScalarBuffer or a Scalar**
    */
-  Scalar* At(int channel, int sample);
+  Scalar* at(int channel, int sample);
 
   /**
    * Copies the first numSamples of an other interleaved buffer, optionally up
@@ -231,7 +231,7 @@ public:
    * @param numChannels the number of channels to copy. If negative, all
    * channels will be copied.
    */
-  void CopyFrom(InterleavedBuffer const& other,
+  void copyFrom(InterleavedBuffer const& other,
                 int numSamples,
                 int numChannels = -1);
 };
@@ -253,7 +253,7 @@ static_assert(std::is_nothrow_move_assignable<InterleavedBuffer<float>>::value,
  */
 template<typename Scalar>
 inline void
-GetNumOfVecBuffersUsedByInterleavedBuffer(int numChannels,
+getNumOfVecBuffersUsedByInterleavedBuffer(int numChannels,
                                           int& num2,
                                           int& num4,
                                           int& num8)
@@ -300,7 +300,7 @@ GetNumOfVecBuffersUsedByInterleavedBuffer(int numChannels,
 }
 
 /**
- * Consider the At(int channel, int sample) method of the InterleavedBuffer.
+ * Consider the at(int channel, int sample) method of the InterleavedBuffer.
  * It has to find in what VecBuffer the speficied channel is stored, and what
  * to what channel of the VecBuffer it is mapped. This class provides the
  * logic necessary to get the buffer and the relative channel, abstracted from
@@ -311,7 +311,7 @@ template<typename Scalar>
 struct InterleavedChannel final
 {
   /**
-   * Executes a functor on a spefici channel of a structure layed out as the
+   * Executes a functor on a specific channel of a structure layed out as the
    * InterleavedBuffer.
    * @param the channel to execute the functor on
    * @param v2 the container of the Vec2 objects
@@ -320,7 +320,7 @@ struct InterleavedChannel final
    * @param action the functor to execute
    */
   template<class Action, class T2, class T4, class T8>
-  static auto Do(int channel, T2& v2, T4& v4, T8& v8, Action action)
+  static auto doAtChannel(int channel, T2& v2, T4& v4, T8& v8, Action action)
   {
     constexpr bool VEC8_AVAILABLE = SimdTypes<Scalar>::VEC8_AVAILABLE;
     constexpr bool VEC4_AVAILABLE = SimdTypes<Scalar>::VEC4_AVAILABLE;
@@ -373,73 +373,73 @@ struct InterleavedChannel final
 
 template<typename Scalar>
 void
-InterleavedBuffer<Scalar>::Reserve(int value)
+InterleavedBuffer<Scalar>::reserve(int value)
 {
   if (capacity >= value) {
     return;
   }
   capacity = value;
   for (auto& b8 : buffers8) {
-    b8.SetCapacityAsVec(value);
+    b8.reserveVec(value);
   }
   for (auto& b4 : buffers4) {
-    b4.SetCapacityAsVec(value);
+    b4.reserveVec(value);
   }
   for (auto& b2 : buffers2) {
-    b2.SetCapacityAsVec(value);
+    b2.reserveVec(value);
   }
 }
 
 template<typename Scalar>
 inline void
-InterleavedBuffer<Scalar>::SetNumSamples(int value)
+InterleavedBuffer<Scalar>::setNumSamples(int value)
 {
   numSamples = value;
-  Reserve(value);
+  reserve(value);
   for (auto& b8 : buffers8) {
-    b8.SetNumSamples(value);
+    b8.setNumSamples(value);
   }
   for (auto& b4 : buffers4) {
-    b4.SetNumSamples(value);
+    b4.setNumSamples(value);
   }
   for (auto& b2 : buffers2) {
-    b2.SetNumSamples(value);
+    b2.setNumSamples(value);
   }
 }
 
 template<typename Scalar>
 void
-InterleavedBuffer<Scalar>::SetNumChannels(int value)
+InterleavedBuffer<Scalar>::setNumChannels(int value)
 {
   numChannels = value;
   int num2, num4, num8;
-  GetNumOfVecBuffersUsedByInterleavedBuffer<Scalar>(
+  getNumOfVecBuffersUsedByInterleavedBuffer<Scalar>(
     numChannels, num2, num4, num8);
   buffers8.resize(num8);
   buffers4.resize(num4);
   buffers2.resize(num2);
-  Reserve(capacity);
-  SetNumSamples(numSamples);
+  reserve(capacity);
+  setNumSamples(numSamples);
 }
 
 template<typename Scalar>
 void
-InterleavedBuffer<Scalar>::Fill(Scalar value)
+InterleavedBuffer<Scalar>::fill(Scalar value)
 {
   for (auto& b8 : buffers8) {
-    b8.Fill(value);
+    b8.fill(value);
   }
   for (auto& b4 : buffers4) {
-    b4.Fill(value);
+    b4.fill(value);
   }
   for (auto& b2 : buffers2) {
-    b2.Fill(value);
+    b2.fill(value);
   }
 }
 
 template<typename Scalar>
 bool
-InterleavedBuffer<Scalar>::Deinterleave(Scalar** output,
+InterleavedBuffer<Scalar>::deinterleave(Scalar** output,
                                         int numOutputChannels,
                                         int numOutputSamples) const
 {
@@ -518,29 +518,29 @@ InterleavedBuffer<Scalar>::Deinterleave(Scalar** output,
 
 template<typename Scalar>
 bool
-InterleavedBuffer<Scalar>::Interleave(Scalar* const* input,
+InterleavedBuffer<Scalar>::interleave(Scalar* const* input,
                                       int numInputChannels,
                                       int numInputSamples)
 {
 
   if (numInputChannels > numChannels) {
-    SetNumChannels(numInputChannels);
+    setNumChannels(numInputChannels);
   }
-  SetNumSamples(numInputSamples);
+  setNumSamples(numInputSamples);
 
   if (VEC8_AVAILABLE && buffers8.size() > 0) {
     if (numInputChannels % 8 != 0) {
-      Fill(0.f);
+      fill(0.f);
     }
   }
   else if (VEC4_AVAILABLE && buffers4.size() > 0) {
     if (numInputChannels % 4 != 0) {
-      Fill(0.f);
+      fill(0.f);
     }
   }
   else {
     if (numInputChannels % 2 != 0) {
-      Fill(0.f);
+      fill(0.f);
     }
   }
 
@@ -615,17 +615,17 @@ InterleavedBuffer<Scalar>::Interleave(Scalar* const* input,
 
 template<typename Scalar>
 Scalar const*
-InterleavedBuffer<Scalar>::At(int channel, int sample) const
+InterleavedBuffer<Scalar>::at(int channel, int sample) const
 {
   return const_cast<Scalar const*>(
-    const_cast<InterleavedBuffer<Scalar>*>(this)->At(channel, sample));
+    const_cast<InterleavedBuffer<Scalar>*>(this)->at(channel, sample));
 }
 
 template<typename Scalar>
 Scalar*
-InterleavedBuffer<Scalar>::At(int channel, int sample)
+InterleavedBuffer<Scalar>::at(int channel, int sample)
 {
-  return InterleavedChannel<Scalar>::Do(
+  return InterleavedChannel<Scalar>::doAtChannel(
     channel,
     buffers2,
     buffers4,
@@ -637,18 +637,18 @@ InterleavedBuffer<Scalar>::At(int channel, int sample)
 
 template<typename Scalar>
 inline void
-InterleavedBuffer<Scalar>::CopyFrom(InterleavedBuffer const& other,
+InterleavedBuffer<Scalar>::copyFrom(InterleavedBuffer const& other,
                                     int numSamples,
                                     int numChannelsToCopy)
 {
   if (numChannelsToCopy < 0) {
-    numChannelsToCopy = other.GetNumChannels();
+    numChannelsToCopy = other.getNumChannels();
   }
   if (numChannels < numChannelsToCopy) {
-    SetNumChannels(other.GetNumChannels());
+    setNumChannels(other.getNumChannels());
   }
-  assert(numSamples <= other.GetNumSamples());
-  SetNumSamples(numSamples);
+  assert(numSamples <= other.getNumSamples());
+  setNumSamples(numSamples);
   if constexpr (VEC8_AVAILABLE) {
     for (int i = 0; i < buffers8.size(); ++i) {
       std::copy(&other.buffers8[i](0),

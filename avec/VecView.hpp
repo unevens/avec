@@ -47,14 +47,14 @@ public:
    * @param ptr pointer to the memory to view. It must be aligned to Vec::size()
    * * sizeof(Scalar).
    */
-  VecView(Scalar* ptr) { SetPointer(ptr); }
+  VecView(Scalar* ptr) { setPointer(ptr); }
 
   /**
    * Resets the view to point to a different address.
    * @param ptr_ pointer to the memory to view. It must be aligned to
    * Vec::size()*sizeof(Scalar).
    */
-  void SetPointer(Scalar* ptr_)
+  void setPointer(Scalar* ptr_)
   {
     AVEC_ASSERT_ALIGNMENT(ptr_, Vec);
     ptr = ptr_;
@@ -200,13 +200,13 @@ public:
    * Explicit Conversion to Scalar*
    * @returns the pointer to the viewed memory.
    */
-  Scalar* Ptr() { return ptr; }
+  Scalar* getPtr() { return ptr; }
 
   /**
    * Explicit Conversion to Scalar*
    * @returns the pointer to the viewed memory.
    */
-  Scalar const* Ptr() const { return ptr; }
+  Scalar const* getPtr() const { return ptr; }
 
   /**
    * A nullptr with VecView type.

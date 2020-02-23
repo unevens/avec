@@ -41,20 +41,25 @@ template<typename Scalar>
 class VecBiquadFilterInterface
 {
 public:
-  virtual void Reset(int channel) = 0;
-  virtual void Setup(int channel, bool reset, bool automate = true) = 0;
-  virtual void SetFrequency(int channel, double value, bool update) = 0;
-  virtual void SetGain(int channel, double value, bool update) = 0;
-  virtual void SetQuality(int channel, double value, bool update) = 0;
-  virtual void SetBiquadFilterType(int channel,
+  virtual void reset(int channel) = 0;
+  virtual void reset() = 0;
+  virtual void setup(int channel, bool reset, bool automate = true) = 0;
+  virtual void setFrequency(int channel, double value, bool update) = 0;
+  virtual void setFrequency(double value, bool update) = 0;
+  virtual void setGain(int channel, double value, bool update) = 0;
+  virtual void setGain(double value, bool update) = 0;
+  virtual void setQuality(int channel, double value, bool update) = 0;
+  virtual void setQuality(double value, bool update) = 0;
+  virtual void setBiquadFilterType(int channel,
                                    BiquadFilterType value,
                                    bool update) = 0;
-  virtual double GetFrequency(int channel) const = 0;
-  virtual double GetGain(int channel) const = 0;
-  virtual double GetQuality(int channel) const = 0;
-  virtual BiquadFilterType GetBiquadFilterType(int channel) const = 0;
-  virtual void SetState(int channel, Scalar state0, Scalar state1) = 0;
-  virtual void GetState(int channel, Scalar& state0, Scalar& state1) const = 0;
+  virtual void setBiquadFilterType(BiquadFilterType value, bool update) = 0;
+  virtual double getFrequency(int channel) const = 0;
+  virtual double getGain(int channel) const = 0;
+  virtual double getQuality(int channel) const = 0;
+  virtual BiquadFilterType getBiquadFilterType(int channel) const = 0;
+  virtual void setState(int channel, Scalar state0, Scalar state1) = 0;
+  virtual void getState(int channel, Scalar& state0, Scalar& state1) const = 0;
 };
 
 /**
@@ -87,7 +92,7 @@ public:
     std::fill(frequency.begin(), frequency.end(), frequency_);
     std::fill(quality.begin(), quality.end(), quality_);
     std::fill(gain.begin(), gain.end(), gain_);
-    Setup(true);
+    setup(true);
   }
 
   /**
@@ -96,7 +101,7 @@ public:
    * @param output the output
    * @param numSamples the number of samples to process
    */
-  void ProcessBlock(VecBuffer<Vec> const& input,
+  void processBlock(VecBuffer<Vec> const& input,
                     VecBuffer<Vec>& output,
                     int numSamples)
   {
@@ -164,7 +169,7 @@ public:
    * Resets the state of the filter, as if it was processing silence from an
    * eternity.
    */
-  void Reset()
+  void reset() override
   {
     buffer[5] = 0.0;
     buffer[6] = 0.0;
@@ -181,7 +186,7 @@ public:
    * processing silence from an eternity.
    * @param channel the channel to reset
    */
-  void Reset(int channel) override
+  void reset(int channel) override
   {
     buffer[5][channel] = 0.0;
     buffer[6][channel] = 0.0;
@@ -199,7 +204,7 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetFrequency(int channel, double value, bool update = true) override
+  void setFrequency(int channel, double value, bool update = true) override
   {
     if (frequency[channel] == value) {
       return;
@@ -207,7 +212,7 @@ public:
     isSetupNeeded[channel] = true;
     frequency[channel] = value;
     if (update) {
-      Setup(channel);
+      setup(channel);
     }
   }
 
@@ -218,7 +223,7 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetGain(int channel, double value, bool update = true) override
+  void setGain(int channel, double value, bool update = true) override
   {
     if (gain[channel] == value) {
       return;
@@ -226,7 +231,7 @@ public:
     isSetupNeeded[channel] = true;
     gain[channel] = value;
     if (update) {
-      Setup(channel);
+      setup(channel);
     }
   }
 
@@ -237,7 +242,7 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetQuality(int channel, double value, bool update = true) override
+  void setQuality(int channel, double value, bool update = true) override
   {
     if (quality[channel] == value) {
       return;
@@ -245,7 +250,7 @@ public:
     isSetupNeeded[channel] = true;
     quality[channel] = value;
     if (update) {
-      Setup(channel);
+      setup(channel);
     }
   }
 
@@ -256,7 +261,7 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetBiquadFilterType(int channel,
+  void setBiquadFilterType(int channel,
                            BiquadFilterType value,
                            bool update = true) override
   {
@@ -266,7 +271,7 @@ public:
     isSetupNeeded[channel] = true;
     filterType[channel] = value;
     if (update) {
-      Setup(channel);
+      setup(channel);
     }
   }
 
@@ -276,14 +281,14 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetFrequency(double value, bool update = true)
+  void setFrequency(double value, bool update = true) override
   {
     for (int i = 0; i < Vec::size(); ++i) {
       isSetupNeeded[i] = frequency[i] != value;
     }
     std::fill(frequency.begin(), frequency.end(), value);
     if (update) {
-      MakeReady();
+      makeReady();
     }
   }
 
@@ -293,14 +298,14 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetGain(double value, bool update = true)
+  void setGain(double value, bool update = true) override
   {
     for (int i = 0; i < Vec::size(); ++i) {
       isSetupNeeded[i] = gain[i] != value;
     }
     std::fill(gain.begin(), gain.end(), value);
     if (update) {
-      MakeReady();
+      makeReady();
     }
   }
 
@@ -310,14 +315,14 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetQuality(double value, bool update = true)
+  void setQuality(double value, bool update = true) override
   {
     for (int i = 0; i < Vec::size(); ++i) {
       isSetupNeeded[i] = quality[i] != value;
     }
     std::fill(quality.begin(), quality.end(), value);
     if (update) {
-      MakeReady();
+      makeReady();
     }
   }
 
@@ -327,14 +332,14 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetBiquadFilterType(BiquadFilterType value, bool update = true)
+  void setBiquadFilterType(BiquadFilterType value, bool update = true) override
   {
     for (int i = 0; i < Vec::size(); ++i) {
       isSetupNeeded[i] = filterType[i] != value;
     }
     std::fill(filterType.begin(), filterType.end(), value);
     if (update) {
-      MakeReady();
+      makeReady();
     }
   }
 
@@ -343,28 +348,28 @@ public:
    * @param channel the channel to get the cutoff frequency from
    * @return the cutoff frequency of the specified channel.
    */
-  double GetFrequency(int channel) const override { return frequency[channel]; }
+  double getFrequency(int channel) const override { return frequency[channel]; }
 
   /**
    * Gets the gain used for the specified channel.
    * @param channel the channel to get the gain from
    * @return the gain of the specified channel.
    */
-  double GetGain(int channel) const override { return gain[channel]; }
+  double getGain(int channel) const override { return gain[channel]; }
 
   /**
    * Gets the quality used for the specified channel.
    * @param channel the channel to get the quality from
    * @return the quality of the specified channel.
    */
-  double GetQuality(int channel) const override { return quality[channel]; }
+  double getQuality(int channel) const override { return quality[channel]; }
 
   /**
    * Gets the filter type used for the specified channel.
    * @param channel the channel to get the filter type from
    * @return the filter type of the specified channel.
    */
-  BiquadFilterType GetBiquadFilterType(int channel) const override
+  BiquadFilterType getBiquadFilterType(int channel) const override
   {
     return filterType[channel];
   }
@@ -372,12 +377,12 @@ public:
   /**
    * Computes the filter coefficients for a specified channel.
    * @param channel the channel to compute the coefficients the coeffcient for
-   * @param reset if true, resets the state of filter, calling Reset(). false by
+   * @param reset if true, resets the state of filter, calling reset(). false by
    * default.
    * @param automate if true, as it is by default, the filter will use the next
    * process block call to smooth between its current state and the new state.
    */
-  void Setup(int channel, bool reset = false, bool automate = true) override
+  void setup(int channel, bool reset = false, bool automate = true) override
   {
     isSetupNeeded[channel] = false;
 
@@ -477,22 +482,22 @@ public:
     }
 
     if (reset) {
-      Reset(channel);
+      reset(channel);
     }
   }
 
   /**
    * Computes the filter coefficients.
-   * @param reset if true resets the state of filter, calling Reset(). false by
+   * @param reset if true resets the state of filter, calling reset(). false by
    * default.
    */
-  void Setup(bool reset = false)
+  void setup(bool reset = false)
   {
     for (int i = 0; i < Vec::size(); ++i) {
-      Setup(i, false);
+      setup(i, false);
     }
     if (reset) {
-      Reset();
+      reset();
     }
   }
 
@@ -502,7 +507,7 @@ public:
    * @param state0 the first number of the state of the filter
    * @param state1 the second number of the state of the filter
    */
-  void SetState(int channel, Scalar state0, Scalar state1) override
+  void setState(int channel, Scalar state0, Scalar state1) override
   {
     buffer[5][channel] = state0;
     buffer[6][channel] = state1;
@@ -514,7 +519,7 @@ public:
    * @param state0 the first number of the state of the filter
    * @param state1 the second number of the state of the filter
    */
-  void GetState(int channel, Scalar& state0, Scalar& state1) const override
+  void getState(int channel, Scalar& state0, Scalar& state1) const override
   {
     state0 = buffer[5][channel];
     state1 = buffer[6][channel];
@@ -524,11 +529,11 @@ public:
    * Computes any the coefficients necessary for the computation that was not
    * already computed. Usefull if you call setters with
    */
-  void MakeReady()
+  void makeReady()
   {
     for (int i = 0; i < Vec::size(); ++i) {
       if (isSetupNeeded[i]) {
-        Setup(i);
+        setup(i);
       }
     }
   }
@@ -563,7 +568,7 @@ class BiquadFilter final
   std::vector<VecBiquadFilter<Vec2>> filters2;
 
   template<class Action, typename ValueType>
-  ValueType OnChannel(Action action, int channel)
+  ValueType onChannel(Action action, int channel)
   {
     if constexpr (VEC8_AVAILABLE) {
       if (filters4.size() > 0) {
@@ -635,7 +640,7 @@ public:
     : numChannels(numChannels)
   {
     int num2, num4, num8;
-    GetNumOfVecBuffersUsedByInterleavedBuffer<Scalar>(
+    getNumOfVecBuffersUsedByInterleavedBuffer<Scalar>(
       numChannels, num2, num4, num8);
     filters8.reserve(num8);
     filters4.reserve(num4);
@@ -661,23 +666,23 @@ public:
    * @param numSamples the number of samples to process
    * @param numChannelsToProcess the number of channels to process
    */
-  void ProcessBlock(InterleavedBuffer<Scalar> const& input,
+  void processBlock(InterleavedBuffer<Scalar> const& input,
                     InterleavedBuffer<Scalar>& output,
                     int numSamples,
                     int numChannelsToProcess)
   {
     assert(numChannelsToProcess <= numChannels);
-    assert(numSamples <= input.GetNumSamples());
+    assert(numSamples <= input.getNumSamples());
 
     int channelsCount = numChannelsToProcess;
 
-    output.SetNumSamples(numSamples);
+    output.setNumSamples(numSamples);
 
     if constexpr (VEC2_AVAILABLE) {
-      int lastBuffers2 = output.GetNumBuffers2() - 1;
+      int lastBuffers2 = output.getNumBuffers2() - 1;
       for (int i = 0; i < filters2.size(); ++i) {
-        filters2[i].ProcessBlock(
-          input.GetBuffer2(i), output.GetBuffer2(i), numSamples);
+        filters2[i].processBlock(
+          input.getBuffer2(i), output.getBuffer2(i), numSamples);
         channelsCount -= 2;
         if (channelsCount <= 0) {
           break;
@@ -686,8 +691,8 @@ public:
     }
     if constexpr (VEC4_AVAILABLE) {
       for (int i = 0; i < filters4.size(); ++i) {
-        filters4[i].ProcessBlock(
-          input.GetBuffer4(i), output.GetBuffer4(i), numSamples);
+        filters4[i].processBlock(
+          input.getBuffer4(i), output.getBuffer4(i), numSamples);
         channelsCount -= 4;
         if (channelsCount <= 0) {
           break;
@@ -696,8 +701,8 @@ public:
     }
     if constexpr (VEC8_AVAILABLE) {
       for (int i = 0; i < filters8.size(); ++i) {
-        filters8[i].ProcessBlock(
-          input.GetBuffer8(i), output.GetBuffer8(i), numSamples);
+        filters8[i].processBlock(
+          input.getBuffer8(i), output.getBuffer8(i), numSamples);
         channelsCount -= 8;
         if (channelsCount <= 0) {
           break;
@@ -710,16 +715,16 @@ public:
    * Resets the state of the filter, as if it was processing silence from an
    * eternity.
    */
-  void Reset()
+  void reset()
   {
     for (auto& f : filters8) {
-      f.Reset();
+      f.reset();
     }
     for (auto& f : filters4) {
-      f.Reset();
+      f.reset();
     }
     for (auto& f : filters2) {
-      f.Reset();
+      f.reset();
     }
   }
 
@@ -730,11 +735,11 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetFrequency(int channel, double value, bool update = true)
+  void setFrequency(int channel, double value, bool update = true)
   {
-    OnChannel(
+    onChannel(
       [value, update](auto* filter, int channel) {
-        filter->SetFrequency(channel, value, update);
+        filter->setFrequency(channel, value, update);
         return 0.0;
       },
       channel);
@@ -747,11 +752,11 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetGain(int channel, double value, bool update = true)
+  void setGain(int channel, double value, bool update = true)
   {
-    OnChannel(
+    onChannel(
       [value, update](auto* filter, int channel) {
-        filter->SetGain(channel, value, update);
+        filter->setGain(channel, value, update);
         return 0.0;
       },
       channel);
@@ -764,11 +769,11 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetQuality(int channel, double value, bool update = true)
+  void setQuality(int channel, double value, bool update = true)
   {
-    OnChannel(
+    onChannel(
       [value, update](auto* filter, int channel) {
-        filter->SetQuality(channel, value, update);
+        filter->setQuality(channel, value, update);
         return 0.0;
       },
       channel);
@@ -781,13 +786,13 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetBiquadFilterType(int channel,
+  void setBiquadFilterType(int channel,
                            BiquadFilterType value,
                            bool update = true)
   {
-    OnChannel(
+    onChannel(
       [value, update](auto* filter, int channel) {
-        filter->SetBiquadFilterType(channel, value, update);
+        filter->setBiquadFilterType(channel, value, update);
         return 0.0;
       },
       channel);
@@ -799,16 +804,16 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetFrequency(double value, bool update = true)
+  void setFrequency(double value, bool update = true)
   {
     for (auto& f : filters8) {
-      f.SetFrequency(value, update);
+      f.setFrequency(value, update);
     }
     for (auto& f : filters4) {
-      f.SetFrequency(value, update);
+      f.setFrequency(value, update);
     }
     for (auto& f : filters2) {
-      f.SetFrequency(value, update);
+      f.setFrequency(value, update);
     }
   }
 
@@ -818,16 +823,16 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetGain(double value, bool update = true)
+  void setGain(double value, bool update = true)
   {
     for (auto& f : filters8) {
-      f.SetGain(value, update);
+      f.setGain(value, update);
     }
     for (auto& f : filters4) {
-      f.SetGain(value, update);
+      f.setGain(value, update);
     }
     for (auto& f : filters2) {
-      f.SetGain(value, update);
+      f.setGain(value, update);
     }
   }
 
@@ -837,16 +842,16 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetQuality(double value, bool update = true)
+  void setQuality(double value, bool update = true)
   {
     for (auto& f : filters8) {
-      f.SetQuality(value, update);
+      f.setQuality(value, update);
     }
     for (auto& f : filters4) {
-      f.SetQuality(value, update);
+      f.setQuality(value, update);
     }
     for (auto& f : filters2) {
-      f.SetQuality(value, update);
+      f.setQuality(value, update);
     }
   }
 
@@ -856,16 +861,16 @@ public:
    * @param update if true, as it is by default, the new filter coefficients
    * will be computed. Otherwise they will not be computed.
    */
-  void SetBiquadFilterType(BiquadFilterType value, bool update = true)
+  void setBiquadFilterType(BiquadFilterType value, bool update = true)
   {
     for (auto& f : filters8) {
-      f.SetBiquadFilterType(value, update);
+      f.setBiquadFilterType(value, update);
     }
     for (auto& f : filters4) {
-      f.SetBiquadFilterType(value, update);
+      f.setBiquadFilterType(value, update);
     }
     for (auto& f : filters2) {
-      f.SetBiquadFilterType(value, update);
+      f.setBiquadFilterType(value, update);
     }
   }
 
@@ -874,10 +879,10 @@ public:
    * @param channel the channel to get the cutoff frequency from
    * @return the cutoff frequency of the specified channel.
    */
-  double GetFrequency(int channel) const
+  double getFrequency(int channel) const
   {
-    OnChannel(
-      [](auto* filter, int channel) { return filter->GetFrequency(channel); },
+    onChannel(
+      [](auto* filter, int channel) { return filter->getFrequency(channel); },
       channel);
   }
 
@@ -886,10 +891,10 @@ public:
    * @param channel the channel to get the gain from
    * @return the gain of the specified channel.
    */
-  double GetGain(int channel) const
+  double getGain(int channel) const
   {
-    OnChannel(
-      [](auto* filter, int channel) { return filter->GetGain(channel); },
+    onChannel(
+      [](auto* filter, int channel) { return filter->getGain(channel); },
       channel);
   }
 
@@ -898,10 +903,10 @@ public:
    * @param channel the channel to get the quality from
    * @return the quality of the specified channel.
    */
-  double GetQuality(int channel) const
+  double getQuality(int channel) const
   {
-    OnChannel(
-      [](auto* filter, int channel) { return filter->GetQuality(channel); },
+    onChannel(
+      [](auto* filter, int channel) { return filter->getQuality(channel); },
       channel);
   }
 
@@ -910,32 +915,32 @@ public:
    * @param channel the channel to get the filter type from
    * @return the filter type of the specified channel.
    */
-  BiquadFilterType GetBiquadFilterType(int channel) const
+  BiquadFilterType getBiquadFilterType(int channel) const
   {
-    OnChannel([](auto* filter,
-                 int channel) { return filter->GetBiquadFilterType(channel); },
+    onChannel([](auto* filter,
+                 int channel) { return filter->getBiquadFilterType(channel); },
               channel);
   }
 
   /**
    * @return the maximum number of channel that the generator can work with.
    */
-  int GetNumChannels() const { return numChannels; }
+  int getNumChannels() const { return numChannels; }
 
   /**
    * Computes any the coefficients necessary for the computation that was not
    * already computed. Usefull if you call setters with
    */
-  void MakeReady()
+  void makeReady()
   {
     for (auto& f : filters8) {
-      f.MakeReady();
+      f.makeReady();
     }
     for (auto& f : filters4) {
-      f.MakeReady();
+      f.makeReady();
     }
     for (auto& f : filters2) {
-      f.MakeReady();
+      f.makeReady();
     }
   }
 };

@@ -58,7 +58,7 @@ i2s(int x)
 }
 
 void
-VERIFY(bool condition, string description)
+verify(bool condition, string description)
 {
   if (!condition) {
     cout << "FAILURE: " << description << "\n";
@@ -67,7 +67,7 @@ VERIFY(bool condition, string description)
 
 template<typename Scalar>
 void
-TestInterleavedBuffer(int numChannels, int samplesPerBlock)
+testInterleavedBuffer(int numChannels, int samplesPerBlock)
 {
   cout << "Testing InterleavedBuffer with " << numChannels << "channels and "
        << (typeid(Scalar) == typeid(float) ? "single" : "double")
@@ -83,12 +83,12 @@ TestInterleavedBuffer(int numChannels, int samplesPerBlock)
   }
   // interleaver test
   auto buffer = InterleavedBuffer<Scalar>(numChannels, samplesPerBlock);
-  buffer.Interleave(inout, numChannels, samplesPerBlock);
+  buffer.interleave(inout, numChannels, samplesPerBlock);
   for (int i = 0; i < numChannels; ++i) {
     for (int s = 0; s < samplesPerBlock; ++s) {
-      // cout << inout[i][s] << "==" << buffer.At(i, s) << "\n";
-      VERIFY(inout[i][s] == buffer.At(i, s)[0],
-             "checking InterleaverBuffer::At\n");
+      // cout << inout[i][s] << "==" << buffer.at(i, s) << "\n";
+      verify(inout[i][s] == buffer.at(i, s)[0],
+             "checking InterleaverBuffer::at\n");
     }
   }
   cout << "interleaving test complete\n";
@@ -98,13 +98,13 @@ TestInterleavedBuffer(int numChannels, int samplesPerBlock)
       inout[i][s] = -1.f;
     }
   }
-  buffer.Deinterleave(inout, numChannels, samplesPerBlock);
+  buffer.deinterleave(inout, numChannels, samplesPerBlock);
   // check
   v = 0;
   for (int i = 0; i < numChannels; ++i) {
     for (int s = 0; s < samplesPerBlock; ++s) {
       // cout << inout[i][s] << "==" << s << "\n";
-      VERIFY(inout[i][s] == (Scalar)v++, "checking deinterleaving\n");
+      verify(inout[i][s] == (Scalar)v++, "checking deinterleaving\n");
     }
   }
   cout << "deinterleaving test completed\n";
@@ -126,8 +126,8 @@ main()
   cout << "avx? " << AVX_AVAILABLE << "\n";
 
   for (int c = 1; c < 32; ++c) {
-    TestInterleavedBuffer<float>(c, 128);
-    TestInterleavedBuffer<double>(c, 128);
+    testInterleavedBuffer<float>(c, 128);
+    testInterleavedBuffer<double>(c, 128);
   }
   return 0;
 }

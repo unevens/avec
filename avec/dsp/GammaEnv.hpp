@@ -95,7 +95,7 @@ struct GammaEnv final
 
   Scalar useRms[Vec::size()];
 
-  void Reset(double initv = 0.0)
+  void reset(double initv = 0.0)
   {
     std::fill_n(&env_[0], 16 * Vec::size(), initv);
     std::fill_n(&envr_[0], 16 * Vec::size(), initv);
@@ -104,7 +104,7 @@ struct GammaEnv final
     std::fill_n(&prevr_[0], Vec::size(), initv);
   }
 
-  void ProcessBlock(VecBuffer<Vec> const& input,
+  void processBlock(VecBuffer<Vec> const& input,
                     VecBuffer<Vec>& output,
                     int numSamples)
   {
@@ -196,7 +196,7 @@ struct GammaEnv final
     prevr.store_a(prevr_);
   }
 
-  void ProcessBlockSymm(VecBuffer<Vec> const& input,
+  void processBlockSymm(VecBuffer<Vec> const& input,
                         VecBuffer<Vec>& output,
                         int numSamples)
   {
@@ -406,10 +406,10 @@ public:
   GammaEnvSettings(GammaEnv<Vec>& processor)
     : processor(processor)
   {
-    ComputeCoefficients();
+    computeCoefficients();
   }
 
-  void ComputeCoefficients(int channel)
+  void computeCoefficients(int channel)
   {
     settings[channel].init();
     for (int s = 0; s < 4; ++s) {
@@ -420,14 +420,14 @@ public:
     processor.envb5_[channel] = settings[channel].envb5;
   }
 
-  void ComputeCoefficients()
+  void computeCoefficients()
   {
     for (int c = 0; c < Vec::size(); ++c) {
-      ComputeCoefficients(c);
+      computeCoefficients(c);
     }
   }
 
-  void Setup(int channel,
+  void setup(int channel,
              bool rms,
              double Attack,
              double Release,
@@ -452,7 +452,7 @@ public:
       isChanged = true;
     }
     if (isChanged) {
-      ComputeCoefficients(channel);
+      computeCoefficients(channel);
     }
     processor.useRms[channel] = rms ? 1.0 : 0.0;
   }

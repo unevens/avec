@@ -36,7 +36,7 @@ class ScalarBuffer final
   int size;
   int capacity;
 
-  void UpdatePointers()
+  void updatePointers()
   {
     pointers.resize(data.size());
     for (int i = 0; i < pointers.size(); ++i) {
@@ -61,18 +61,18 @@ public:
   /**
    * @return a Scalar** to the buffer.
    */
-  Scalar** Get() { return &pointers[0]; }
+  Scalar** get() { return &pointers[0]; }
 
   /**
    * @return a Scalar* const* to the buffer.
    */
-  Scalar* const* Get() const { return &pointers[0]; }
+  Scalar* const* get() const { return &pointers[0]; }
 
   /**
    * Fills the buffer with the supplied value
    * @param value value to set all the elements of the buffer to.
    */
-  void Fill(Scalar value)
+  void fill(Scalar value)
   {
     for (auto& channel : data) {
       std::fill(channel.begin(), channel.end(), value);
@@ -82,38 +82,38 @@ public:
   /**
    * @return the size of each channel of the buffer.
    */
-  int GetNumSamples() const { return size; }
+  int getNumSamples() const { return size; }
 
   /**
    * @return the capacity of each channel of the buffer - capacity = size of
    * allocated memory, measured in sizeof(Scalar).
    */
-  int GetCapacity() const { return capacity; }
+  int getCapacity() const { return capacity; }
 
   /**
    * @return the number of channels of the buffer.
    */
-  int GetNumChannels() const { return data.size(); }
+  int getNumChannels() const { return data.size(); }
 
   /**
    * Sets the number of channels of the buffer.
    * @param numRequiredChannels the new number of channel.
    */
-  void SetNumChannels(int numRequiredChannels)
+  void setNumChannels(int numRequiredChannels)
   {
     data.resize(numRequiredChannels);
     for (int i = 0; i < data.size(); ++i) {
       data[i].reserve(data[0].capacity());
       data[i].resize(data[0].size());
     }
-    UpdatePointers();
+    updatePointers();
   }
 
   /**
    * Preallocates memory for each channel of the buffer.
    * @param numSamples the amount of samples to allocate memory for.
    */
-  void Reserve(int numSamples)
+  void reserve(int numSamples)
   {
     if (capacity >= numSamples) {
       return;
@@ -122,26 +122,26 @@ public:
     for (int i = 0; i < data.size(); ++i) {
       data[i].reserve(numSamples);
     }
-    UpdatePointers();
+    updatePointers();
   }
 
   /**
    * Set the size of each channel of the buffer.
    * @param requiredSize the amount of samples to set the size to.
-   * @param shrink if true, the buffer asks each std::vector to release any
+   * @param shrinkIfSmaller if true, the buffer tells each std::vector to release any
    * previously allocated memory that is no longer neeeded.
    */
-  void SetNumSamples(int numSamples, bool shrink = false)
+  void setNumSamples(int numSamples, bool shrinkIfSmaller = false)
   {
-    Reserve(numSamples);
+    reserve(numSamples);
     size = numSamples;
     for (int i = 0; i < data.size(); ++i) {
       data[i].resize(numSamples, 0.0);
     }
-    if (shrink) {
-      Shrink();
+    if (shrinkIfSmaller) {
+      shrink();
     }
-    UpdatePointers();
+    updatePointers();
   }
 
   /**
@@ -149,28 +149,28 @@ public:
    * @param numRequiredChannels the new number of channels.
    * @param numRequiredSamples the amount of samples to set the size of each
    * channel to.
-   * @param shrink if true, the buffer asks each std::vector to release any
+   * @param shrink if true, the buffer tells each std::vector to release any
    * previously allocated memory that is no longer neeeded.
    */
-  void SetNumChannelsAndSamples(int numRequiredChannels,
+  void setNumChannelsAndSamples(int numRequiredChannels,
                                 int numRequiredSamples,
                                 bool shrink = false)
   {
-    SetNumChannels(numRequiredChannels);
-    SetNumSamples(numRequiredSamples, shrink);
+    setNumChannels(numRequiredChannels);
+    setNumSamples(numRequiredSamples, shrink);
   }
 
   /**
    * Asks each std::vector to release any previously allocated memory that is no
    * longer neeeded.
    */
-  void Shrink()
+  void shrink()
   {
     data.shrink_to_fit();
     for (int i = 0; i < data.size(); ++i) {
       data[i].shrink_to_fit();
     }
-    UpdatePointers();
+    updatePointers();
     pointers.shrink_to_fit();
     capacity = size;
   }
@@ -183,23 +183,23 @@ public:
    */
   ScalarBuffer(int numChannels = 2, int size = 256)
   {
-    SetNumChannelsAndSamples(numChannels, size);
+    setNumChannelsAndSamples(numChannels, size);
   }
 };
 
 template<typename InScalar, typename OutScalar>
 inline void
-CopyScalarBuffer(ScalarBuffer<InScalar> const& input,
+copyScalarBuffer(ScalarBuffer<InScalar> const& input,
                  ScalarBuffer<OutScalar>& output,
                  int numChannels = -1)
 {
   if (numChannels < 0) {
-    numChannels = input.GetNumChannels();
+    numChannels = input.getNumChannels();
   }
-  output.SetNumChannelsAndSamples(numChannels, input.GetNumSamples());
+  output.setNumChannelsAndSamples(numChannels, input.getNumSamples());
   for (int c = 0; c < numChannels; ++c) {
     std::copy(
-      &input[c][0], &input[c][0] + input.GetNumSamples(), &output[c][0]);
+      &input[c][0], &input[c][0] + input.getNumSamples(), &output[c][0]);
   }
 }
 

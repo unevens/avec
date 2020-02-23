@@ -59,7 +59,7 @@ public:
    * @param output the VecBuffer in which to generate the noise.
    * @param numSamples the number of samples to generate in each channel.
    */
-  void Generate(VecBuffer<Vec8f>& output, int numSamples)
+  void generate(VecBuffer<Vec8f>& output, int numSamples)
   {
     xorshift32_16bit_simd_f8(&state[0], &output(0), numSamples);
   }
@@ -69,14 +69,14 @@ public:
    * @param channel the channel whose seed should be set.
    * @param value the new state.
    */
-  void SetState(int channel, uint16_t value) { state[channel] = value; }
+  void setState(int channel, uint16_t value) { state[channel] = value; }
 
   /**
    * Gets the state/seed of a channel.
    * @param channel the channel whose state should be returned.
    * @return the state of the channel.
    */
-  uint16_t GetState(int channel) const { return state[channel]; }
+  uint16_t getState(int channel) const { return state[channel]; }
 };
 
 /**
@@ -106,7 +106,7 @@ public:
    * @param output the VecBuffer in which to generate the noise.
    * @param numSamples the number of samples to generate in each channel.
    */
-  void Generate(VecBuffer<Vec4f>& output, int numSamples)
+  void generate(VecBuffer<Vec4f>& output, int numSamples)
   {
     xorshift32_16bit_simd_f4(&state[0], &output(0), numSamples);
   }
@@ -116,14 +116,14 @@ public:
    * @param channel the channel whose seed should be set.
    * @param value the new state.
    */
-  void SetState(int channel, uint16_t value) { state[channel] = value; }
+  void setState(int channel, uint16_t value) { state[channel] = value; }
 
   /**
    * Gets the state/seed of a channel.
    * @param channel the channel whose state should be returned.
    * @return the state of the channel.
    */
-  uint16_t GetState(int channel) const { return state[channel]; }
+  uint16_t getState(int channel) const { return state[channel]; }
 };
 
 /**
@@ -157,7 +157,7 @@ public:
    * @param output the VecBuffer in which to generate the noise.
    * @param numSamples the number of samples to generate in each channel.
    */
-  void Generate(VecBuffer<Vec8d>& output, int numSamples)
+  void generate(VecBuffer<Vec8d>& output, int numSamples)
   {
     float* asFloats = (float*)&output(0);
     xorshift32_16bit_simd_f8(&state[0], asFloats, numSamples);
@@ -171,14 +171,14 @@ public:
    * @param channel the channel whose seed should be set.
    * @param value the new state.
    */
-  void SetState(int channel, uint16_t value) { state[channel] = value; }
+  void setState(int channel, uint16_t value) { state[channel] = value; }
 
   /**
    * Gets the state/seed of a channel.
    * @param channel the channel whose state should be returned.
    * @return the state of the channel.
    */
-  uint16_t GetState(int channel) const { return state[channel]; }
+  uint16_t getState(int channel) const { return state[channel]; }
 };
 
 /**
@@ -208,7 +208,7 @@ public:
    * @param output the VecBuffer in which to generate the noise.
    * @param numSamples the number of samples to generate in each channel.
    */
-  void Generate(VecBuffer<Vec4d>& output, int numSamples)
+  void generate(VecBuffer<Vec4d>& output, int numSamples)
   {
     float* asFloats = (float*)&output(0);
     xorshift32_16bit_simd_f4(&state[0], asFloats, numSamples);
@@ -222,14 +222,14 @@ public:
    * @param channel the channel whose seed should be set.
    * @param value the new state.
    */
-  void SetState(int channel, uint16_t value) { state[channel] = value; }
+  void setState(int channel, uint16_t value) { state[channel] = value; }
 
   /**
    * Gets the state/seed of a channel.
    * @param channel the channel whose state should be returned.
    * @return the state of the channel.
    */
-  uint16_t GetState(int channel) const { return state[channel]; }
+  uint16_t getState(int channel) const { return state[channel]; }
 };
 
 /**
@@ -261,7 +261,7 @@ public:
    * @param output2 a pointer to an optional VecBuffer in which to generate two
    * additional channels of noise. Ignored if nullptr
    */
-  void Generate(VecBuffer<Vec2d>& output,
+  void generate(VecBuffer<Vec2d>& output,
                 int numSamples,
                 VecBuffer<Vec2d>* output2 = nullptr)
   {
@@ -284,14 +284,14 @@ public:
    * @param channel the channel whose seed should be set.
    * @param value the new state.
    */
-  void SetState(int channel, uint16_t value) { state[channel] = value; }
+  void setState(int channel, uint16_t value) { state[channel] = value; }
 
   /**
    * Gets the state/seed of a channel.
    * @param channel the channel whose state should be returned.
    * @return the state of the channel.
    */
-  uint16_t GetState(int channel) const { return state[channel]; }
+  uint16_t getState(int channel) const { return state[channel]; }
 };
 
 /**
@@ -327,7 +327,7 @@ public:
    * @param state the seed for the first channel. The state of the n-th channel
    * will be state + n.
    */
-  void SetState(uint16_t state);
+  void setState(uint16_t state);
   
   /**
    * Generates noise.
@@ -335,14 +335,14 @@ public:
    * @param numSamples the number of samples to generate in each channel.
    * @param numChannelsToGenerate the number of channels to generate.
    */
-  void Generate(InterleavedBuffer<Scalar>& outputBuffer,
+  void generate(InterleavedBuffer<Scalar>& outputBuffer,
                 int numSamples,
                 int numChannelsToGenerate);
 
   /**
    * @return the maximum number of channel that the generator can work with.
    */
-  int GetNumChannels() const { return numChannels; }
+  int getNumChannels() const { return numChannels; }
 };
 
 // implementation
@@ -352,7 +352,7 @@ inline NoiseGenerator<Scalar>::NoiseGenerator(int numChannels, uint16_t seed)
   : numChannels(numChannels)
 {
   int num2, num4, num8;
-  GetNumOfVecBuffersUsedByInterleavedBuffer<Scalar>(
+  getNumOfVecBuffersUsedByInterleavedBuffer<Scalar>(
     numChannels, num2, num4, num8);
   generators8.reserve(num8);
   generators4.reserve(num4);
@@ -372,39 +372,39 @@ inline NoiseGenerator<Scalar>::NoiseGenerator(int numChannels, uint16_t seed)
 
 template<typename Scalar>
 inline void
-NoiseGenerator<Scalar>::SetState(uint16_t state)
+NoiseGenerator<Scalar>::setState(uint16_t state)
 {
   for (auto& gen : generators8) {
     for (int i = 0; i < 8; ++i) {
-      gen.SetState(i, state++);
+      gen.setState(i, state++);
     }
   }
   for (auto& gen : generators4) {
     for (int i = 0; i < 4; ++i) {
-      gen.SetState(i, state++);
+      gen.setState(i, state++);
     }
   }
   for (auto& gen : generators2) {
     for (int i = 0; i < 4; ++i) {
-      gen.SetState(i, state++);
+      gen.setState(i, state++);
     }
   }
 }
 
 template<typename Scalar>
 inline void
-NoiseGenerator<Scalar>::Generate(InterleavedBuffer<Scalar>& outputBuffer,
+NoiseGenerator<Scalar>::generate(InterleavedBuffer<Scalar>& outputBuffer,
                                  int numSamples,
                                  int numChannelsToGenerate)
 {
   assert(numChannelsToGenerate <= numChannels);
 
   if constexpr (VEC2_AVAILABLE) {
-    int lastBuffers2 = outputBuffer.GetNumBuffers2() - 1;
+    int lastBuffers2 = outputBuffer.getNumBuffers2() - 1;
     for (int i = 0; i < generators2.size(); ++i) {
       VecBuffer<Vec2>* next =
-        (i < lastBuffers2) ? &outputBuffer.GetBuffer2(i + 1) : nullptr;
-      generators2[i].Generate(outputBuffer.GetBuffer2(i), numSamples, next);
+        (i < lastBuffers2) ? &outputBuffer.getBuffer2(i + 1) : nullptr;
+      generators2[i].generate(outputBuffer.getBuffer2(i), numSamples, next);
       numChannelsToGenerate -= 4;
       if (numChannelsToGenerate <= 0) {
         return;
@@ -414,7 +414,7 @@ NoiseGenerator<Scalar>::Generate(InterleavedBuffer<Scalar>& outputBuffer,
 
   if constexpr (VEC4_AVAILABLE) {
     for (int i = 0; i < generators4.size(); ++i) {
-      generators4[i].Generate(outputBuffer.GetBuffer4(i), numSamples);
+      generators4[i].generate(outputBuffer.getBuffer4(i), numSamples);
       numChannelsToGenerate -= 4;
       if (numChannelsToGenerate <= 0) {
         return;
@@ -422,10 +422,10 @@ NoiseGenerator<Scalar>::Generate(InterleavedBuffer<Scalar>& outputBuffer,
     }
   }
 
-  outputBuffer.SetNumSamples(numSamples);
+  outputBuffer.setNumSamples(numSamples);
   if constexpr (VEC8_AVAILABLE) {
     for (int i = 0; i < generators8.size(); ++i) {
-      generators8[i].Generate(outputBuffer.GetBuffer8(i), numSamples);
+      generators8[i].generate(outputBuffer.getBuffer8(i), numSamples);
       numChannelsToGenerate -= 8;
       if (numChannelsToGenerate <= 0) {
         return;
