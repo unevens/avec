@@ -17,37 +17,37 @@ limitations under the License.
 #pragma once
 #include "Spline.hpp"
 
-#define LOAD_SPLINE_STATE(spline, numActiveNodes, Vec, maxNumNodes)            \
+#define LOAD_SPLINE_STATE(spline, numActiveKnots, Vec, maxNumKnots)            \
   Vec const spline##_alpha = spline->getSmoothingAlpha()[0];                   \
-  Vec spline##_xs[maxNumNodes];                                                \
-  Vec spline##_ys[maxNumNodes];                                                \
-  Vec spline##_ts[maxNumNodes];                                                \
-  Vec spline##_ss[maxNumNodes];                                                \
-  Vec spline##_xt[maxNumNodes];                                                \
-  Vec spline##_yt[maxNumNodes];                                                \
-  Vec spline##_tt[maxNumNodes];                                                \
-  Vec spline##_st[maxNumNodes];                                                \
-  for (int n = 0; n < numActiveNodes; ++n) {                                   \
-    spline##_xs[n] = Vec().load_a(spline->getNodes()[n].state.x);              \
-    spline##_ys[n] = Vec().load_a(spline->getNodes()[n].state.y);              \
-    spline##_ts[n] = Vec().load_a(spline->getNodes()[n].state.t);              \
-    spline##_ss[n] = Vec().load_a(spline->getNodes()[n].state.s);              \
-    spline##_xt[n] = Vec().load_a(spline->getNodes()[n].target.x);             \
-    spline##_yt[n] = Vec().load_a(spline->getNodes()[n].target.y);             \
-    spline##_tt[n] = Vec().load_a(spline->getNodes()[n].target.t);             \
-    spline##_st[n] = Vec().load_a(spline->getNodes()[n].target.s);             \
+  Vec spline##_xs[maxNumKnots];                                                \
+  Vec spline##_ys[maxNumKnots];                                                \
+  Vec spline##_ts[maxNumKnots];                                                \
+  Vec spline##_ss[maxNumKnots];                                                \
+  Vec spline##_xt[maxNumKnots];                                                \
+  Vec spline##_yt[maxNumKnots];                                                \
+  Vec spline##_tt[maxNumKnots];                                                \
+  Vec spline##_st[maxNumKnots];                                                \
+  for (int n = 0; n < numActiveKnots; ++n) {                                   \
+    spline##_xs[n] = Vec().load_a(spline->getKnots()[n].state.x);              \
+    spline##_ys[n] = Vec().load_a(spline->getKnots()[n].state.y);              \
+    spline##_ts[n] = Vec().load_a(spline->getKnots()[n].state.t);              \
+    spline##_ss[n] = Vec().load_a(spline->getKnots()[n].state.s);              \
+    spline##_xt[n] = Vec().load_a(spline->getKnots()[n].target.x);             \
+    spline##_yt[n] = Vec().load_a(spline->getKnots()[n].target.y);             \
+    spline##_tt[n] = Vec().load_a(spline->getKnots()[n].target.t);             \
+    spline##_st[n] = Vec().load_a(spline->getKnots()[n].target.s);             \
   }
 
-#define STORE_SPLINE_STATE(spline, numActiveNodes)                             \
-  for (int n = 0; n < numActiveNodes; ++n) {                                   \
-    spline##_xs[n].store_a(spline->getNodes()[n].state.x);                     \
-    spline##_ys[n].store_a(spline->getNodes()[n].state.y);                     \
-    spline##_ts[n].store_a(spline->getNodes()[n].state.t);                     \
-    spline##_ss[n].store_a(spline->getNodes()[n].state.s);                     \
+#define STORE_SPLINE_STATE(spline, numActiveKnots)                             \
+  for (int n = 0; n < numActiveKnots; ++n) {                                   \
+    spline##_xs[n].store_a(spline->getKnots()[n].state.x);                     \
+    spline##_ys[n].store_a(spline->getKnots()[n].state.y);                     \
+    spline##_ts[n].store_a(spline->getKnots()[n].state.t);                     \
+    spline##_ss[n].store_a(spline->getKnots()[n].state.s);                     \
   }
 
-#define SPILINE_AUTOMATION(spline, numActiveNodes, Vec)                        \
-  for (int n = 0; n < numActiveNodes; ++n) {                                   \
+#define SPILINE_AUTOMATION(spline, numActiveKnots, Vec)                        \
+  for (int n = 0; n < numActiveKnots; ++n) {                                   \
     spline##_xs[n] =                                                           \
       spline##_alpha * (spline##_xs[n] - spline##_xt[n]) + spline##_xt[n];     \
     spline##_ys[n] =                                                           \
@@ -58,7 +58,7 @@ limitations under the License.
       spline##_alpha * (spline##_ss[n] - spline##_st[n]) + spline##_st[n];     \
   }
 
-#define COMPUTE_SPLINE(spline, numActiveNodes, Vec, in, out)                   \
+#define COMPUTE_SPLINE(spline, numActiveKnots, Vec, in, out)                   \
   {                                                                            \
     Vec x0 = std::numeric_limits<float>::lowest();                             \
     Vec y0 = 0.f;                                                              \
@@ -78,7 +78,7 @@ limitations under the License.
     Vec y_high = spline##_ys[0];                                               \
     Vec t_high = spline##_ts[0];                                               \
                                                                                \
-    for (int n = 1; n < numActiveNodes; ++n) {                                 \
+    for (int n = 1; n < numActiveKnots; ++n) {                                 \
       auto const is_left = (in > spline##_xs[n]) && (spline##_xs[n] > x0);     \
       x0 = select(is_left, spline##_xs[n], x0);                                \
       y0 = select(is_left, spline##_ys[n], y0);                                \
@@ -128,7 +128,7 @@ limitations under the License.
   }
 
 #define COMPUTE_SPLINE_WITH_DERIVATIVE(                                        \
-  spline, numActiveNodes, Vec, in, out, delta)                                 \
+  spline, numActiveKnots, Vec, in, out, delta)                                 \
   {                                                                            \
     Vec x0 = std::numeric_limits<float>::lowest();                             \
     Vec y0 = 0.f;                                                              \
@@ -148,7 +148,7 @@ limitations under the License.
     Vec y_high = spline##_ys[0];                                               \
     Vec t_high = spline##_ts[0];                                               \
                                                                                \
-    for (int n = 1; n < numActiveNodes; ++n) {                                 \
+    for (int n = 1; n < numActiveKnots; ++n) {                                 \
       auto const is_left = (in > spline##_xs[n]) && (spline##_xs[n] > x0);     \
       x0 = select(is_left, spline##_xs[n], x0);                                \
       y0 = select(is_left, spline##_ys[n], y0);                                \
@@ -201,8 +201,8 @@ limitations under the License.
     delta = select(is_high, t_high, select(is_low, x_low, curve_delta));       \
   }
 
-#define LOAD_WAVESHAPER_STATE(shaper, numActiveNodes, Vec, maxNumNodes)        \
-  LOAD_SPLINE_STATE(shaper, numActiveNodes, Vec, maxNumNodes);                 \
+#define LOAD_WAVESHAPER_STATE(shaper, numActiveKnots, Vec, maxNumKnots)        \
+  LOAD_SPLINE_STATE(shaper, numActiveKnots, Vec, maxNumKnots);                 \
   Vec shaper##_ds = Vec().load_a(shaper->getDcState());                        \
   Vec shaper##_dt = Vec().load_a(shaper->getDcTarget());                       \
   Vec shaper##_ws = Vec().load_a(shaper->getWetState());                       \
@@ -212,23 +212,23 @@ limitations under the License.
   Vec shaper##_ha = Vec().load_a(shaper->getHighPassAlpha());                  \
   auto const shaper##_symm = Vec().load_a(shaper->getIsSymmetric()) != 0.0;
 
-#define STORE_WAVESHAPER_STATE(shaper, numActiveNodes)                         \
-  STORE_SPLINE_STATE(shaper, numActiveNodes)                                   \
+#define STORE_WAVESHAPER_STATE(shaper, numActiveKnots)                         \
+  STORE_SPLINE_STATE(shaper, numActiveKnots)                                   \
   shaper##_ds.store_a(shaper->getDcState());                                   \
   shaper##_ws.store_a(shaper->getWetState());                                  \
   shaper##_hi.store_a(shaper->getHighPassIn());                                \
   shaper##_ho.store_a(shaper->getHighPassOut());
 
-#define WAVESHAPER_AUTOMATION(shaper, numActiveNodes, Vec)                     \
-  SPILINE_AUTOMATION(shaper, numActiveNodes, Vec);                             \
+#define WAVESHAPER_AUTOMATION(shaper, numActiveKnots, Vec)                     \
+  SPILINE_AUTOMATION(shaper, numActiveKnots, Vec);                             \
   shaper##_ws = shaper##_alpha * (shaper##_ws - shaper##_wt) + shaper##_wt;    \
   shaper##_ds = shaper##_alpha * (shaper##_ds - shaper##_dt) + shaper##_dt;
 
-#define COMPUTE_WAVESHAPER(shaper, numActiveNodes, Vec, in_, out)              \
+#define COMPUTE_WAVESHAPER(shaper, numActiveKnots, Vec, in_, out)              \
   {                                                                            \
     Vec const with_dc = in_ + shaper##_ds;                                     \
     Vec const in = select(shaper##_symm, abs(with_dc), with_dc);               \
-    COMPUTE_SPLINE(shaper, numActiveNodes, Vec, in, out);                      \
+    COMPUTE_SPLINE(shaper, numActiveKnots, Vec, in, out);                      \
     out = select(shaper##_symm, sign_combine(out, with_dc), out);              \
     shaper##_ho = shaper##_ha * (shaper##_ho + out - shaper##_hi);             \
     shaper##_hi = out;                                                         \
@@ -237,12 +237,12 @@ limitations under the License.
   }
 
 #define COMPUTE_WAVESHAPER_WITH_DERIVATIVE(                                    \
-  shaper, numActiveNodes, Vec, in, out, delta)                                 \
+  shaper, numActiveKnots, Vec, in, out, delta)                                 \
   {                                                                            \
     Vec const with_dc = in_ + shaper##_ds;                                     \
     Vec const in = select(shaper##_symm, abs(with_dc), with_dc);               \
     COMPUTE_SPLINE_WITH_DERIVATIVE(                                            \
-      shaper, numActiveNodes, Vec, in, out, delta);                            \
+      shaper, numActiveKnots, Vec, in, out, delta);                            \
     /*delta *= select(shaper##_symm, sign_combine(1.0, with_dc), 1.0);*/       \
     out = select(shaper##_symm, sign_combine(out, with_dc), out);              \
     /*delta *= select(shaper##_symm, sign_combine(1.0, with_dc), 1.0);*/       \

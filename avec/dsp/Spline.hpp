@@ -24,7 +24,7 @@ struct SplineInterface
 {
   using Scalar = typename ScalarTypes<Vec>::Scalar;
 
-  struct Node final
+  struct Knot final
   {
     Scalar x[Vec::size()];
     Scalar y[Vec::size()];
@@ -32,15 +32,15 @@ struct SplineInterface
     Scalar s[Vec::size()];
   };
 
-  struct AutomatableNode final
+  struct AutomatableKnot final
   {
-    Node state;
-    Node target;
+    Knot state;
+    Knot target;
   };
 
-  virtual AutomatableNode* getNodes() = 0;
+  virtual AutomatableKnot* getKnots() = 0;
 
-  virtual int getNumNodes() = 0;
+  virtual int getNumKnots() = 0;
 
   virtual Scalar* getSmoothingAlpha() = 0;
 
@@ -87,26 +87,26 @@ struct WaveShaperInterface : public SplineInterface<Vec>
   virtual Scalar* getIsSymmetric() = 0;
 };
 
-template<class Vec, int numNodes_>
+template<class Vec, int numKnots_>
 struct Spline final : public SplineInterface<Vec>
 {
-  static constexpr int numNodes = numNodes_;
+  static constexpr int numKnots = numKnots_;
 
   using Interface = SplineInterface<Vec>;
   using Scalar = typename Interface::Scalar;
-  using AutomatableNode = typename Interface::AutomatableNode;
+  using AutomatableKnot = typename Interface::AutomatableKnot;
 
   struct Data final
   {
     Scalar smoothingAlpha[Vec::size()];
-    AutomatableNode nodes[numNodes];
+    AutomatableKnot knots[numKnots];
   };
 
   aligned_ptr<Data> data;
 
-  AutomatableNode* getNodes() override { return data->nodes; }
+  AutomatableKnot* getKnots() override { return data->knots; }
 
-  int getNumNodes() override { return numNodes; }
+  int getNumKnots() override { return numKnots; }
 
   void setSmoothingFrequency(Scalar frequency) override
   {
@@ -117,10 +117,10 @@ struct Spline final : public SplineInterface<Vec>
 
   virtual void reset() override
   {
-    for (auto& node : data->nodes) {
-      std::copy(&node.target.x[0],
-                &node.target.x[0] + 4 * Vec::size(),
-                &node.state.x[0]);
+    for (auto& knot : data->knots) {
+      std::copy(&knot.target.x[0],
+                &knot.target.x[0] + 4 * Vec::size(),
+                &knot.state.x[0]);
     }
   }
 
@@ -134,13 +134,13 @@ struct Spline final : public SplineInterface<Vec>
   }
 };
 
-template<class Vec, int numNodes_>
+template<class Vec, int numKnots_>
 struct WaveShaper final : public WaveShaperInterface<Vec>
 {
-  static constexpr int numNodes = numNodes_;
+  static constexpr int numKnots = numKnots_;
   using Interface = WaveShaperInterface<Vec>;
   using Scalar = typename Interface::Scalar;
-  using AutomatableNode = typename Interface::AutomatableNode;
+  using AutomatableKnot = typename Interface::AutomatableKnot;
 
   struct Settings final
   {
@@ -158,7 +158,7 @@ struct WaveShaper final : public WaveShaperInterface<Vec>
   struct Data final
   {
     Scalar smoothingAlpha[Vec::size()];
-    AutomatableNode nodes[numNodes];
+    AutomatableKnot knots[numKnots];
     Scalar isSymmetric[Vec::size()];
     Settings settingsTarget;
     Settings settingsState;
@@ -167,9 +167,9 @@ struct WaveShaper final : public WaveShaperInterface<Vec>
 
   aligned_ptr<Data> data;
 
-  AutomatableNode* getNodes() override { return data->nodes; }
+  AutomatableKnot* getKnots() override { return data->knots; }
 
-  int getNumNodes() override { return numNodes; }
+  int getNumKnots() override { return numKnots; }
 
   void setSmoothingFrequency(Scalar frequency) override
   {
@@ -236,10 +236,10 @@ struct WaveShaper final : public WaveShaperInterface<Vec>
 
   void reset() override
   {
-    for (auto& node : data->nodes) {
-      std::copy(&node.target.x[0],
-                &node.target.x[0] + 4 * Vec::size(),
-                &node.state.x[0]);
+    for (auto& knot : data->knots) {
+      std::copy(&knot.target.x[0],
+                &knot.target.x[0] + 4 * Vec::size(),
+                &knot.state.x[0]);
     }
     std::copy(&data->settingsTarget.dc[0],
               &data->settingsTarget.dc[0] + 2 * Vec::size(),
@@ -261,16 +261,16 @@ struct SplineHolder final
 
   std::vector<std::unique_ptr<SplineInterface>> splines;
 
-  SplineInterface* getSpline(int numNodes)
+  SplineInterface* getSpline(int numKnots)
   {
-    int index = numNodes - 1;
+    int index = numKnots - 1;
     if (index < splines.size()) {
       return splines[index].get();
     }
     return nullptr;
   }
 
-  template<int numNodes>
+  template<int numKnots>
   void initialize();
 
   void reset()
@@ -280,24 +280,24 @@ struct SplineHolder final
     }
   }
 
-  template<int numNodes>
+  template<int numKnots>
   static SplineHolder make();
 };
 
-template<template<class, int> class SplineClass, class Vec, int maxNumNodes>
+template<template<class, int> class SplineClass, class Vec, int maxNumKnots>
 struct SplineFactory
 {
   static void initialize(SplineHolder<SplineClass, Vec>& holder)
   {
-    using Interface = typename SplineClass<Vec, maxNumNodes>::Interface;
+    using Interface = typename SplineClass<Vec, maxNumKnots>::Interface;
 
     holder.splines.resize(
-      std::max(holder.splines.size(), (std::size_t)maxNumNodes));
+      std::max(holder.splines.size(), (std::size_t)maxNumKnots));
 
-    holder.splines[maxNumNodes - 1] =
-      std::unique_ptr<Interface>(new SplineClass<Vec, maxNumNodes>);
+    holder.splines[maxNumKnots - 1] =
+      std::unique_ptr<Interface>(new SplineClass<Vec, maxNumKnots>);
 
-    SplineFactory<SplineClass, Vec, maxNumNodes - 1>::initialize(holder);
+    SplineFactory<SplineClass, Vec, maxNumKnots - 1>::initialize(holder);
   }
 
   static SplineHolder<SplineClass, Vec> make()
@@ -323,26 +323,26 @@ struct SplineFactory<SplineClass, Vec, 0>
 };
 
 template<template<class, int> class SplineClass, class Vec>
-template<int numNodes>
+template<int numKnots>
 void
 SplineHolder<SplineClass, Vec>::initialize()
 {
-  SplineFactory<SplineClass, Vec, numNodes>::initialize(*this);
+  SplineFactory<SplineClass, Vec, numKnots>::initialize(*this);
 }
 
 template<template<class, int> class SplineClass, class Vec>
-template<int numNodes>
+template<int numKnots>
 SplineHolder<SplineClass, Vec>
 SplineHolder<SplineClass, Vec>::make()
 {
-  return SplineFactory<SplineClass, Vec, numNodes>::make();
+  return SplineFactory<SplineClass, Vec, numKnots>::make();
 }
 
 // implementation
 
-template<class Vec, int numNodes_>
+template<class Vec, int numKnots_>
 inline void
-Spline<Vec, numNodes_>::processBlock(VecBuffer<Vec> const& input,
+Spline<Vec, numKnots_>::processBlock(VecBuffer<Vec> const& input,
                                      VecBuffer<Vec>& output)
 {
   int const numSamples = input.getNumSamples();
@@ -350,46 +350,46 @@ Spline<Vec, numNodes_>::processBlock(VecBuffer<Vec> const& input,
 
   Vec const alpha = this->data->smoothingAlpha[0];
 
-  Vec xs[numNodes];
-  Vec ys[numNodes];
-  Vec ts[numNodes];
-  Vec ss[numNodes];
+  Vec xs[numKnots];
+  Vec ys[numKnots];
+  Vec ts[numKnots];
+  Vec ss[numKnots];
 
-  Vec xt[numNodes];
-  Vec yt[numNodes];
-  Vec tt[numNodes];
-  Vec st[numNodes];
+  Vec xt[numKnots];
+  Vec yt[numKnots];
+  Vec tt[numKnots];
+  Vec st[numKnots];
 
-  for (int n = 0; n < numNodes; ++n) {
-    xs[n] = Vec().load_a(this->data->nodes[n].state.x);
-    ys[n] = Vec().load_a(this->data->nodes[n].state.y);
-    ts[n] = Vec().load_a(this->data->nodes[n].state.t);
-    ss[n] = Vec().load_a(this->data->nodes[n].state.s);
-    xt[n] = Vec().load_a(this->data->nodes[n].target.x);
-    yt[n] = Vec().load_a(this->data->nodes[n].target.y);
-    tt[n] = Vec().load_a(this->data->nodes[n].target.t);
-    st[n] = Vec().load_a(this->data->nodes[n].target.s);
+  for (int n = 0; n < numKnots; ++n) {
+    xs[n] = Vec().load_a(this->data->knots[n].state.x);
+    ys[n] = Vec().load_a(this->data->knots[n].state.y);
+    ts[n] = Vec().load_a(this->data->knots[n].state.t);
+    ss[n] = Vec().load_a(this->data->knots[n].state.s);
+    xt[n] = Vec().load_a(this->data->knots[n].target.x);
+    yt[n] = Vec().load_a(this->data->knots[n].target.y);
+    tt[n] = Vec().load_a(this->data->knots[n].target.t);
+    st[n] = Vec().load_a(this->data->knots[n].target.s);
   }
 
   for (int i = 0; i < numSamples; ++i) {
     Vec const in = input[i];
 
     // advance automation
-    for (int n = 0; n < numNodes; ++n) {
+    for (int n = 0; n < numKnots; ++n) {
       xs[n] = alpha * (xs[n] - xt[n]) + xt[n];
       ys[n] = alpha * (ys[n] - yt[n]) + yt[n];
       ts[n] = alpha * (ts[n] - tt[n]) + tt[n];
       ss[n] = alpha * (ss[n] - st[n]) + st[n];
     }
 
-    // left node paramters
+    // left knot paramters
 
     Vec x0 = std::numeric_limits<float>::lowest();
     Vec y0 = 0.f;
     Vec t0 = 0.f;
     Vec s0 = 0.f;
 
-    // right node paramters
+    // right knot paramters
 
     Vec x1 = std::numeric_limits<float>::max();
     Vec y1 = 0.f;
@@ -408,9 +408,9 @@ Spline<Vec, numNodes_>::processBlock(VecBuffer<Vec> const& input,
     Vec y_high = ys[0];
     Vec t_high = ts[0];
 
-    // find interval and set left and right node parameters
+    // find interval and set left and right knot parameters
 
-    for (int n = 0; n < numNodes; ++n) {
+    for (int n = 0; n < numKnots; ++n) {
       auto const is_left = (in > xs[n]) && (xs[n] > x0);
       x0 = select(is_left, xs[n], x0);
       y0 = select(is_left, ys[n], y0);
@@ -473,21 +473,21 @@ Spline<Vec, numNodes_>::processBlock(VecBuffer<Vec> const& input,
 
   // update spline state
 
-  for (int n = 0; n < numNodes; ++n) {
-    xs[n].store_a(this->data->nodes[n].state.x);
-    ys[n].store_a(this->data->nodes[n].state.y);
-    ts[n].store_a(this->data->nodes[n].state.t);
-    ss[n].store_a(this->data->nodes[n].state.s);
-    xt[n].store_a(this->data->nodes[n].target.x);
-    yt[n].store_a(this->data->nodes[n].target.y);
-    tt[n].store_a(this->data->nodes[n].target.t);
-    st[n].store_a(this->data->nodes[n].target.s);
+  for (int n = 0; n < numKnots; ++n) {
+    xs[n].store_a(this->data->knots[n].state.x);
+    ys[n].store_a(this->data->knots[n].state.y);
+    ts[n].store_a(this->data->knots[n].state.t);
+    ss[n].store_a(this->data->knots[n].state.s);
+    xt[n].store_a(this->data->knots[n].target.x);
+    yt[n].store_a(this->data->knots[n].target.y);
+    tt[n].store_a(this->data->knots[n].target.t);
+    st[n].store_a(this->data->knots[n].target.s);
   }
 }
 
-template<class Vec, int numNodes_>
+template<class Vec, int numKnots_>
 inline void
-WaveShaper<Vec, numNodes_>::processBlock(VecBuffer<Vec> const& input,
+WaveShaper<Vec, numKnots_>::processBlock(VecBuffer<Vec> const& input,
                                          VecBuffer<Vec>& output)
 {
   int const numSamples = input.getNumSamples();
@@ -495,15 +495,15 @@ WaveShaper<Vec, numNodes_>::processBlock(VecBuffer<Vec> const& input,
 
   Vec const alpha = this->data->smoothingAlpha[0];
 
-  Vec xs[numNodes];
-  Vec ys[numNodes];
-  Vec ts[numNodes];
-  Vec ss[numNodes];
+  Vec xs[numKnots];
+  Vec ys[numKnots];
+  Vec ts[numKnots];
+  Vec ss[numKnots];
 
-  Vec xt[numNodes];
-  Vec yt[numNodes];
-  Vec tt[numNodes];
-  Vec st[numNodes];
+  Vec xt[numKnots];
+  Vec yt[numKnots];
+  Vec tt[numKnots];
+  Vec st[numKnots];
 
   Vec ds = Vec().load_a(this->data->settingsState.dc);
   Vec dt = Vec().load_a(this->data->settingsTarget.dc);
@@ -517,22 +517,22 @@ WaveShaper<Vec, numNodes_>::processBlock(VecBuffer<Vec> const& input,
 
   auto symm = Vec().load_a(this->data->isSymmetric) != 0.0;
 
-  for (int n = 0; n < numNodes; ++n) {
-    xs[n] = Vec().load_a(this->data->nodes[n].state.x);
-    ys[n] = Vec().load_a(this->data->nodes[n].state.y);
-    ts[n] = Vec().load_a(this->data->nodes[n].state.t);
-    ss[n] = Vec().load_a(this->data->nodes[n].state.s);
-    xt[n] = Vec().load_a(this->data->nodes[n].target.x);
-    yt[n] = Vec().load_a(this->data->nodes[n].target.y);
-    tt[n] = Vec().load_a(this->data->nodes[n].target.t);
-    st[n] = Vec().load_a(this->data->nodes[n].target.s);
+  for (int n = 0; n < numKnots; ++n) {
+    xs[n] = Vec().load_a(this->data->knots[n].state.x);
+    ys[n] = Vec().load_a(this->data->knots[n].state.y);
+    ts[n] = Vec().load_a(this->data->knots[n].state.t);
+    ss[n] = Vec().load_a(this->data->knots[n].state.s);
+    xt[n] = Vec().load_a(this->data->knots[n].target.x);
+    yt[n] = Vec().load_a(this->data->knots[n].target.y);
+    tt[n] = Vec().load_a(this->data->knots[n].target.t);
+    st[n] = Vec().load_a(this->data->knots[n].target.s);
   }
 
   for (int i = 0; i < numSamples; ++i) {
 
     // advance automation
 
-    for (int n = 0; n < numNodes; ++n) {
+    for (int n = 0; n < numKnots; ++n) {
       xs[n] = alpha * (xs[n] - xt[n]) + xt[n];
       ys[n] = alpha * (ys[n] - yt[n]) + yt[n];
       ts[n] = alpha * (ts[n] - tt[n]) + tt[n];
@@ -547,14 +547,14 @@ WaveShaper<Vec, numNodes_>::processBlock(VecBuffer<Vec> const& input,
 
     Vec const in = select(symm, abs(with_dc), with_dc);
 
-    // left node paramters
+    // left knot paramters
 
     Vec x0 = std::numeric_limits<float>::lowest();
     Vec y0 = 0.f;
     Vec t0 = 0.f;
     Vec s0 = 0.f;
 
-    // right node paramters
+    // right knot paramters
 
     Vec x1 = std::numeric_limits<float>::max();
     Vec y1 = 0.f;
@@ -573,9 +573,9 @@ WaveShaper<Vec, numNodes_>::processBlock(VecBuffer<Vec> const& input,
     Vec y_high = ys[0];
     Vec t_high = ts[0];
 
-    // find interval and set left and right node parameters
+    // find interval and set left and right knot parameters
 
-    for (int n = 0; n < numNodes; ++n) {
+    for (int n = 0; n < numKnots; ++n) {
       auto const is_left = (in > xs[n]) && (xs[n] > x0);
       x0 = select(is_left, xs[n], x0);
       y0 = select(is_left, ys[n], y0);
@@ -652,11 +652,11 @@ WaveShaper<Vec, numNodes_>::processBlock(VecBuffer<Vec> const& input,
 
   // update spline state
 
-  for (int n = 0; n < numNodes; ++n) {
-    xs[n].store_a(this->data->nodes[n].state.x);
-    ys[n].store_a(this->data->nodes[n].state.y);
-    ts[n].store_a(this->data->nodes[n].state.t);
-    ss[n].store_a(this->data->nodes[n].state.s);
+  for (int n = 0; n < numKnots; ++n) {
+    xs[n].store_a(this->data->knots[n].state.x);
+    ys[n].store_a(this->data->knots[n].state.y);
+    ts[n].store_a(this->data->knots[n].state.t);
+    ss[n].store_a(this->data->knots[n].state.s);
   }
   ds.store_a(this->data->settingsState.dc);
   ws.store_a(this->data->settingsState.wet);
