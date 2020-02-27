@@ -118,9 +118,7 @@ struct Spline final : public SplineInterface<Vec>
   virtual void reset() override
   {
     for (auto& knot : data->knots) {
-      std::copy(&knot.target.x[0],
-                &knot.target.x[0] + 4 * Vec::size(),
-                &knot.state.x[0]);
+      std::copy(&knot.target, &knot.target + 1, &knot.state);
     }
   }
 
@@ -237,9 +235,7 @@ struct WaveShaper final : public WaveShaperInterface<Vec>
   void reset() override
   {
     for (auto& knot : data->knots) {
-      std::copy(&knot.target.x[0],
-                &knot.target.x[0] + 4 * Vec::size(),
-                &knot.state.x[0]);
+      std::copy(&knot.target, &knot.target + 1, &knot.state);
     }
     std::copy(&data->settingsTarget.dc[0],
               &data->settingsTarget.dc[0] + 2 * Vec::size(),
