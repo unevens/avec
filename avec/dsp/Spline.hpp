@@ -50,6 +50,8 @@ struct SplineInterface
                             VecBuffer<Vec>& output) = 0;
 
   virtual void reset() = 0;
+
+  virtual ~SplineInterface() {}
 };
 
 template<class Vec>
