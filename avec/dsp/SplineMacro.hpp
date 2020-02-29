@@ -201,55 +201,27 @@ limitations under the License.
     delta = select(is_high, t_high, select(is_low, x_low, curve_delta));       \
   }
 
-#define LOAD_WAVESHAPER_STATE(shaper, numActiveKnots, Vec, maxNumKnots)        \
-  LOAD_SPLINE_STATE(shaper, numActiveKnots, Vec, maxNumKnots);                 \
-  Vec shaper##_ds = Vec().load_a(shaper->getDcState());                        \
-  Vec shaper##_dt = Vec().load_a(shaper->getDcTarget());                       \
-  Vec shaper##_ws = Vec().load_a(shaper->getWetState());                       \
-  Vec shaper##_wt = Vec().load_a(shaper->getWetTarget());                      \
-  Vec shaper##_hi = Vec().load_a(shaper->getHighPassIn());                     \
-  Vec shaper##_ho = Vec().load_a(shaper->getHighPassOut());                    \
-  Vec shaper##_ha = Vec().load_a(shaper->getHighPassAlpha());                  \
-  auto const shaper##_symm = Vec().load_a(shaper->getIsSymmetric()) != 0.0;
+#define LOAD_SYMABLE_SPLINE_STATE(spline, numActiveKnots, Vec, maxNumKnots)    \
+  LOAD_SPLINE_STATE(spline, numActiveKnots, Vec, maxNumKnots);                 \
+  auto const spline##_symm = Vec().load_a(spline->getIsSymmetric()) != 0.0;
 
-#define STORE_WAVESHAPER_STATE(shaper, numActiveKnots)                         \
-  STORE_SPLINE_STATE(shaper, numActiveKnots)                                   \
-  shaper##_ds.store_a(shaper->getDcState());                                   \
-  shaper##_ws.store_a(shaper->getWetState());                                  \
-  shaper##_hi.store_a(shaper->getHighPassIn());                                \
-  shaper##_ho.store_a(shaper->getHighPassOut());
+#define STORE_SYMABLE_SPLINE_STATE(spline, numActiveKnots)                     \
+  STORE_SPLINE_STATE(spline, numActiveKnots)
 
-#define WAVESHAPER_AUTOMATION(shaper, numActiveKnots, Vec)                     \
-  SPILINE_AUTOMATION(shaper, numActiveKnots, Vec);                             \
-  shaper##_ws = shaper##_alpha * (shaper##_ws - shaper##_wt) + shaper##_wt;    \
-  shaper##_ds = shaper##_alpha * (shaper##_ds - shaper##_dt) + shaper##_dt;
-
-#define COMPUTE_WAVESHAPER(shaper, numActiveKnots, Vec, in_, out)              \
+#define COMPUTE_SYMABLE_SPLINE(spline, numActiveKnots, Vec, in_, out)          \
   {                                                                            \
-    Vec const with_dc = in_ + shaper##_ds;                                     \
-    Vec const in = select(shaper##_symm, abs(with_dc), with_dc);               \
-    COMPUTE_SPLINE(shaper, numActiveKnots, Vec, in, out);                      \
-    out = select(shaper##_symm, sign_combine(out, with_dc), out);              \
-    shaper##_ho = shaper##_ha * (shaper##_ho + out - shaper##_hi);             \
-    shaper##_hi = out;                                                         \
-    out = shaper##_ho;                                                         \
-    out = in_ + shaper##_ws * (out - in_);                                     \
+    Vec const in = select(spline##_symm, abs(in_), in_);                       \
+    COMPUTE_SPLINE(spline, numActiveKnots, Vec, in, out);                      \
+    out = select(spline##_symm, sign_combine(out, in_), out);                  \
   }
 
-#define COMPUTE_WAVESHAPER_WITH_DERIVATIVE(                                    \
-  shaper, numActiveKnots, Vec, in, out, delta)                                 \
+#define COMPUTE_SYMABLE_SPLINE_WITH_DERIVATIVE(                                \
+  spline, numActiveKnots, Vec, in_, out, delta)                                \
   {                                                                            \
-    Vec const with_dc = in_ + shaper##_ds;                                     \
-    Vec const in = select(shaper##_symm, abs(with_dc), with_dc);               \
+    Vec const in = select(spline##_symm, abs(in_), in_);                       \
     COMPUTE_SPLINE_WITH_DERIVATIVE(                                            \
-      shaper, numActiveKnots, Vec, in, out, delta);                            \
-    /*delta *= select(shaper##_symm, sign_combine(1.0, with_dc), 1.0);*/       \
-    out = select(shaper##_symm, sign_combine(out, with_dc), out);              \
-    /*delta *= select(shaper##_symm, sign_combine(1.0, with_dc), 1.0);*/       \
-    shaper##_ho = shaper##_ha * (shaper##_ho + out - shaper##_hi);             \
-    shaper##_hi = out;                                                         \
-    out = shaper##_ho;                                                         \
-    delta *= shaper##_ha;                                                      \
-    out = in_ + shaper##_ws * (out - in_);                                     \
-    delta = 1.0 + shaper##_ws * (delta - 1.0);                                 \
+      spline, numActiveKnots, Vec, in, out, delta);                            \
+    /*delta *= select(spline##_symm, sign_combine(1.0, in_), 1.0);*/           \
+    out = select(spline##_symm, sign_combine(out, in_), out);                  \
+    /*delta *= select(spline##_symm, sign_combine(1.0, in_), 1.0);*/           \
   }
