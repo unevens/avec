@@ -59,6 +59,9 @@ struct SimpleHighPass final
       in_mem = io;
       output[i] = out_mem;
     }
+
+    in_mem.store_a(inputMemory);
+    out_mem.store_a(outputMemory);
   }
 
   void reset() { std::fill_n(inputMemory, 2 * Vec::size(), 0.0); }
