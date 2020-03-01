@@ -18,7 +18,7 @@ limitations under the License.
 #include "Spline.hpp"
 
 #define LOAD_SPLINE_STATE(spline, numActiveKnots, Vec, maxNumKnots)            \
-  Scalar* spline##_knots = spline->getKnots();                                 \
+  auto spline##_knots = spline->getKnots();                                    \
   Vec spline##_x[maxNumKnots];                                                 \
   Vec spline##_y[maxNumKnots];                                                 \
   Vec spline##_t[maxNumKnots];                                                 \
@@ -31,9 +31,8 @@ limitations under the License.
   }
 
 #define LOAD_SPLINE_AUTOMATOR(automator, numActiveKnots, Vec, maxNumKnots)     \
-  Vec const automator##_alpha =                                                \
-    Vec().load_a(automator->getSmoothingAlpha()[0]);                           \
-  Scalar* automator##_knots = automator->getKnots();                           \
+  Vec const automator##_alpha = Vec().load_a(automator->getSmoothingAlpha());  \
+  auto automator##_knots = automator->getKnots();                              \
   Vec automator##_x_a[maxNumKnots];                                            \
   Vec automator##_y_a[maxNumKnots];                                            \
   Vec automator##_t_a[maxNumKnots];                                            \
@@ -55,13 +54,13 @@ limitations under the License.
 
 #define SPILINE_AUTOMATION(spline, automator, numActiveKnots, Vec)             \
   for (int n = 0; n < numActiveKnots; ++n) {                                   \
-    spline##_x[n] = spline##_alpha * (spline##_x[n] - automator##_x_a[n]) +    \
+    spline##_x[n] = automator##_alpha * (spline##_x[n] - automator##_x_a[n]) + \
                     automator##_x_a[n];                                        \
-    spline##_y[n] = spline##_alpha * (spline##_y[n] - automator##_y_a[n]) +    \
+    spline##_y[n] = automator##_alpha * (spline##_y[n] - automator##_y_a[n]) + \
                     automator##_y_a[n];                                        \
-    spline##_t[n] = spline##_alpha * (spline##_t[n] - automator##_t_a[n]) +    \
+    spline##_t[n] = automator##_alpha * (spline##_t[n] - automator##_t_a[n]) + \
                     automator##_t_a[n];                                        \
-    spline##_s[n] = spline##_alpha * (spline##_s[n] - automator##_s_a[n]) +    \
+    spline##_s[n] = automator##_alpha * (spline##_s[n] - automator##_s_a[n]) + \
                     automator##_s_a[n];                                        \
   }
 
