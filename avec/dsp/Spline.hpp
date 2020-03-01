@@ -74,7 +74,7 @@ struct SplineAutomatorInterface
 
   virtual Scalar* getSmoothingAlpha() = 0;
 
-  virtual void setSmoothingFrequency(Scalar frequency) = 0;
+  virtual void setSmoothingAlpha(Scalar alpha) = 0;
   virtual void reset(SplineInterface<Vec>* spline) = 0;
 
   virtual ~SplineAutomatorInterface() {}
@@ -146,9 +146,9 @@ struct SplineAutomator final : public SplineAutomatorInterface<Vec>
 
   Knot* getKnots() override { return data->knots; }
 
-  void setSmoothingFrequency(Scalar frequency) override
+  void setSmoothingAlpha(Scalar alpha) override
   {
-    std::fill_n(data->smoothingAlpha, Vec::size(), exp(-frequency));
+    std::fill_n(data->smoothingAlpha, Vec::size(), alpha);
   }
 
   Scalar* getSmoothingAlpha() override { return data->smoothingAlpha; };
@@ -208,7 +208,7 @@ struct SplineFactory
     if (makeAutomators) {
 
       holder.automators.resize(
-        std::max(holder.splines.size(), (std::size_t)maxNumKnots));
+        std::max(holder.automators.size(), (std::size_t)maxNumKnots));
 
       holder.automators[maxNumKnots - 1] =
         std::unique_ptr<SplineAutomatorInterface<Vec>>(
@@ -534,8 +534,9 @@ inline void
 SplineAutomator<Vec, numKnots_>::reset(SplineInterface<Vec>* spline)
 {
   int i = 0;
+  auto splineKnots = spline->getKnots();
   for (auto& knot : data->knots) {
-    std::copy(&knot, &knot + 1, &spline->getKnots()[i++]);
+    std::copy(&knot, &knot + 1, &splineKnots[i++]);
   }
 }
 
