@@ -20,6 +20,18 @@ limitations under the License.
 namespace avec {
 
 template<class Vec>
+struct SplineInterface;
+
+template<class Vec>
+struct SplineAutomatorInterface;
+
+template<class Vec, int numKnots_>
+struct Spline;
+
+template<class Vec, int numKnots_>
+struct SplineAutomator;
+
+template<class Vec>
 struct SplineInterface
 {
   using Scalar = typename ScalarTypes<Vec>::Scalar;
@@ -32,19 +44,9 @@ struct SplineInterface
     Scalar s[Vec::size()];
   };
 
-  struct AutomatableKnot final
-  {
-    Knot state;
-    Knot target;
-  };
-
-  virtual AutomatableKnot* getKnots() = 0;
+  virtual Knot* getKnots() = 0;
 
   virtual int getNumKnots() = 0;
-
-  virtual Scalar* getSmoothingAlpha() = 0;
-
-  virtual void setSmoothingFrequency(Scalar frequency) = 0;
 
   virtual void setIsSymmetric(bool isSymmetric) = 0;
 
@@ -55,9 +57,27 @@ struct SplineInterface
   virtual void processBlock(VecBuffer<Vec> const& input,
                             VecBuffer<Vec>& output) = 0;
 
-  virtual void reset() = 0;
+  virtual void processBlock(VecBuffer<Vec> const& input,
+                            VecBuffer<Vec>& output,
+                            SplineAutomatorInterface<Vec>* automator) = 0;
 
   virtual ~SplineInterface() {}
+};
+
+template<class Vec>
+struct SplineAutomatorInterface
+{
+  using Scalar = typename ScalarTypes<Vec>::Scalar;
+  using Knot = typename SplineInterface<Vec>::Knot;
+
+  virtual Knot* getKnots() = 0;
+
+  virtual Scalar* getSmoothingAlpha() = 0;
+
+  virtual void setSmoothingFrequency(Scalar frequency) = 0;
+  virtual void reset(SplineInterface<Vec>* spline) = 0;
+
+  virtual ~SplineAutomatorInterface() {}
 };
 
 template<class Vec, int numKnots_>
@@ -67,27 +87,19 @@ struct Spline final : public SplineInterface<Vec>
 
   using Interface = SplineInterface<Vec>;
   using Scalar = typename Interface::Scalar;
-  using AutomatableKnot = typename Interface::AutomatableKnot;
+  using Knot = typename Interface::Knot;
 
   struct Data final
   {
-    Scalar smoothingAlpha[Vec::size()];
     Scalar isSymmetric[Vec::size()];
-    AutomatableKnot knots[numKnots];
+    Knot knots[numKnots];
   };
 
   aligned_ptr<Data> data;
 
-  AutomatableKnot* getKnots() override { return data->knots; }
+  Knot* getKnots() override { return data->knots; }
 
   int getNumKnots() override { return numKnots; }
-
-  void setSmoothingFrequency(Scalar frequency) override
-  {
-    std::fill_n(data->smoothingAlpha, Vec::size(), exp(-frequency));
-  }
-
-  Scalar* getSmoothingAlpha() override { return data->smoothingAlpha; };
 
   void setIsSymmetric(bool isSymmetric) override
   {
@@ -101,106 +113,147 @@ struct Spline final : public SplineInterface<Vec>
 
   Scalar* getIsSymmetric() override { return data->isSymmetric; }
 
-  virtual void reset() override
-  {
-    for (auto& knot : data->knots) {
-      std::copy(&knot.target, &knot.target + 1, &knot.state);
-    }
-  }
-
   void processBlock(VecBuffer<Vec> const& input,
                     VecBuffer<Vec>& output) override;
+
+  void processBlock(
+    VecBuffer<Vec> const& input,
+    VecBuffer<Vec>& output,
+    SplineAutomatorInterface<Vec>* automator = nullptr) override;
 
   Spline()
     : data(avec::Aligned<Data>::make())
   {
-    std::fill_n(data->smoothingAlpha, sizeof(Data) / sizeof(Scalar), 0.0);
-    std::fill_n(data->isSymmetric, Vec::size(), 0.0);
+    std::fill_n(data->isSymmetric, sizeof(Data) / sizeof(Scalar), 0.0);
   }
 };
 
-template<template<class, int> class SplineClass, class Vec>
+template<class Vec, int numKnots_>
+struct SplineAutomator final : public SplineAutomatorInterface<Vec>
+{
+  static constexpr int numKnots = numKnots_;
+
+  using Interface = SplineAutomatorInterface<Vec>;
+  using Knot = typename SplineInterface<Vec>::Knot;
+
+  struct Data final
+  {
+    Scalar smoothingAlpha[Vec::size()];
+    Knot knots[numKnots];
+  };
+
+  aligned_ptr<Data> data;
+
+  Knot* getKnots() override { return data->knots; }
+
+  void setSmoothingFrequency(Scalar frequency) override
+  {
+    std::fill_n(data->smoothingAlpha, Vec::size(), exp(-frequency));
+  }
+
+  Scalar* getSmoothingAlpha() override { return data->smoothingAlpha; };
+
+  void reset(SplineInterface<Vec>* spline) override;
+
+  SplineAutomator()
+    : data(avec::Aligned<Data>::make())
+  {
+    std::fill_n(data->smoothingAlpha, sizeof(Data) / sizeof(Scalar), 0.0);
+  }
+};
+
+template<class Vec>
 struct SplineHolder final
 {
-  using SplineInterface = typename SplineClass<Vec, 1>::Interface;
+  std::vector<std::unique_ptr<SplineInterface<Vec>>> splines;
+  std::vector<std::unique_ptr<SplineAutomatorInterface<Vec>>> automators;
 
-  std::vector<std::unique_ptr<SplineInterface>> splines;
-
-  SplineInterface* getSpline(int numKnots)
+  std::pair<SplineInterface<Vec>*, SplineAutomatorInterface<Vec>*> getSpline(
+    int numKnots)
   {
     int index = numKnots - 1;
     if (index < splines.size()) {
-      return splines[index].get();
+      return { splines[index].get(),
+               index < automators.size() ? automators[index].get() : nullptr };
     }
-    return nullptr;
+    return { nullptr, nullptr };
   }
 
   template<int numKnots>
-  void initialize();
+  void initialize(bool makeAutomators);
 
   void reset()
   {
-    for (auto& s : splines) {
-      s->reset();
+    int i = 0;
+    for (auto& a : automators) {
+      a->reset(splines[i++]);
     }
   }
 
   template<int numKnots>
-  static SplineHolder make();
+  static SplineHolder make(bool makeAutomators);
 };
 
-template<template<class, int> class SplineClass, class Vec, int maxNumKnots>
+template<class Vec, int maxNumKnots>
 struct SplineFactory
 {
-  static void initialize(SplineHolder<SplineClass, Vec>& holder)
+  static void initialize(SplineHolder<Vec>& holder, bool makeAutomators)
   {
-    using Interface = typename SplineClass<Vec, maxNumKnots>::Interface;
-
     holder.splines.resize(
       std::max(holder.splines.size(), (std::size_t)maxNumKnots));
 
     holder.splines[maxNumKnots - 1] =
-      std::unique_ptr<Interface>(new SplineClass<Vec, maxNumKnots>);
+      std::unique_ptr<SplineInterface<Vec>>(new Spline<Vec, maxNumKnots>);
 
-    SplineFactory<SplineClass, Vec, maxNumKnots - 1>::initialize(holder);
+    if (makeAutomators) {
+
+      holder.automators.resize(
+        std::max(holder.splines.size(), (std::size_t)maxNumKnots));
+
+      holder.automators[maxNumKnots - 1] =
+        std::unique_ptr<SplineAutomatorInterface<Vec>>(
+          new SplineAutomator<Vec, maxNumKnots>);
+    }
+
+    SplineFactory<Vec, maxNumKnots - 1>::initialize(holder, makeAutomators);
   }
 
-  static SplineHolder<SplineClass, Vec> make()
+  static SplineHolder<Vec> make(bool makeAutomators)
   {
-    auto holder = SplineHolder<SplineClass, Vec>{};
-    initialize(holder);
+    auto holder = SplineHolder<Vec>{};
+    initialize(holder, makeAutomators);
     return holder;
   }
 };
 
-template<template<class, int> class SplineClass, class Vec>
-struct SplineFactory<SplineClass, Vec, 0>
+template<class Vec>
+struct SplineFactory<Vec, 0>
 {
-  static void initialize(SplineHolder<SplineClass, Vec>& holder)
+  static void initialize(SplineHolder<Vec>& holder, bool makeAutomators)
   {
     // stops the recursion
   }
 
-  static SplineHolder<SplineClass, Vec> make()
+  static SplineHolder<Vec> make(bool makeAutomators)
   {
-    return SplineHolder<SplineClass, Vec>{};
+    return SplineHolder<Vec>{};
   }
 };
 
-template<template<class, int> class SplineClass, class Vec>
+template<class Vec>
 template<int numKnots>
 void
-SplineHolder<SplineClass, Vec>::initialize()
+SplineHolder<Vec>::initialize(bool makeAutomators)
 {
-  SplineFactory<SplineClass, Vec, numKnots>::initialize(*this);
+  SplineFactory<Vec, numKnots>::initialize(*this, makeAutomators);
 }
 
-template<template<class, int> class SplineClass, class Vec>
+template<class Vec>
 template<int numKnots>
-SplineHolder<SplineClass, Vec>
-SplineHolder<SplineClass, Vec>::make()
+SplineHolder<Vec>
+SplineHolder<Vec>::make(bool makeAutomators)
 {
-  return SplineFactory<SplineClass, Vec, numKnots>::make();
+  return SplineFactory<Vec, numKnots>::make(makeAutomators);
 }
 
 // implementation
@@ -208,34 +261,40 @@ SplineHolder<SplineClass, Vec>::make()
 template<class Vec, int numKnots_>
 inline void
 Spline<Vec, numKnots_>::processBlock(VecBuffer<Vec> const& input,
-                                     VecBuffer<Vec>& output)
+                                     VecBuffer<Vec>& output,
+                                     SplineAutomatorInterface<Vec>* automator)
 {
   int const numSamples = input.getNumSamples();
   output.setNumSamples(numSamples);
 
-  Vec const alpha = this->data->smoothingAlpha[0];
+  Vec const alpha = Vec().load_a(automator->getSmoothingAlpha());
 
-  Vec xs[numKnots];
-  Vec ys[numKnots];
-  Vec ts[numKnots];
-  Vec ss[numKnots];
+  Vec x[numKnots];
+  Vec y[numKnots];
+  Vec t[numKnots];
+  Vec s[numKnots];
 
-  Vec xt[numKnots];
-  Vec yt[numKnots];
-  Vec tt[numKnots];
-  Vec st[numKnots];
+  Vec x_a[numKnots];
+  Vec y_a[numKnots];
+  Vec t_a[numKnots];
+  Vec s_a[numKnots];
 
   auto symm = Vec().load_a(this->data->isSymmetric) != 0.0;
 
   for (int n = 0; n < numKnots; ++n) {
-    xs[n] = Vec().load_a(this->data->knots[n].state.x);
-    ys[n] = Vec().load_a(this->data->knots[n].state.y);
-    ts[n] = Vec().load_a(this->data->knots[n].state.t);
-    ss[n] = Vec().load_a(this->data->knots[n].state.s);
-    xt[n] = Vec().load_a(this->data->knots[n].target.x);
-    yt[n] = Vec().load_a(this->data->knots[n].target.y);
-    tt[n] = Vec().load_a(this->data->knots[n].target.t);
-    st[n] = Vec().load_a(this->data->knots[n].target.s);
+    x[n] = Vec().load_a(this->data->knots[n].x);
+    y[n] = Vec().load_a(this->data->knots[n].y);
+    t[n] = Vec().load_a(this->data->knots[n].t);
+    s[n] = Vec().load_a(this->data->knots[n].s);
+  }
+
+  auto* automationKnots = automator->getKnots();
+
+  for (int n = 0; n < numKnots; ++n) {
+    x_a[n] = Vec().load_a(automationKnots[n].x);
+    y_a[n] = Vec().load_a(automationKnots[n].y);
+    t_a[n] = Vec().load_a(automationKnots[n].t);
+    s_a[n] = Vec().load_a(automationKnots[n].s);
   }
 
   for (int i = 0; i < numSamples; ++i) {
@@ -243,10 +302,10 @@ Spline<Vec, numKnots_>::processBlock(VecBuffer<Vec> const& input,
     // advance automation
 
     for (int n = 0; n < numKnots; ++n) {
-      xs[n] = alpha * (xs[n] - xt[n]) + xt[n];
-      ys[n] = alpha * (ys[n] - yt[n]) + yt[n];
-      ts[n] = alpha * (ts[n] - tt[n]) + tt[n];
-      ss[n] = alpha * (ss[n] - st[n]) + st[n];
+      x[n] = alpha * (x[n] - x_a[n]) + x_a[n];
+      y[n] = alpha * (y[n] - y_a[n]) + y_a[n];
+      t[n] = alpha * (t[n] - t_a[n]) + t_a[n];
+      s[n] = alpha * (s[n] - s_a[n]) + s_a[n];
     }
 
     Vec const in_signed = input[i];
@@ -269,40 +328,40 @@ Spline<Vec, numKnots_>::processBlock(VecBuffer<Vec> const& input,
 
     // parameters for segment below the range of the spline
 
-    Vec x_low = xs[0];
-    Vec y_low = ys[0];
-    Vec t_low = ts[0];
+    Vec x_low = x[0];
+    Vec y_low = y[0];
+    Vec t_low = t[0];
 
     // parameters for segment above the range of the spline
 
-    Vec x_high = xs[0];
-    Vec y_high = ys[0];
-    Vec t_high = ts[0];
+    Vec x_high = x[0];
+    Vec y_high = y[0];
+    Vec t_high = t[0];
 
     // find interval and set left and right knot parameters
 
     for (int n = 0; n < numKnots; ++n) {
-      auto const is_left = (in > xs[n]) && (xs[n] > x0);
-      x0 = select(is_left, xs[n], x0);
-      y0 = select(is_left, ys[n], y0);
-      t0 = select(is_left, ts[n], t0);
-      s0 = select(is_left, ss[n], s0);
+      auto const is_left = (in > x[n]) && (x[n] > x0);
+      x0 = select(is_left, x[n], x0);
+      y0 = select(is_left, y[n], y0);
+      t0 = select(is_left, t[n], t0);
+      s0 = select(is_left, s[n], s0);
 
-      auto const is_right = (in <= xs[n]) && (xs[n] < x1);
-      x1 = select(is_right, xs[n], x1);
-      y1 = select(is_right, ys[n], y1);
-      t1 = select(is_right, ts[n], t1);
-      s1 = select(is_right, ss[n], s1);
+      auto const is_right = (in <= x[n]) && (x[n] < x1);
+      x1 = select(is_right, x[n], x1);
+      y1 = select(is_right, y[n], y1);
+      t1 = select(is_right, t[n], t1);
+      s1 = select(is_right, s[n], s1);
 
-      auto const is_lowest = xs[n] < x_low;
-      x_low = select(is_lowest, xs[n], x_low);
-      y_low = select(is_lowest, ys[n], y_low);
-      t_low = select(is_lowest, ts[n], t_low);
+      auto const is_lowest = x[n] < x_low;
+      x_low = select(is_lowest, x[n], x_low);
+      y_low = select(is_lowest, y[n], y_low);
+      t_low = select(is_lowest, t[n], t_low);
 
-      auto const is_highest = xs[n] > x_high;
-      x_high = select(is_highest, xs[n], x_high);
-      y_high = select(is_highest, ys[n], y_high);
-      t_high = select(is_highest, ts[n], t_high);
+      auto const is_highest = x[n] > x_high;
+      x_high = select(is_highest, x[n], x_high);
+      y_high = select(is_highest, y[n], y_high);
+      t_high = select(is_highest, t[n], t_high);
     }
 
     auto const is_high = x1 == std::numeric_limits<float>::max();
@@ -345,14 +404,138 @@ Spline<Vec, numKnots_>::processBlock(VecBuffer<Vec> const& input,
   // update spline state
 
   for (int n = 0; n < numKnots; ++n) {
-    xs[n].store_a(this->data->knots[n].state.x);
-    ys[n].store_a(this->data->knots[n].state.y);
-    ts[n].store_a(this->data->knots[n].state.t);
-    ss[n].store_a(this->data->knots[n].state.s);
-    xt[n].store_a(this->data->knots[n].target.x);
-    yt[n].store_a(this->data->knots[n].target.y);
-    tt[n].store_a(this->data->knots[n].target.t);
-    st[n].store_a(this->data->knots[n].target.s);
+    x[n].store_a(this->data->knots[n].x);
+    y[n].store_a(this->data->knots[n].y);
+    t[n].store_a(this->data->knots[n].t);
+    s[n].store_a(this->data->knots[n].s);
+  }
+}
+
+template<class Vec, int numKnots_>
+inline void
+Spline<Vec, numKnots_>::processBlock(VecBuffer<Vec> const& input,
+                                     VecBuffer<Vec>& output)
+{
+  int const numSamples = input.getNumSamples();
+  output.setNumSamples(numSamples);
+
+  Vec x[numKnots];
+  Vec y[numKnots];
+  Vec t[numKnots];
+  Vec s[numKnots];
+
+  auto symm = Vec().load_a(this->data->isSymmetric) != 0.0;
+
+  for (int n = 0; n < numKnots; ++n) {
+    x[n] = Vec().load_a(this->data->knots[n].x);
+    y[n] = Vec().load_a(this->data->knots[n].y);
+    t[n] = Vec().load_a(this->data->knots[n].t);
+    s[n] = Vec().load_a(this->data->knots[n].s);
+  }
+
+  for (int i = 0; i < numSamples; ++i) {
+
+    Vec const in_signed = input[i];
+
+    Vec const in = select(symm, abs(in_signed), in_signed);
+
+    // left knot paramters
+
+    Vec x0 = std::numeric_limits<float>::lowest();
+    Vec y0 = 0.f;
+    Vec t0 = 0.f;
+    Vec s0 = 0.f;
+
+    // right knot paramters
+
+    Vec x1 = std::numeric_limits<float>::max();
+    Vec y1 = 0.f;
+    Vec t1 = 0.f;
+    Vec s1 = 0.f;
+
+    // parameters for segment below the range of the spline
+
+    Vec x_low = x[0];
+    Vec y_low = y[0];
+    Vec t_low = t[0];
+
+    // parameters for segment above the range of the spline
+
+    Vec x_high = x[0];
+    Vec y_high = y[0];
+    Vec t_high = t[0];
+
+    // find interval and set left and right knot parameters
+
+    for (int n = 0; n < numKnots; ++n) {
+      auto const is_left = (in > x[n]) && (x[n] > x0);
+      x0 = select(is_left, x[n], x0);
+      y0 = select(is_left, y[n], y0);
+      t0 = select(is_left, t[n], t0);
+      s0 = select(is_left, s[n], s0);
+
+      auto const is_right = (in <= x[n]) && (x[n] < x1);
+      x1 = select(is_right, x[n], x1);
+      y1 = select(is_right, y[n], y1);
+      t1 = select(is_right, t[n], t1);
+      s1 = select(is_right, s[n], s1);
+
+      auto const is_lowest = x[n] < x_low;
+      x_low = select(is_lowest, x[n], x_low);
+      y_low = select(is_lowest, y[n], y_low);
+      t_low = select(is_lowest, t[n], t_low);
+
+      auto const is_highest = x[n] > x_high;
+      x_high = select(is_highest, x[n], x_high);
+      y_high = select(is_highest, y[n], y_high);
+      t_high = select(is_highest, t[n], t_high);
+    }
+
+    auto const is_high = x1 == std::numeric_limits<float>::max();
+    auto const is_low = x0 == std::numeric_limits<float>::lowest();
+
+    // compute spline and segment coeffcients
+
+    Vec const dx = max(x1 - x0, std::numeric_limits<float>::min());
+    Vec const dy = y1 - y0;
+    Vec const a = t0 * dx - dy;
+    Vec const b = -t1 * dx + dy;
+    Vec const ix = 1.0 / dx;
+    Vec const m = dy * ix;
+    Vec const o = y0 - m * x0;
+
+    // compute spline
+
+    Vec const j = (in - x0) * ix;
+    Vec const k = 1.0 - j;
+    Vec const hermite = k * y0 + j * y1 + j * k * (a * k + b * j);
+
+    // compute segment and interpolate using smoothness
+
+    Vec const segment = m * in + o;
+    Vec const smoothness = s1 + k * (s0 - s1);
+    Vec const curve = segment + smoothness * (hermite - segment);
+
+    // override the result if the input is outside the spline range
+
+    Vec const low = y_low + (in - x_low) * t_low;
+    Vec const high = y_high + (in - x_high) * t_high;
+
+    Vec const out = select(is_high, high, select(is_low, low, curve));
+
+    // symmetry
+
+    output[i] = select(symm, sign_combine(out, in_signed), out);
+  }
+}
+
+template<class Vec, int numKnots_>
+inline void
+SplineAutomator<Vec, numKnots_>::reset(SplineInterface<Vec>* spline)
+{
+  int i = 0;
+  for (auto& knot : data->knots) {
+    std::copy(&knot, &knot + 1, &spline->getKnots()[i++]);
   }
 }
 
