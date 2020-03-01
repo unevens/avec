@@ -671,7 +671,7 @@ InterleavedBuffer<Scalar>::copyFrom(InterleavedBuffer const& other,
       }
     }
   }
-  else {
+  if constexpr (VEC2_AVAILABLE) {
     for (int i = 0; i < buffers2.size(); ++i) {
       std::copy(&other.buffers2[i](0),
                 &other.buffers2[i](0) + 2 * numSamples,
