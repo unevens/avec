@@ -97,30 +97,30 @@ struct StateVariable
     Vec s2 = Vec().load_a(state + Vec::size());
 
     Vec g = Vec().load_a(frequency);
-    Vec g_a = Vec().load_a(frequencyTarget);
+    Vec const g_a = Vec().load_a(frequencyTarget);
 
     Vec r = Vec().load_a(resonance);
-    Vec r_a = Vec().load_a(resonanceTarget);
+    Vec const r_a = Vec().load_a(resonanceTarget);
 
-    Vec alpha = Vec().load_a(smoothingAlpha);
+    Vec const alpha = Vec().load_a(smoothingAlpha);
 
     for (int i = 0; i < numSamples; ++i) {
 
       g = alpha * (g - g_a) + g_a;
       r = alpha * (r - r_a) + r_a;
 
-      Vec in = input[i];
+      Vec const in = input[i];
 
-      Vec r_g = r + g;
+      Vec const r_g = r + g;
 
-      Vec high = (in - r_g * s1 - s2) / (1.0 + r_g * g);
+      Vec const high = (in - r_g * s1 - s2) / (1.0 + r_g * g);
 
-      Vec v1 = g * high;
-      Vec band = v1 + s1;
+      Vec const v1 = g * high;
+      Vec const band = v1 + s1;
       s1 = band + v1;
 
-      Vec v2 = g * band;
-      Vec low = v2 + s2;
+      Vec const v2 = g * band;
+      Vec const low = v2 + s2;
       s2 = low + v2;
 
       output[i] = high;
@@ -152,13 +152,13 @@ private:
     Scalar bandwidth,
     Scalar normalizedFrequency)
   {
-    Scalar b = pow(2.0, bandwidth * 0.5);
-    Scalar n0 = normalizedFrequency / b;
-    Scalar n1 = std::min(1.0, normalizedFrequency * b);
-    Scalar w0 = tan(pi * n0);
-    Scalar w1 = tan(pi * n1);
-    Scalar w = sqrt(w0 * w1);
-    Scalar r = 0.5 * w1 / w0;
+    Scalar const b = pow(2.0, bandwidth * 0.5);
+    Scalar const n0 = normalizedFrequency / b;
+    Scalar const n1 = std::min(1.0, normalizedFrequency * b);
+    Scalar const w0 = tan(pi * n0);
+    Scalar const w1 = tan(pi * n1);
+    Scalar const w = sqrt(w0 * w1);
+    Scalar const r = 0.5 * w1 / w0;
     return { w, r };
   }
 
@@ -179,26 +179,26 @@ private:
     Vec s2 = Vec().load_a(state + Vec::size());
 
     Vec g = Vec().load_a(frequency);
-    Vec g_a = Vec().load_a(frequencyTarget);
+    Vec const g_a = Vec().load_a(frequencyTarget);
 
     Vec r = Vec().load_a(resonance);
-    Vec r_a = Vec().load_a(resonanceTarget);
+    Vec const r_a = Vec().load_a(resonanceTarget);
 
-    Vec alpha = Vec().load_a(smoothingAlpha);
+    Vec const alpha = Vec().load_a(smoothingAlpha);
 
     for (int i = 0; i < numSamples; ++i) {
 
       g = alpha * (g - g_a) + g_a;
       r = alpha * (r - r_a) + r_a;
 
-      Vec in = input[i];
+      Vec const in = input[i];
 
-      Vec band = (g * (in - s2) + s1) / (1.0 + g * (r + g));
+      Vec const band = (g * (in - s2) + s1) / (1.0 + g * (r + g));
 
       s1 = 2.0 * band - s1;
 
-      Vec v2 = g * band;
-      Vec low = v2 + s2;
+      Vec const v2 = g * band;
+      Vec const low = v2 + s2;
       s2 = low + v2;
 
       if constexpr (multimodeOutput == lowPassOutput) {

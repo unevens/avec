@@ -77,17 +77,17 @@ private:
 
     Vec s = Vec().load_a(state);
     Vec g = Vec().load_a(frequency);
-    Vec g_a = Vec().load_a(frequencyTarget);
-    Vec alpha = Vec().load_a(smoothingAlpha);
+    Vec const g_a = Vec().load_a(frequencyTarget);
+    Vec const alpha = Vec().load_a(smoothingAlpha);
 
     for (int i = 0; i < numSamples; ++i) {
 
       g = alpha * (g - g_a) + g_a;
 
-      Vec in = input[i];
+      Vec const in = input[i];
 
-      Vec v = g * (in - s) / (1.0 + g);
-      Vec low = v + s;
+      Vec const v = g * (in - s) / (1.0 + g);
+      Vec const low = v + s;
 
       s = low + v;
 
