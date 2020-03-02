@@ -16,7 +16,6 @@ limitations under the License.
 
 #pragma once
 #include "avec/Avec.hpp"
-#include "avec/dsp/SplineMacro.hpp"
 
 namespace avec {
 
@@ -36,6 +35,8 @@ struct StateVariable
   StateVariable()
   {
     AVEC_ASSERT_ALIGNMENT(this, Vec);
+    setFrequency(0.25);
+    setResonance(0.0);
     reset();
   }
 
@@ -58,34 +59,26 @@ struct StateVariable
 
   void setResonance(Scalar value)
   {
-    std::fill_n(resonance, Vec::size(), 2.0 * value);
+    std::fill_n(resonanceTarget, Vec::size(), 2.0 * (1.0 - value));
   }
 
   void setResonance(Scalar value, int channel)
   {
-    resonance[channel] = 2.0 * value;
+    resonanceTarget[channel] = 2.0 * (1.0 - value);
   }
 
-  void setBandPass(Scalar bandwidth,
-                   Scalar normalizedCenterFrequency,
-                   int channel)
+  void setBandPass(Scalar bandwidth, Scalar normalizedFrequency, int channel)
   {
-    Scalar b = pow(2.0, bandwidth * 0.5);
-    Scalar w0 = tan(pi * normalizedCenterFrequency * b);
-    Scalar w1 = tan(pi * normalizedCenterFrequency * b);
-    frequencyTarget[channel] = sqrt(w0 * w1);
-    Scalar d = w0 / w1;
-    resonance[channel] = 0.5 * (d - 1.0 / d);
+    auto [w, r] = bandPassPrewarp(bandwidth, normalizedFrequency);
+    frequencyTarget[channel] = w;
+    resonanceTarget[channel] = r;
   }
 
-  void setBandPass(Scalar bandwidth, Scalar normalizedCenterFrequency)
+  void setBandPass(Scalar bandwidth, Scalar normalizedFrequency)
   {
-    Scalar b = pow(2.0, bandwidth * 0.5);
-    Scalar w0 = tan(pi * normalizedCenterFrequency * b);
-    Scalar w1 = tan(pi * normalizedCenterFrequency * b);
-    std::fill_n(frequencyTarget, Vec::size(), sqrt(w0 * w1));
-    Scalar d = w0 / w1;
-    std::fill_n(resonance, Vec::size(), 0.5 * (d - 1.0 / d));
+    auto [w, r] = bandPassPrewarp(bandwidth, normalizedFrequency);
+    std::fill_n(frequencyTarget, Vec::size(), w);
+    std::fill_n(resonanceTarget, Vec::size(), r);
   }
 
   void setSmoothingAlpha(Scalar alpha)
@@ -148,6 +141,19 @@ struct StateVariable
   }
 
 private:
+  static std::pair<Scalar, Scalar> bandPassPrewarp(Scalar bandwidth,
+                                                   Scalar normalizedFrequency)
+  {
+    Scalar b = pow(2.0, bandwidth * 0.5);
+    Scalar n0 = normalizedFrequency / b;
+    Scalar n1 = std::min(1.0, normalizedFrequency * b);
+    Scalar w0 = tan(pi * n0);
+    Scalar w1 = tan(pi * n1);
+    Scalar w = sqrt(w0 * w1);
+    Scalar r = 0.5 * w1 / w0;
+    return { w, r };
+  }
+
   template<int isBandPass>
   void bandPassAlgorithm(VecBuffer<Vec> const& input, VecBuffer<Vec>& output)
   {

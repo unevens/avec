@@ -16,7 +16,6 @@ limitations under the License.
 
 #pragma once
 #include "avec/Avec.hpp"
-#include "avec/dsp/SplineMacro.hpp"
 
 namespace avec {
 
@@ -34,6 +33,7 @@ struct OnePole
   OnePole()
   {
     AVEC_ASSERT_ALIGNMENT(this, Vec);
+    setFrequency(0.25);
     reset();
   }
 
