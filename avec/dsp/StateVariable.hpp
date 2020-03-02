@@ -67,16 +67,18 @@ struct StateVariable
     resonanceTarget[channel] = 2.0 * (1.0 - value);
   }
 
-  void setBandPass(Scalar bandwidth, Scalar normalizedFrequency, int channel)
+  void setupNormalizedBandPass(Scalar bandwidth,
+                               Scalar normalizedFrequency,
+                               int channel)
   {
-    auto [w, r] = bandPassPrewarp(bandwidth, normalizedFrequency);
+    auto [w, r] = normalizedBandPassPrewarp(bandwidth, normalizedFrequency);
     frequencyTarget[channel] = w;
     resonanceTarget[channel] = r;
   }
 
-  void setBandPass(Scalar bandwidth, Scalar normalizedFrequency)
+  void setupNormalizedBandPass(Scalar bandwidth, Scalar normalizedFrequency)
   {
-    auto [w, r] = bandPassPrewarp(bandwidth, normalizedFrequency);
+    auto [w, r] = normalizedBandPassPrewarp(bandwidth, normalizedFrequency);
     std::fill_n(frequencyTarget, Vec::size(), w);
     std::fill_n(resonanceTarget, Vec::size(), r);
   }
@@ -140,9 +142,15 @@ struct StateVariable
     bandPassAlgorithm<0>(input, output);
   }
 
+  void normalizedBandPass(VecBuffer<Vec> const& input, VecBuffer<Vec>& output)
+  {
+    bandPassAlgorithm<2>(input, output);
+  }
+
 private:
-  static std::pair<Scalar, Scalar> bandPassPrewarp(Scalar bandwidth,
-                                                   Scalar normalizedFrequency)
+  static std::pair<Scalar, Scalar> normalizedBandPassPrewarp(
+    Scalar bandwidth,
+    Scalar normalizedFrequency)
   {
     Scalar b = pow(2.0, bandwidth * 0.5);
     Scalar n0 = normalizedFrequency / b;
@@ -154,7 +162,7 @@ private:
     return { w, r };
   }
 
-  template<int isBandPass>
+  template<int lowPass0_bandPass1_normBandPass2>
   void bandPassAlgorithm(VecBuffer<Vec> const& input, VecBuffer<Vec>& output)
   {
     int const numSamples = input.getNumSamples();
@@ -186,11 +194,14 @@ private:
       Vec low = v2 + s2;
       s2 = low + v2;
 
-      if constexpr (isBandPass) {
-        output[i] = band * r;
+      if constexpr (lowPass0_bandPass1_normBandPass2 == 0) {
+        output[i] = low;
+      }
+      else if constexpr (lowPass0_bandPass1_normBandPass2 == 1) {
+        output[i] = band;
       }
       else {
-        output[i] = low;
+        output[i] = band * r;
       }
     }
 
