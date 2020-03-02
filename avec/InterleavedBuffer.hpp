@@ -41,9 +41,6 @@ class InterleavedBuffer final
 
   std::vector<VecBuffer<Vec8>> buffers8;
   std::vector<VecBuffer<Vec4>> buffers4;
-
-  // fallback when VEC4_AVAILABLE == false (Scalar=double, and no AVX)
-  // otherwise unused
   std::vector<VecBuffer<Vec2>> buffers2;
 
   int numChannels;
