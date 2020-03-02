@@ -186,7 +186,7 @@ struct SplineHolder final
   {
     int i = 0;
     for (auto& a : automators) {
-      a->reset(splines[i++]);
+      a->reset(splines[i++].get());
     }
   }
 
