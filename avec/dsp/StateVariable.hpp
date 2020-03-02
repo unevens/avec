@@ -134,17 +134,17 @@ struct StateVariable
 
   void bandPass(VecBuffer<Vec> const& input, VecBuffer<Vec>& output)
   {
-    bandPassAlgorithm<1>(input, output);
+    bandPassAlgorithm<bandPassOutpt>(input, output);
   }
 
   void lowPass(VecBuffer<Vec> const& input, VecBuffer<Vec>& output)
   {
-    bandPassAlgorithm<0>(input, output);
+    bandPassAlgorithm<lowPassOutput>(input, output);
   }
 
   void normalizedBandPass(VecBuffer<Vec> const& input, VecBuffer<Vec>& output)
   {
-    bandPassAlgorithm<2>(input, output);
+    bandPassAlgorithm<normalizedBandPassOutput>(input, output);
   }
 
 private:
@@ -162,7 +162,14 @@ private:
     return { w, r };
   }
 
-  template<int lowPass0_bandPass1_normBandPass2>
+  enum MultimodeOutputs
+  {
+    lowPassOutput = 0,
+    bandPassOutpt,
+    normalizedBandPassOutput
+  };
+
+  template<int multimodeOutput>
   void bandPassAlgorithm(VecBuffer<Vec> const& input, VecBuffer<Vec>& output)
   {
     int const numSamples = input.getNumSamples();
@@ -194,14 +201,18 @@ private:
       Vec low = v2 + s2;
       s2 = low + v2;
 
-      if constexpr (lowPass0_bandPass1_normBandPass2 == 0) {
+      if constexpr (multimodeOutput == lowPassOutput) {
         output[i] = low;
       }
-      else if constexpr (lowPass0_bandPass1_normBandPass2 == 1) {
+      else if constexpr (multimodeOutput == bandPassOutpt) {
         output[i] = band;
       }
-      else {
+      else if constexpr (multimodeOutput == normalizedBandPassOutput) {
         output[i] = band * r;
+      }
+      else {
+        static_assert(
+          false, "multimodeOutput must be a member of the enum MultimodeOutputs.");
       }
     }
 
