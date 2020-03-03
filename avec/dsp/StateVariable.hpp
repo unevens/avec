@@ -89,6 +89,8 @@ struct StateVariable
     std::fill_n(smoothingAlpha, Vec::size(), alpha);
   }
 
+  // linear
+
   void highPass(VecBuffer<Vec> const& input, VecBuffer<Vec>& output)
   {
     int const numSamples = input.getNumSamples();
@@ -209,50 +211,83 @@ struct StateVariable
     bandPassAlgorithm<normalizedBandPassOutput>(input, output);
   }
 
-  template<class Saturator, class SaturatorWithDerivative>
-  void bandPass(VecBuffer<Vec> const& input,
-                VecBuffer<Vec>& output,
-                int numIterations,
-                Saturator saturationGain,
-                SaturatorWithDerivative computeSaturationAndDerivative)
+  // nonlinear
+
+  template<class Saturator, class SaturationGain, class SaturatorWithDerivative>
+  void lowPass(VecBuffer<Vec> const& input,
+               VecBuffer<Vec>& output,
+               int numIterations,
+               Saturator saturate,
+               SaturationGain saturationGain,
+               SaturatorWithDerivative computeSaturationAndDerivative)
   {
-    bandPassAlgorithm<bandPassOutput>(input,
+    withAntisaturation<lowPassOutput>(input,
                                       output,
                                       numIterations,
+                                      saturate,
                                       saturationGain,
                                       computeSaturationAndDerivative);
   }
 
-  template<class Saturator, class SaturatorWithDerivative>
-  void lowPass(VecBuffer<Vec> const& input,
-               VecBuffer<Vec>& output,
-               int numIterations,
-               Saturator saturationGain,
-               SaturatorWithDerivative computeSaturationAndDerivative)
+  template<class Saturator, class SaturationGain, class SaturatorWithDerivative>
+  void bandPass(VecBuffer<Vec> const& input,
+                VecBuffer<Vec>& output,
+                int numIterations,
+                Saturator saturate,
+                SaturationGain saturationGain,
+                SaturatorWithDerivative computeSaturationAndDerivative)
   {
-    bandPassAlgorithm<lowPassOutput>(input,
-                                     output,
-                                     numIterations,
-                                     saturationGain,
-                                     computeSaturationAndDerivative);
+    withAntisaturation<bandPassOutput>(input,
+                                       output,
+                                       numIterations,
+                                       saturate,
+                                       saturationGain,
+                                       computeSaturationAndDerivative);
   }
 
-  template<class Saturator, class SaturatorWithDerivative>
+  template<class Saturator, class SaturationGain, class SaturatorWithDerivative>
   void normalizedBandPass(
     VecBuffer<Vec> const& input,
     VecBuffer<Vec>& output,
     int numIterations,
-    Saturator saturationGain,
+    Saturator saturate,
+    SaturationGain saturationGain,
     SaturatorWithDerivative computeSaturationAndDerivative)
   {
-    bandPassAlgorithm<normalizedBandPassOutput>(input,
-                                                output,
-                                                numIterations,
-                                                saturationGain,
-                                                computeSaturationAndDerivative);
+    withAntisaturation<normalizedBandPassOutput>(
+      input,
+      output,
+      numIterations,
+      saturate,
+      saturationGain,
+      computeSaturationAndDerivative);
+  }
+
+  template<class Saturator, class SaturationGain, class SaturatorWithDerivative>
+  void highPass(VecBuffer<Vec> const& input,
+                VecBuffer<Vec>& output,
+                int numIterations,
+                Saturator saturate,
+                SaturationGain saturationGain,
+                SaturatorWithDerivative computeSaturationAndDerivative)
+  {
+    withAntisaturation<highPassOutput>(input,
+                                       output,
+                                       numIterations,
+                                       saturate,
+                                       saturationGain,
+                                       computeSaturationAndDerivative);
   }
 
 private:
+  enum MultimodeOutputs
+  {
+    lowPassOutput = 0,
+    bandPassOutput,
+    normalizedBandPassOutput,
+    highPassOutput
+  };
+
   static std::pair<Scalar, Scalar> normalizedBandPassPrewarp(
     Scalar bandwidth,
     Scalar normalizedFrequency)
@@ -266,14 +301,6 @@ private:
     Scalar const r = 0.5 * w1 / w0;
     return { w, r };
   }
-
-  enum MultimodeOutputs
-  {
-    lowPassOutput = 0,
-    bandPassOutput,
-    normalizedBandPassOutput,
-    highPassOutput
-  };
 
   template<int multimodeOutput>
   void bandPassAlgorithm(VecBuffer<Vec> const& input, VecBuffer<Vec>& output)
@@ -367,7 +394,7 @@ private:
 
       // Mistran's cheap method, solving for antisaturated bandpass "u"
 
-      Vec sigma = saturationGain(u); // saturation(u)/u
+      Vec sigma = saturationGain(u); // saturate(u)/u
 
       Vec d = 1.0 + g * (g_r);
 
