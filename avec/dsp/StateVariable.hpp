@@ -17,6 +17,9 @@ limitations under the License.
 #pragma once
 #include "avec/Avec.hpp"
 
+//#include <JuceHeader.h>
+#define DBG(x)
+
 namespace avec {
 
 template<class Vec>
@@ -28,14 +31,14 @@ struct StateVariable
   enum class Output
   {
     lowPass = 0,
+    highPass,
     bandPass,
-    normalizedBandPass,
-    highPass
+    normalizedBandPass
   };
 
   Scalar smoothingAlpha[Vec::size()];
   Scalar state[2 * Vec::size()];
-  Scalar memory[2 * Vec::size()]; // for antisaturator
+  Scalar memory[Vec::size()]; // for antisaturator
   Scalar frequency[Vec::size()];
   Scalar resonance[Vec::size()];
   Scalar frequencyTarget[Vec::size()];
@@ -112,7 +115,7 @@ struct StateVariable
 
   void processBlock(VecBuffer<Vec> const& input, VecBuffer<Vec>& output)
   {
-    linear<>(input, output);
+    linear<-1>(input, output);
   }
 
   void bandPass(VecBuffer<Vec> const& input, VecBuffer<Vec>& output)
@@ -132,30 +135,38 @@ struct StateVariable
 
   // nonlinear
 
-  template<class Saturator, class SaturationGain, class SaturatorWithDerivative>
+  template<class Saturator,
+           class SaturationGain,
+           class SaturatorWithDerivative,
+           class SaturatorAutomation>
   void processBlock(VecBuffer<Vec> const& input,
-                VecBuffer<Vec>& output,
-                int numIterations,
-                Saturator saturate,
-                SaturationGain saturationGain,
-                SaturatorWithDerivative computeSaturationAndDerivative)
+                    VecBuffer<Vec>& output,
+                    int numIterations,
+                    Saturator saturate,
+                    SaturationGain saturationGain,
+                    SaturatorWithDerivative computeSaturationAndDerivative,
+                    SaturatorAutomation saturatorAutomation)
   {
-    withAntisaturation<>(
-      input,
-      output,
-      numIterations,
-      saturate,
-      saturationGain,
-      computeSaturationAndDerivative);
+    withAntisaturation<-1>(input,
+                           output,
+                           numIterations,
+                           saturate,
+                           saturationGain,
+                           computeSaturationAndDerivative,
+                           saturatorAutomation);
   }
 
-  template<class Saturator, class SaturationGain, class SaturatorWithDerivative>
+  template<class Saturator,
+           class SaturationGain,
+           class SaturatorWithDerivative,
+           class SaturatorAutomation>
   void lowPass(VecBuffer<Vec> const& input,
                VecBuffer<Vec>& output,
                int numIterations,
                Saturator saturate,
                SaturationGain saturationGain,
-               SaturatorWithDerivative computeSaturationAndDerivative)
+               SaturatorWithDerivative computeSaturationAndDerivative,
+               SaturatorAutomation saturatorAutomation)
   {
     withAntisaturation<static_cast<int>(Output::lowPass)>(
       input,
@@ -163,16 +174,21 @@ struct StateVariable
       numIterations,
       saturate,
       saturationGain,
-      computeSaturationAndDerivative);
+      computeSaturationAndDerivative,
+      saturatorAutomation);
   }
 
-  template<class Saturator, class SaturationGain, class SaturatorWithDerivative>
+  template<class Saturator,
+           class SaturationGain,
+           class SaturatorWithDerivative,
+           class SaturatorAutomation>
   void bandPass(VecBuffer<Vec> const& input,
                 VecBuffer<Vec>& output,
                 int numIterations,
                 Saturator saturate,
                 SaturationGain saturationGain,
-                SaturatorWithDerivative computeSaturationAndDerivative)
+                SaturatorWithDerivative computeSaturationAndDerivative,
+                SaturatorAutomation saturatorAutomation)
   {
     withAntisaturation<static_cast<int>(Output::bandPass)>(
       input,
@@ -180,17 +196,22 @@ struct StateVariable
       numIterations,
       saturate,
       saturationGain,
-      computeSaturationAndDerivative);
+      computeSaturationAndDerivative,
+      saturatorAutomation);
   }
 
-  template<class Saturator, class SaturationGain, class SaturatorWithDerivative>
+  template<class Saturator,
+           class SaturationGain,
+           class SaturatorWithDerivative,
+           class SaturatorAutomation>
   void normalizedBandPass(
     VecBuffer<Vec> const& input,
     VecBuffer<Vec>& output,
     int numIterations,
     Saturator saturate,
     SaturationGain saturationGain,
-    SaturatorWithDerivative computeSaturationAndDerivative)
+    SaturatorWithDerivative computeSaturationAndDerivative,
+    SaturatorAutomation saturatorAutomation)
   {
     withAntisaturation<static_cast<int>(Output::normalizedBandPass)>(
       input,
@@ -198,16 +219,21 @@ struct StateVariable
       numIterations,
       saturate,
       saturationGain,
-      computeSaturationAndDerivative);
+      computeSaturationAndDerivative,
+      saturatorAutomation);
   }
 
-  template<class Saturator, class SaturationGain, class SaturatorWithDerivative>
+  template<class Saturator,
+           class SaturationGain,
+           class SaturatorWithDerivative,
+           class SaturatorAutomation>
   void highPass(VecBuffer<Vec> const& input,
                 VecBuffer<Vec>& output,
                 int numIterations,
                 Saturator saturate,
                 SaturationGain saturationGain,
-                SaturatorWithDerivative computeSaturationAndDerivative)
+                SaturatorWithDerivative computeSaturationAndDerivative,
+                SaturatorAutomation saturatorAutomation)
   {
     withAntisaturation<static_cast<int>(Output::highPass)>(
       input,
@@ -215,7 +241,8 @@ struct StateVariable
       numIterations,
       saturate,
       saturationGain,
-      computeSaturationAndDerivative);
+      computeSaturationAndDerivative,
+      saturatorAutomation);
   }
 
 private:
@@ -233,7 +260,7 @@ private:
     return { w, r };
   }
 
-  template<int multimodeOutput = -1>
+  template<int multimodeOutput>
   void linear(VecBuffer<Vec> const& input, VecBuffer<Vec>& output)
   {
     int const numSamples = input.getNumSamples();
@@ -250,7 +277,13 @@ private:
 
     Vec const alpha = Vec().load_a(smoothingAlpha);
 
-    if constexpr (multimodeOutput == satic_cast<int>(Output::highPass)) {
+    Vec const output_mode = Vec().load_a(outputMode);
+    auto const is_high_pass = output_mode == static_cast<int>(Output::highPass);
+    auto const is_band_pass = output_mode == static_cast<int>(Output::bandPass);
+    auto const is_nrm_band_pass =
+      output_mode == static_cast<int>(Output::normalizedBandPass);
+
+    if constexpr (multimodeOutput == static_cast<int>(Output::highPass)) {
 
       for (int i = 0; i < numSamples; ++i) {
 
@@ -286,32 +319,32 @@ private:
 
         Vec const band = (g * (in - s2) + s1) / (1.0 + g * (r + g));
 
-        s1 = 2.0 * band - s1;
+        s1 = band + band - s1;
 
         Vec const v2 = g * band;
         Vec const low = v2 + s2;
         s2 = low + v2;
 
         if constexpr (multimodeOutput == -1) {
-          Vec normalized_band_pass = band * r + 2.0 * u;
-          Vec high_pass = in - (g_r * band + s2 + u);
+          Vec normalized_band = band * r;
+          Vec high = in - (g * r * band + s2);
 
           output[i] = select(is_band_pass,
                              band,
                              select(is_nrm_band_pass,
-                                    normalized_band_pass,
-                                    select(is_high_pass, high_pass, low)));
+                                    normalized_band,
+                                    select(is_high_pass, high, low)));
         }
         else if constexpr (multimodeOutput ==
-                           satic_cast<int>(Output::lowPass)) {
+                           static_cast<int>(Output::lowPass)) {
           output[i] = low;
         }
         else if constexpr (multimodeOutput ==
-                           satic_cast<int>(Output::bandPass)) {
+                           static_cast<int>(Output::bandPass)) {
           output[i] = band;
         }
         else if constexpr (multimodeOutput ==
-                           satic_cast<int>(Output::normalizedBandPass)) {
+                           static_cast<int>(Output::normalizedBandPass)) {
           output[i] = band * r;
         }
         else {
@@ -326,17 +359,19 @@ private:
     r.store_a(resonance);
   }
 
-  template<int multimodeOutput = -1,
+  template<int multimodeOutput,
            class Saturator,
            class SaturationGain,
-           class SaturatorWithDerivative>
+           class SaturatorWithDerivative,
+           class SaturatorAutomation>
   void withAntisaturation(
     VecBuffer<Vec> const& input,
     VecBuffer<Vec>& output,
     int numIterations,
     Saturator saturate,
     SaturationGain saturationGain,
-    SaturatorWithDerivative computeSaturationAndDerivative)
+    SaturatorWithDerivative computeSaturationAndDerivative,
+    SaturatorAutomation saturatorAutomation)
   {
     int const numSamples = input.getNumSamples();
     output.setNumSamples(numSamples);
@@ -354,66 +389,85 @@ private:
     Vec const alpha = Vec().load_a(smoothingAlpha);
 
     Vec const output_mode = Vec().load_a(outputMode);
-    Vec const is_high_pass = output_mode == Output::highPass;
-    Vec const is_band_pass = output_mode == Output::bandPass;
-    Vec const is_nrm_band_pass = output_mode == Output::normalizedBandPass;
-    Vec const is_low_pass = output_mode == Output::lowPass;
+    auto const is_high_pass = output_mode == static_cast<int>(Output::highPass);
+    auto const is_band_pass = output_mode == static_cast<int>(Output::bandPass);
+    auto const is_nrm_band_pass =
+      output_mode == static_cast<int>(Output::normalizedBandPass);
 
     for (int i = 0; i < numSamples; ++i) {
+
+      saturatorAutomation();
 
       g = alpha * (g - g_a) + g_a;
       r = alpha * (r - r_a) + r_a;
 
       Vec const g_r = r + g;
-      Vec g_2 = 2.0 * g;
+      Vec g_2 = g + g;
+      Vec const d = 1.0 + g * (g_r);
 
       Vec const in = input[i];
 
       // Mistran's cheap method, solving for antisaturated bandpass "u"
 
+      DBG(String("prev u: ") + String(u[0]));
+      DBG(String("prev s1: ") + String(s1[0]));
+      DBG(String("prev s2: ") + String(s2[0]));
+
       Vec sigma = saturationGain(u); // saturate(u)/u
 
-      Vec d = 1.0 + g * (g_r);
+      DBG(String("sigma: ") + String(sigma[0]));
 
-      u = (s1 + g * (in - s2)) / (g_2 + sigma * d);
+      u = (s1 + g * (in - s2)) / (sigma * d + g_2);
 
       // Newton - Raphson
+
+      DBG(String("m u: ") + String(u[0]));
 
       for (int it = 0; it < numIterations; ++it) {
         Vec band, delta_band_delta_u;
         computeSaturationAndDerivative(u, band, delta_band_delta_u);
-        Vec const imp = band * d - g * (in - 2.0 * u - s2) - s1;
-        Vec const delta = delta_band_delta_u * d - g_2;
+        Vec const imp = band * d - g * (in - (u + u) - s2) - s1;
+        Vec const delta = delta_band_delta_u * d + g_2;
         u -= imp / delta;
+        DBG(String("n u ") + String(it) + String(": ") + String(u[0]) +
+            String(", ") + String(imp[0]) + String(", ") + String(delta[0]));
       }
 
       Vec band = saturate(u);
+      DBG(String("band ") + String(band[0]));
+
+      s1 = band + band - s1;
+      DBG(String("s1") + String(s1[0]));
 
       Vec const v2 = g * band;
       Vec const low = v2 + s2;
       s2 = low + v2;
+      DBG(String("low ") + String(low[0]));
+      DBG(String("s2 ") + String(s2[0]));
 
       if constexpr (multimodeOutput == -1) {
-        Vec normalized_band_pass = band * r + 2.0 * u;
-        Vec high_pass = in - (g_r * band + s2 + u);
+        Vec normalized_band = band * r + 2.0 * u;
+        Vec high = in - (g_r * band + s2 + u);
 
         output[i] = select(is_band_pass,
                            band,
                            select(is_nrm_band_pass,
-                                  normalized_band_pass,
-                                  select(is_high_pass, high_pass, low)));
+                                  normalized_band,
+                                  select(is_high_pass, high, low)));
       }
-      else if constexpr (multimodeOutput == satic_cast<int>(Output::lowPass)) {
+      else if constexpr (multimodeOutput == static_cast<int>(Output::lowPass)) {
         output[i] = low;
       }
-      else if constexpr (multimodeOutput == satic_cast<int>(Output::bandPass)) {
+      else if constexpr (multimodeOutput ==
+                         static_cast<int>(Output::bandPass)) {
         output[i] = band;
       }
       else if constexpr (multimodeOutput ==
-                         satic_cast<int>(Output::normalizedBandPass)) {
+                         static_cast<int>(Output::normalizedBandPass)) {
         output[i] = band * r + 2.0 * u;
       }
-      if constexpr (multimodeOutput == satic_cast<int>(Output::highPass)) {
+      else if constexpr (multimodeOutput ==
+                         static_cast<int>(Output::highPass)) {
         output[i] = in - (g_r * band + s2 + u);
       }
       else {
@@ -425,6 +479,7 @@ private:
     s2.store_a(state + Vec::size());
     u.store_a(memory);
     g.store_a(frequency);
+    r += 2.0;
     r.store_a(resonance);
   }
 };
