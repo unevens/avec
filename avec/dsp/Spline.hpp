@@ -134,6 +134,7 @@ struct SplineAutomator final : public SplineAutomatorInterface<Vec>
   static constexpr int numKnots = numKnots_;
 
   using Interface = SplineAutomatorInterface<Vec>;
+  using Scalar = typename Interface::Scalar;
   using Knot = typename SplineInterface<Vec>::Knot;
 
   struct Data final
