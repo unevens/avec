@@ -17,9 +17,6 @@ limitations under the License.
 #pragma once
 #include "avec/Avec.hpp"
 
-//#include <JuceHeader.h>
-#define DBG(x)
-
 namespace avec {
 
 template<class Vec>
@@ -409,19 +406,11 @@ private:
 
       // Mistran's cheap method, solving for antisaturated bandpass "u"
 
-      DBG(String("prev u: ") + String(u[0]));
-      DBG(String("prev s1: ") + String(s1[0]));
-      DBG(String("prev s2: ") + String(s2[0]));
-
       Vec sigma = saturationGain(u); // saturate(u)/u
-
-      DBG(String("sigma: ") + String(sigma[0]));
 
       u = (s1 + g * (in - s2)) / (sigma * d + g_2);
 
       // Newton - Raphson
-
-      DBG(String("m u: ") + String(u[0]));
 
       for (int it = 0; it < numIterations; ++it) {
         Vec band, delta_band_delta_u;
@@ -429,21 +418,15 @@ private:
         Vec const imp = band * d - g * (in - (u + u) - s2) - s1;
         Vec const delta = delta_band_delta_u * d + g_2;
         u -= imp / delta;
-        DBG(String("n u ") + String(it) + String(": ") + String(u[0]) +
-            String(", ") + String(imp[0]) + String(", ") + String(delta[0]));
       }
 
       Vec band = saturate(u);
-      DBG(String("band ") + String(band[0]));
 
       s1 = band + band - s1;
-      DBG(String("s1") + String(s1[0]));
 
       Vec const v2 = g * band;
       Vec const low = v2 + s2;
       s2 = low + v2;
-      DBG(String("low ") + String(low[0]));
-      DBG(String("s2 ") + String(s2[0]));
 
       if constexpr (multimodeOutput == -1) {
         Vec normalized_band = band * r + 2.0 * u;
