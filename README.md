@@ -1,44 +1,19 @@
 # [*avec*](https://github.com/unevens/avec)
 
-*avec* is a collection of classes using SIMD instructions for audio applications. 
+*avec* is a little library for using SIMD instructions in audio applications. 
+
 It features containers and views for aligned memory, with an API designed to work seamlessly with Agner Fog's [vectorclass](https://github.com/vectorclass/version2), which is included as a submodule.
 
 ## Containers and views
 
 In vectorclass each SIMD type has its own class: `Vec4f` for `__m128`, `Vec8f` for `__m256`, `Vec4d` for `__m256d` and so on.
 
-In *avec* are implemented the template classes `VecBuffer<Vec>` and `VecView<Vec>` to manage aligned memory and convert it to and from the SIMD classes of vectorclass.
+In *avec*, the template classes `VecBuffer<Vec>` and `VecView<Vec>` are used to manage blocks of aligned memory and convert it to and from the SIMD classes of vectorclass.
 
-The template class `InterleavedBuffer<Scalar>` (where `Scalar` can be either `float` or `double`) can be used to interleave a buffer of any number of audio channels into a set of `VecBuffer<Vec8f>` and `VecBuffer<Vec4f>` (when `Scalar` is `float`), or of `VecBuffer<Vec4d>` and `VecBuffer<Vec2d>` (when `Scalar` is `double`). 
+## Interleaving
 
-
-## DSP
-
-The directory `avec/dsp` contains SIMD implementation of some audio filters/generators.
-
-### Splines
-
-The file `"Spline.hpp"` implements cubic Hermite splines with smoothly automatable control points.
-
-### GammaEnv
-
-The file `"GammaEnv.hpp"` implements Aleksey Vaneev's [gammaenv](https://github.com/avaneev/gammaenv) using SIMD instructions.
-
-### Noise Generator
-
-The file `Noise.hpp` implements a (white) noise generator which can populate VecBuffers and InterleavedBuffers with noise, with a different seed for each channel.
-It uses [a SIMD implementation](https://github.com/unevens/xorshift32_16bit_simd) of a [16 bit xorshift32 random number generator](https://b2d-f9r.blogspot.com/2010/08/16-bit-xorshift-rng-now-with-more.html
-), to generate 4 samples of noise in parallel. 
-
-It is the only part of *avec* which is not header only, as it needs to compile the file `xorshift32_16bit_simd.c`.
-
-### Biquad Filters
-
-The file `Biquad.hpp` implements simple biquad filters which take either VecBuffers or InterleavedBuffers as input and output. They use SIMD instructions to process all the channels interleaved in each VecBuffer at the same time.
-
-## Usage
-
-Just add the folder `avec` to your project and `#include "avec/Avec.hpp` to get all the symbols for the containers and the views in the global namespace. Otherwise include the headers you need singularly, and they will define their symbols in the `avec` namespace.
+The template class `InterleavedBuffer<Scalar>` (where `Scalar` can be either `float` or `double`) is used to interleave a buffer of any number of audio channels into a set of `VecBuffer<Vec8f>`, `VecBuffer<Vec4f>` and `VecBuffer<Vec2f>` (when `Scalar` is `float`), or of `VecBuffer<Vec8d>`, `VecBuffer<Vec4d>` and `VecBuffer<Vec2d>` (when `Scalar` is `double`). 
+Only the `VecBuffers` whose underlying vectorclass type is supported by the hardware will be used, in order to easily abstract over the many SIMD instruction sets.
 
 ## Dependencies
 
