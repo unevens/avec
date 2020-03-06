@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['noisegenerator_80',['NoiseGenerator',['../classavec_1_1_noise_generator.html',1,'avec']]]
+  ['masktypes_58',['MaskTypes',['../classavec_1_1_mask_types.html',1,'avec']]]
 ];

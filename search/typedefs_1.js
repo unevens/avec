@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['vec2_161',['Vec2',['../structavec_1_1_simd_types.html#a7229896ca3051cb2b11cc933d595d915',1,'avec::SimdTypes']]],
-  ['vec4_162',['Vec4',['../structavec_1_1_simd_types.html#acc3588e7e2dcf6b10f1a3cfb988e12fc',1,'avec::SimdTypes']]],
-  ['vec8_163',['Vec8',['../structavec_1_1_simd_types.html#a2c9c61e866a666af76f9c07d68ee2857',1,'avec::SimdTypes']]]
+  ['scalar_108',['Scalar',['../classavec_1_1_scalar_types.html#a1b1877a6f0452b8559c07c5e6cdc1fb4',1,'avec::ScalarTypes::Scalar()'],['../classavec_1_1_vec_buffer.html#aad31c671cef3a1b65d02604c38e58e55',1,'avec::VecBuffer::Scalar()'],['../classavec_1_1_vec_view.html#a1d96cf6c780395fa4a0fb0578f53767d',1,'avec::VecView::Scalar()']]]
 ];

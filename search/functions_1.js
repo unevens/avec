@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['biquadfilter_96',['BiquadFilter',['../classavec_1_1_biquad_filter.html#a354b78d3a50c972e42f5ef7e41e8fead',1,'avec::BiquadFilter']]]
+  ['copyfrom_65',['copyFrom',['../classavec_1_1_interleaved_buffer.html#a3f91553c1e4c3a6feb3a3b4b22cf6306',1,'avec::InterleavedBuffer']]]
 ];

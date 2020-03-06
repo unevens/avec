@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['biquadfilter_78',['BiquadFilter',['../classavec_1_1_biquad_filter.html',1,'avec']]]
+  ['aligned_54',['Aligned',['../classavec_1_1_aligned.html',1,'avec']]],
+  ['aligneddeleter_55',['AlignedDeleter',['../structavec_1_1_aligned_deleter.html',1,'avec']]]
 ];

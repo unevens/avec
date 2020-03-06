@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['noisegenerator_124',['NoiseGenerator',['../classavec_1_1_noise_generator.html#ac1febde432daafd844434d5cb39117d4',1,'avec::NoiseGenerator']]],
-  ['null_125',['null',['../classavec_1_1_vec_view.html#ac89126c65bc719887e23886bee89c266',1,'avec::VecView']]]
+  ['reserve_92',['reserve',['../classavec_1_1_interleaved_buffer.html#a5a85779ed0bfcc39796f187221e99f28',1,'avec::InterleavedBuffer::reserve()'],['../classavec_1_1_scalar_buffer.html#aafef4fad7fae51fa4dd40aa84fd0f1c3',1,'avec::ScalarBuffer::reserve()']]],
+  ['reservescalar_93',['reserveScalar',['../classavec_1_1_vec_buffer.html#a0836427021fbd1b969e5b4a2fa144b05',1,'avec::VecBuffer']]],
+  ['reservevec_94',['reserveVec',['../classavec_1_1_vec_buffer.html#a6b82f682569a72768510f11a1623f03f',1,'avec::VecBuffer']]]
 ];

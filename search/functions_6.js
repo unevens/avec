@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['interleave_121',['Interleave',['../classavec_1_1_interleaved_buffer.html#a6e2f82b4a2afcff9bc406ced66d214b4',1,'avec::InterleavedBuffer::Interleave(Scalar *const *input, int numInputChannels, int numInputSamples)'],['../classavec_1_1_interleaved_buffer.html#af4619448004f752c6c738566cbe318c2',1,'avec::InterleavedBuffer::Interleave(ScalarBuffer&lt; Scalar &gt; const &amp;input, int numInputChannels)']]],
-  ['interleavedbuffer_122',['InterleavedBuffer',['../classavec_1_1_interleaved_buffer.html#a25c87bc5dfaa1486caff54f54b6a2380',1,'avec::InterleavedBuffer']]]
+  ['null_85',['null',['../classavec_1_1_vec_view.html#ac89126c65bc719887e23886bee89c266',1,'avec::VecView']]]
 ];

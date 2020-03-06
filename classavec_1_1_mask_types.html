@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.16"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Avec: Member List</title>
+<title>Avec: avec::MaskTypes&lt; Vec &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,22 +62,45 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>avec</b></li><li class="navelem"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec4f_01_4.html">VecNoiseGenerator&lt; Vec4f &gt;</a></li>  </ul>
+<li class="navelem"><b>avec</b></li><li class="navelem"><a class="el" href="classavec_1_1_mask_types.html">MaskTypes</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
+<a href="classavec_1_1_mask_types-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">avec::VecNoiseGenerator&lt; Vec4f &gt; Member List</div>  </div>
+<div class="title">avec::MaskTypes&lt; Vec &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>This is the complete list of members for <a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec4f_01_4.html">avec::VecNoiseGenerator&lt; Vec4f &gt;</a>, including all inherited members.</p>
-<table class="directory">
-  <tr class="even"><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec4f_01_4.html#a51d3b084af051e5ce60682a020503ba2">Generate</a>(VecBuffer&lt; Vec4f &gt; &amp;output, int numSamples)</td><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec4f_01_4.html">avec::VecNoiseGenerator&lt; Vec4f &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec4f_01_4.html#a710a304d3da95ab09308ed8688b5d85c">GetState</a>(int channel) const</td><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec4f_01_4.html">avec::VecNoiseGenerator&lt; Vec4f &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec4f_01_4.html#a975b6f049e73d05baa6ed375f79bd68c">SetState</a>(int channel, uint16_t value)</td><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec4f_01_4.html">avec::VecNoiseGenerator&lt; Vec4f &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec4f_01_4.html#abbacf750b907c48489307a928b8e74ae">VecNoiseGenerator</a>(aligned_vector&lt; uint16_t &gt; const &amp;seed={ 1, 2, 3, 4 })</td><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec4f_01_4.html">avec::VecNoiseGenerator&lt; Vec4f &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-</table></div><!-- contents -->
+<p>Static template class with an alias to deduce the mask type from vectorclass type.  
+ <a href="classavec_1_1_mask_types.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_simd_8hpp_source.html">Simd.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:ad71c31b4c2eced1c1c101b4b985571ac"><td class="memItemLeft" align="right" valign="top"><a id="ad71c31b4c2eced1c1c101b4b985571ac"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classavec_1_1_mask_types.html#ad71c31b4c2eced1c1c101b4b985571ac">Mask</a> = typename std::conditional&lt; std::is_same&lt; Vec, Vec8f &gt;::value, Vec8fb, typename std::conditional&lt; std::is_same&lt; Vec, Vec4f &gt;::value, Vec4fb, typename std::conditional&lt; std::is_same&lt; Vec, Vec8d &gt;::value, Vec8db, typename std::conditional&lt; std::is_same&lt; Vec, Vec4d &gt;::value, Vec4db, typename std::conditional&lt; std::is_same&lt; Vec, Vec2d &gt;::value, Vec2db, bool &gt;::type &gt;::type &gt;::type &gt;::type &gt;::type</td></tr>
+<tr class="memdesc:ad71c31b4c2eced1c1c101b4b985571ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Mask type deduced from Vec. <br /></td></tr>
+<tr class="separator:ad71c31b4c2eced1c1c101b4b985571ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Vec&gt;<br />
+class avec::MaskTypes&lt; Vec &gt;</h3>
+
+<p>Static template class with an alias to deduce the mask type from vectorclass type. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Vec</td><td>the simd vector type. </td></tr>
+  </table>
+  </dd>
+</dl>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
+<li>avec/<a class="el" href="_simd_8hpp_source.html">Simd.hpp</a></li>
+</ul>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

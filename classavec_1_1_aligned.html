@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.16"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Avec: Member List</title>
+<title>Avec: avec::Aligned&lt; Class &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,22 +62,42 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>avec</b></li><li class="navelem"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec8d_01_4.html">VecNoiseGenerator&lt; Vec8d &gt;</a></li>  </ul>
+<li class="navelem"><b>avec</b></li><li class="navelem"><a class="el" href="classavec_1_1_aligned.html">Aligned</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="classavec_1_1_aligned-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">avec::VecNoiseGenerator&lt; Vec8d &gt; Member List</div>  </div>
+<div class="title">avec::Aligned&lt; Class &gt; Class Template Reference<span class="mlabels"><span class="mlabel">final</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>This is the complete list of members for <a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec8d_01_4.html">avec::VecNoiseGenerator&lt; Vec8d &gt;</a>, including all inherited members.</p>
-<table class="directory">
-  <tr class="even"><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec8d_01_4.html#abc8ee10d3d885bcb0ce1e69b83ed2258">Generate</a>(VecBuffer&lt; Vec8d &gt; &amp;output, int numSamples)</td><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec8d_01_4.html">avec::VecNoiseGenerator&lt; Vec8d &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec8d_01_4.html#a7884d712e48db9d4b6dab2a0a844c8b2">GetState</a>(int channel) const</td><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec8d_01_4.html">avec::VecNoiseGenerator&lt; Vec8d &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec8d_01_4.html#a14ac7dff343766d163a7e3afbdd3c9d2">SetState</a>(int channel, uint16_t value)</td><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec8d_01_4.html">avec::VecNoiseGenerator&lt; Vec8d &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec8d_01_4.html#ad22394c635b9058e2d90f0354fa892e1">VecNoiseGenerator</a>(aligned_vector&lt; uint16_t &gt; const &amp;seed={ 1, 2, 3, 4, 5, 6, 7, 8 })</td><td class="entry"><a class="el" href="classavec_1_1_vec_noise_generator_3_01_vec8d_01_4.html">avec::VecNoiseGenerator&lt; Vec8d &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-</table></div><!-- contents -->
+<p>Template class that provides static methods to construct aligned unique_ptr or aligned_vector of the class specified as its template argument.  
+ <a href="classavec_1_1_aligned.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_alignment_8hpp_source.html">Alignment.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a83b1a1d2b144c9da87073e6f494581a9"><td class="memTemplParams" colspan="2"><a id="a83b1a1d2b144c9da87073e6f494581a9"></a>
+template&lt;class HolderClass  = Class&gt; </td></tr>
+<tr class="memitem:a83b1a1d2b144c9da87073e6f494581a9"><td class="memTemplItemLeft" align="right" valign="top">static aligned_ptr&lt; HolderClass &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>make</b> ()</td></tr>
+<tr class="separator:a83b1a1d2b144c9da87073e6f494581a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3a1d0f8eae44f4c86ba24b8df1f97ef"><td class="memItemLeft" align="right" valign="top"><a id="ab3a1d0f8eae44f4c86ba24b8df1f97ef"></a>
+static aligned_vector&lt; Class &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>make</b> (int num)</td></tr>
+<tr class="separator:ab3a1d0f8eae44f4c86ba24b8df1f97ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;class Class&gt;<br />
+class avec::Aligned&lt; Class &gt;</h3>
+
+<p>Template class that provides static methods to construct aligned unique_ptr or aligned_vector of the class specified as its template argument. </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
+<li>avec/<a class="el" href="_alignment_8hpp_source.html">Alignment.hpp</a></li>
+</ul>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

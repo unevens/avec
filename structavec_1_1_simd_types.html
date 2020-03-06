@@ -103,6 +103,9 @@ Static Public Attributes</h2></td></tr>
 <tr class="memitem:a6d3ba5d75f8ddbf4dc0f266e15a5aac8"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structavec_1_1_simd_types.html#a6d3ba5d75f8ddbf4dc0f266e15a5aac8">VEC4_AVAILABLE</a></td></tr>
 <tr class="memdesc:a6d3ba5d75f8ddbf4dc0f266e15a5aac8"><td class="mdescLeft">&#160;</td><td class="mdescRight">bool constexpr, true if 4 elements vector are not emulated.  <a href="structavec_1_1_simd_types.html#a6d3ba5d75f8ddbf4dc0f266e15a5aac8">More...</a><br /></td></tr>
 <tr class="separator:a6d3ba5d75f8ddbf4dc0f266e15a5aac8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a030dc526de3b282786723d2e046df63c"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structavec_1_1_simd_types.html#a030dc526de3b282786723d2e046df63c">VEC2_AVAILABLE</a></td></tr>
+<tr class="memdesc:a030dc526de3b282786723d2e046df63c"><td class="mdescLeft">&#160;</td><td class="mdescRight">bool constexpr, true if 2 elements vector are available.  <a href="structavec_1_1_simd_types.html#a030dc526de3b282786723d2e046df63c">More...</a><br /></td></tr>
+<tr class="separator:a030dc526de3b282786723d2e046df63c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar&gt;<br />
@@ -116,6 +119,34 @@ struct avec::SimdTypes&lt; Scalar &gt;</h3>
   </dd>
 </dl>
 </div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="a030dc526de3b282786723d2e046df63c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a030dc526de3b282786723d2e046df63c">&#9670;&nbsp;</a></span>VEC2_AVAILABLE</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr bool <a class="el" href="structavec_1_1_simd_types.html">avec::SimdTypes</a>&lt; Scalar &gt;::VEC2_AVAILABLE</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">=</div>
+<div class="line">    std::is_same&lt;Scalar, double&gt;::value ? true : <span class="keyword">false</span></div>
+</div><!-- fragment -->
+<p>bool constexpr, true if 2 elements vector are available. </p>
+
+</div>
+</div>
 <a id="a6d3ba5d75f8ddbf4dc0f266e15a5aac8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6d3ba5d75f8ddbf4dc0f266e15a5aac8">&#9670;&nbsp;</a></span>VEC4_AVAILABLE</h2>
 

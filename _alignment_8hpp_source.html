@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.16"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Avec: avec/AlignedVector.hpp Source File</title>
+<title>Avec: avec/Alignment.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -67,11 +67,11 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">AlignedVector.hpp</div>  </div>
+<div class="title">Alignment.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">Copyright 2019 Dario Mambro</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">Copyright 2019-2020 Dario Mambro</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"></span> </div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">you may not use this file except in compliance with the License.</span></div>
@@ -101,8 +101,35 @@ $(function() {
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">using</span> aligned_vector =</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  std::vector&lt;T, boost::alignment::aligned_allocator&lt;T, ALIGNMENT&gt;&gt;;</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;} <span class="comment">// namespace avec</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="structavec_1_1_aligned_deleter.html">   41</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structavec_1_1_aligned_deleter.html">AlignedDeleter</a></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;{</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keywordtype">void</span> operator()(<span class="keywordtype">void</span>* ptr) { boost::alignment::aligned_free(ptr); }</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;};</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">using</span> aligned_ptr = std::unique_ptr&lt;T, AlignedDeleter&gt;;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Class&gt;</div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="classavec_1_1_aligned.html">   57</a></span>&#160;<span class="keyword">class </span><a class="code" href="classavec_1_1_aligned.html">Aligned</a> final</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;{</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> HolderClass = Class&gt;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keyword">static</span> aligned_ptr&lt;HolderClass&gt; make()</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  {</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">auto</span> ptr = boost::alignment::aligned_alloc(ALIGNMENT, <span class="keyword">sizeof</span>(Class));</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordflow">return</span> aligned_ptr&lt;HolderClass&gt;(<span class="keyword">new</span> (ptr) Class);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  }</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keyword">static</span> aligned_vector&lt;Class&gt; make(<span class="keywordtype">int</span> num)</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  {</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">return</span> aligned_vector&lt;Class&gt;(num);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  }</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;};</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;} <span class="comment">// namespace avec</span></div>
 </div><!-- fragment --></div><!-- contents -->
+<div class="ttc" id="aclassavec_1_1_aligned_html"><div class="ttname"><a href="classavec_1_1_aligned.html">avec::Aligned</a></div><div class="ttdoc">Template class that provides static methods to construct aligned unique_ptr or aligned_vector of the ...</div><div class="ttdef"><b>Definition:</b> Alignment.hpp:57</div></div>
+<div class="ttc" id="astructavec_1_1_aligned_deleter_html"><div class="ttname"><a href="structavec_1_1_aligned_deleter.html">avec::AlignedDeleter</a></div><div class="ttdoc">Deleter for unique_ptr holding memory allocated using boost::alignment::aligned_alloc.</div><div class="ttdef"><b>Definition:</b> Alignment.hpp:41</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

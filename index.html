@@ -66,28 +66,19 @@ $(function() {
 <div class="title"><a href="https://github.com/unevens/avec"><em>avec</em></a> </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><em>avec</em> is a collection of classes for using SIMD instructions in audio applications. It features containers and views for aligned memory, with an API designed to work seamlessly with Agner Fog's <a href="https://github.com/vectorclass/version2">vectorclass</a>, which is included as a submodule.</p>
+<div class="textblock"><p><em>avec</em> is a little library for using SIMD instructions in audio applications.</p>
+<p>It features containers and views for aligned memory, with an API designed to work seamlessly with Agner Fog's <a href="https://github.com/vectorclass/version2">vectorclass</a>, which is included as a submodule.</p>
 <h1><a class="anchor" id="autotoc_md1"></a>
 Containers and views</h1>
 <p>In vectorclass each SIMD type has its own class: <code>Vec4f</code> for <code>__m128</code>, <code>Vec8f</code> for <code>__m256</code>, <code>Vec4d</code> for <code>__m256d</code> and so on.</p>
-<p>In <em>avec</em> are implemented the template classes <code>VecBuffer&lt;Vec&gt;</code> and <code>VecView&lt;Vec&gt;</code> to manage aligned memory and convert it to and from the SIMD classes of vectorclass.</p>
-<p>The template class <code>InterleavedBuffer&lt;Scalar&gt;</code> (where <code>Scalar</code> can be either <code>float</code> or <code>double</code>) can be used to interleave a buffer of any number of audio channels into a set of <code>VecBuffer&lt;Vec8f&gt;</code> and <code>VecBuffer&lt;Vec4f&gt;</code> (when <code>Scalar</code> is <code>float</code>), or of <code>VecBuffer&lt;Vec4d&gt;</code> and <code>VecBuffer&lt;Vec2d&gt;</code> (when <code>Scalar</code> is <code>double</code>).</p>
+<p>In <em>avec</em>, the template classes <code>VecBuffer&lt;Vec&gt;</code> and <code>VecView&lt;Vec&gt;</code> are used to manage blocks of aligned memory and convert it to and from the SIMD classes of vectorclass.</p>
 <h1><a class="anchor" id="autotoc_md2"></a>
-Noise Generator</h1>
-<p>The file <code><a class="el" href="_noise_8hpp_source.html">Noise.hpp</a></code> implements a (white) noise generator which can populate VecBuffers and InterleavedBuffers with noise, with a different seed for each channel. It uses <a href="https://github.com/unevens/xorshift32_16bit_simd">a SIMD implementation</a> of a <a href="https://b2d-f9r.blogspot.com/2010/08/16-bit-xorshift-rng-now-with-more.html">16 bit xorshift32 random number generator</a>, to generate 4 samples of noise in parallel.</p>
-<p>It is the only part of <em>avec</em> which is not header only, as it needs to compile the file <code>xorshift32_16bit_simd.c</code>.</p>
-<p>The header <code><a class="el" href="_noise_8hpp_source.html">Noise.hpp</a></code> is not included by <code><a class="el" href="_avec_8hpp_source.html">Avec.hpp</a></code>. Consider it an optional feature.</p>
+Interleaving</h1>
+<p>The template class <code>InterleavedBuffer&lt;Scalar&gt;</code> (where <code>Scalar</code> can be either <code>float</code> or <code>double</code>) is used to interleave a buffer of any number of audio channels into a set of <code>VecBuffer&lt;Vec8f&gt;</code>, <code>VecBuffer&lt;Vec4f&gt;</code> and <code>VecBuffer&lt;Vec2f&gt;</code> (when <code>Scalar</code> is <code>float</code>), or of <code>VecBuffer&lt;Vec8d&gt;</code>, <code>VecBuffer&lt;Vec4d&gt;</code> and <code>VecBuffer&lt;Vec2d&gt;</code> (when <code>Scalar</code> is <code>double</code>). Only the <code>VecBuffers</code> whose underlying vectorclass type is supported by the hardware will be used, in order to easily abstract over the many SIMD instruction sets.</p>
 <h1><a class="anchor" id="autotoc_md3"></a>
-Biquad Filters</h1>
-<p>The file <code><a class="el" href="_biquad_8hpp_source.html">Biquad.hpp</a></code> implements simple biquad filters which take either VecBuffers or InterleavedBuffers as input and output. They use SIMD instructions to process all the channels interleaved in each VecBuffer at the same time.</p>
-<p>The header <code><a class="el" href="_biquad_8hpp_source.html">Biquad.hpp</a></code> is not included by <code><a class="el" href="_avec_8hpp_source.html">Avec.hpp</a></code>. Consider it an optional feature.</p>
-<h1><a class="anchor" id="autotoc_md4"></a>
-Usage</h1>
-<p>Just add the folder <code>avec</code> to your project and <code>#include "<a class="el" href="_avec_8hpp_source.html">avec/Avec.hpp</a></code> to get all the symbols for the containers and the views in the global namespace. Otherwise include the headers you need singularly, and they will define their symbols in the <code>avec</code> namespace.</p>
-<h1><a class="anchor" id="autotoc_md5"></a>
 Dependencies</h1>
 <p><em>avec</em> uses <a href="https://www.boost.org/doc/libs/1_71_0/doc/html/align.html">Boost.Align</a>.</p>
-<h1><a class="anchor" id="autotoc_md6"></a>
+<h1><a class="anchor" id="autotoc_md4"></a>
 Documentation</h1>
 <p>The documentation, available at <a href="https://unevens.github.io/avec/,">https://unevens.github.io/avec/,</a> can be generated with <a href="http://doxygen.nl/">Doxygen</a> running</p>
 <div class="fragment"><div class="line">$ doxygen doxyfile.txt</div>
