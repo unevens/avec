@@ -93,7 +93,7 @@ public:
   /**
    * @return the number of channels of the buffer.
    */
-  int getNumChannels() const { return data.size(); }
+  int getNumChannels() const { return (int)data.size(); }
 
   /**
    * Sets the number of channels of the buffer.

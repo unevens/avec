@@ -52,12 +52,12 @@ public:
   /**
    * @return the size of the buffer measured in number of Scalar elements
    */
-  inline int getScalarSize() const { return data.size(); }
+  inline int getScalarSize() const { return (int)data.size(); }
 
   /**
    * @return the size of the buffer measured in number of Vec elements
    */
-  inline int getNumSamples() const { return data.size() / Vec::size(); }
+  inline int getNumSamples() const { return (int)data.size() / Vec::size(); }
 
   /**
    * @return the capacity of the buffer measured in number of Scalar elements
@@ -94,10 +94,7 @@ public:
    * Resize the buffer
    * @param newCapacity the new size measured in number of Vec elements
    */
-  void reserveVec(int newCapacity)
-  {
-    reserveScalar(newCapacity * Vec::size());
-  }
+  void reserveVec(int newCapacity) { reserveScalar(newCapacity * Vec::size()); }
 
   /**
    * Fills the buffer with the supplied value

@@ -225,11 +225,12 @@ public:
   /**
    * Copies the first numSamples of an other interleaved buffer, optionally up
    * to a specified channel.
+   * @param numSamplesToCopy the number of samples to copy
    * @param numChannels the number of channels to copy. If negative, all
    * channels will be copied.
    */
   void copyFrom(InterleavedBuffer const& other,
-                int numSamples,
+                int numSamplesToCopy,
                 int numChannels = -1);
 };
 
@@ -635,7 +636,7 @@ InterleavedBuffer<Scalar>::at(int channel, int sample)
 template<typename Scalar>
 inline void
 InterleavedBuffer<Scalar>::copyFrom(InterleavedBuffer const& other,
-                                    int numSamples,
+                                    int numSamplesToCopy,
                                     int numChannelsToCopy)
 {
   if (numChannelsToCopy < 0) {
@@ -644,8 +645,8 @@ InterleavedBuffer<Scalar>::copyFrom(InterleavedBuffer const& other,
   if (numChannels < numChannelsToCopy) {
     setNumChannels(other.getNumChannels());
   }
-  assert(numSamples <= other.getNumSamples());
-  setNumSamples(numSamples);
+  assert(numSamplesToCopy <= other.getNumSamples());
+  setNumSamples(numSamplesToCopy);
   if constexpr (VEC8_AVAILABLE) {
     for (int i = 0; i < buffers8.size(); ++i) {
       std::copy(&other.buffers8[i](0),
