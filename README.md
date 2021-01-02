@@ -13,6 +13,7 @@ In *avec*, the template classes `VecBuffer<Vec>` and `VecView<Vec>` are used to 
 ## Interleaving
 
 The template class `InterleavedBuffer<Scalar>` (where `Scalar` can be either `float` or `double`) is used to interleave a buffer of any number of audio channels into a set of `VecBuffer<Vec8f>`, `VecBuffer<Vec4f>` and `VecBuffer<Vec2f>` (when `Scalar` is `float`), or of `VecBuffer<Vec8d>`, `VecBuffer<Vec4d>` and `VecBuffer<Vec2d>` (when `Scalar` is `double`). 
+
 Only the `VecBuffers` whose underlying vectorclass type is supported by the hardware will be used, in order to easily abstract over the many SIMD instruction sets.
 
 ## Dependencies
