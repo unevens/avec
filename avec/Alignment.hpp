@@ -15,11 +15,19 @@ limitations under the License.
 */
 
 #pragma once
-#include <boost/align.hpp>
+#include "BoostAlign.hpp"
 #include <cassert>
 #include <climits>
 #include <cmath>
 #include <vector>
+
+#define AVEC_ASSERT_ALIGNMENT(ptr, Vec)                                        \
+  assert(boost::alignment::is_aligned(                                         \
+    ptr, Vec::size() * sizeof(typename ScalarTypes<Vec>::Scalar)));
+
+#define AVEC_ASSUME_ALIGNMENT(ptr, Vec)                                        \
+  BOOST_ALIGN_ASSUME_ALIGNED(                                                  \
+    ptr, Vec::size() * sizeof(typename ScalarTypes<Vec>::Scalar));
 
 namespace avec {
 
