@@ -123,7 +123,7 @@ testInterleavedBuffer(int numChannels, int samplesPerBlock)
 int
 main()
 {
-  cout << "avx? " << AVX_AVAILABLE << "\n";
+  cout << "are 256 bit simd registers available? " << has256bitSimdRegisters << "\n";
 
   for (int c = 1; c < 32; ++c) {
     testInterleavedBuffer<float>(c, 128);
