@@ -16,31 +16,10 @@ limitations under the License.
 
 #pragma once
 
-#include <type_traits>
 #include "avec/Vec.hpp"
-
-#if (defined(__arm__) || defined(__aarch64__) || defined(__arm64__))
-
-#include "NeonVec.h"
-
-#else
-
-#include "vectorclass.h"
-#include "vectormath_exp.h"
-#include "vectormath_hyp.h"
-#include "vectormath_trig.h"
-
-#endif
+#include <type_traits>
 
 namespace avec {
-
-// see vectorclass/instrset.h
-constexpr bool has256bitSimdRegisters = INSTRSET >= 7;
-constexpr bool has128bitSimdRegisters = INSTRSET >= 2;
-constexpr bool supportsDoublePrecision = INSTRSET >= 2;
-constexpr bool has512bitSimdRegisters = INSTRSET >= 9;
-static_assert(has128bitSimdRegisters,
-              "The minimum supported instruction sets are SSE2 and NEON.");
 
 /**
  * Static template class with aliases for the available vectorclass types for a

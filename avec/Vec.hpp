@@ -18,17 +18,30 @@ limitations under the License.
 
 #if (defined(__arm__) || defined(__aarch64__) || defined(__arm64__))
 
+#ifdef __ARM_NEON
 constexpr bool has128bitSimdRegisters = true;
+#else
+constexpr bool has128bitSimdRegisters = false;
+#endif
+
 constexpr bool has256bitSimdRegisters = false;
 constexpr bool has512bitSimdRegisters = false;
 
 #if (defined(__aarch64__) || defined(__arm64__))
+#define AVEC_NEON_64
 constexpr bool supportsDoublePrecision = true;
 #else
 constexpr bool supportsDoublePrecision = false;
 #endif
 
-#include "NeonVec.h"
+static_assert(has128bitSimdRegisters, "NEON not supported.");
+
+#include "NeonMathFloat.hpp"
+#include "avec/NeonVec.hpp"
+
+#ifdef AVEC_NEON_64
+#include "NeonMathDouble.hpp"
+#endif
 
 #else
 
@@ -36,5 +49,13 @@ constexpr bool supportsDoublePrecision = false;
 #include "vectormath_exp.h"
 #include "vectormath_hyp.h"
 #include "vectormath_trig.h"
+
+// see vectorclass/instrset.h
+constexpr bool has256bitSimdRegisters = INSTRSET >= 7;
+constexpr bool has128bitSimdRegisters = INSTRSET >= 2;
+constexpr bool supportsDoublePrecision = INSTRSET >= 2;
+constexpr bool has512bitSimdRegisters = INSTRSET >= 9;
+static_assert(has128bitSimdRegisters,
+              "The minimum supported instruction set is SSE2.");
 
 #endif

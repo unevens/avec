@@ -28,7 +28,7 @@
   (this is the zlib license)
 */
 
-#include "NeonMathFloat.hpp"
+#include "avec/NeonMathFloat.hpp"
 
 namespace avec {
 namespace detail {

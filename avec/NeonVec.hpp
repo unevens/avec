@@ -16,20 +16,69 @@ limitations under the License.
 
 #pragma once
 
-#include "NeonMathFloat.hpp"
+#include <arm_neon.h>
 
 namespace avec {
 
-class Vec4fb final{};
-class Vec4f final{};
+class Vec4fb final
+{
+  // todo
+};
 
-class Vec2db final{};
-class Vec2d final{};
+class Vec4f final
+{
+  // todo
+};
 
-/*
- * operators, all the basics, then
- * some mathy things like
- * log, exp, cos, sin...
- * */
+class Vec2db final
+{
+  // todo
+};
 
-}
+class Vec2d final
+{
+  // todo
+};
+
+// these are not implemented, and are just here for compatibility with vcl
+
+class Vec4db final
+{
+  Vec4db() {}
+};
+
+class Vec4d final
+{
+  Vec4d() {}
+};
+
+class Vec8fb final
+{
+  Vec8fb() {}
+};
+
+class Vec8f final
+{
+  Vec8f() {}
+};
+
+class Vec8db final
+{
+  Vec8db() {}
+};
+
+class Vec8d final
+{
+  Vec8d() {}
+};
+
+class Vec16fb final
+{
+  Vec16fb() {}
+};
+
+class Vec16f final
+{
+  Vec16f() {}
+};
+} // namespace avec
