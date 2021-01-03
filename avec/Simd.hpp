@@ -1,5 +1,5 @@
 /*
-Copyright 2019-2020 Dario Mambro
+Copyright 2019-2021 Dario Mambro
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,19 +15,32 @@ limitations under the License.
 */
 
 #pragma once
+
+#include <type_traits>
+#include "avec/Vec.hpp"
+
+#if (defined(__arm__) || defined(__aarch64__) || defined(__arm64__))
+
+#include "NeonVec.h"
+
+#else
+
 #include "vectorclass.h"
 #include "vectormath_exp.h"
 #include "vectormath_hyp.h"
 #include "vectormath_trig.h"
-#include <type_traits>
+
+#endif
 
 namespace avec {
 
 // see vectorclass/instrset.h
-constexpr bool AVX_AVAILABLE = INSTRSET >= 7;
-constexpr bool AVX512_AVAILABLE = INSTRSET >= 9;
-constexpr bool SSE2_AVAILABLE = INSTRSET >= 2;
-static_assert(SSE2_AVAILABLE, "The minimum supported instruction set is SSE2.");
+constexpr bool has256bitSimdRegisters = INSTRSET >= 7;
+constexpr bool has128bitSimdRegisters = INSTRSET >= 2;
+constexpr bool supportsDoublePrecision = INSTRSET >= 2;
+constexpr bool has512bitSimdRegisters = INSTRSET >= 9;
+static_assert(has128bitSimdRegisters,
+              "The minimum supported instruction sets are SSE2 and NEON.");
 
 /**
  * Static template class with aliases for the available vectorclass types for a
@@ -58,13 +71,14 @@ struct SimdTypes
   /**
    * bool constexpr, true if 8 elements vector are not emulated.
    */
-  static constexpr bool VEC8_AVAILABLE =
-    std::is_same<Scalar, float>::value ? AVX_AVAILABLE : AVX512_AVAILABLE;
+  static constexpr bool VEC8_AVAILABLE = std::is_same<Scalar, float>::value
+                                           ? has256bitSimdRegisters
+                                           : has512bitSimdRegisters;
   /**
    * bool constexpr, true if 4 elements vector are not emulated.
    */
   static constexpr bool VEC4_AVAILABLE =
-    std::is_same<Scalar, float>::value ? true : AVX_AVAILABLE;
+    std::is_same<Scalar, float>::value ? true : has256bitSimdRegisters;
   /**
    * bool constexpr, true if 2 elements vector are available.
    */
@@ -148,6 +162,5 @@ public:
   static_assert(!std::is_same<Mask, bool>::value,
                 "Only Vec8f Vec4f Vec8d Vec4d and Vec2d are allowed here.");
 };
-
 
 } // namespace avec
