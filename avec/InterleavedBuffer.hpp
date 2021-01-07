@@ -46,7 +46,6 @@ class InterleavedBuffer final
   int numChannels;
   int capacity;
   int numSamples;
-  bool isUsingBuffer4;
 
 public:
   /**
