@@ -362,7 +362,7 @@ struct InterleavedChannel final
     }
     else {
       auto d2 = std::div(channel, 2);
-      return action(v2[d2.quot], d2.rem, 4);
+      return action(v2[d2.quot], d2.rem, 2);
     }
   }
 };
