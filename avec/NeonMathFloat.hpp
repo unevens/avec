@@ -27,6 +27,7 @@
   (this is the zlib license)
 */
 
+#pragma once
 #include <arm_neon.h>
 
 namespace avec {

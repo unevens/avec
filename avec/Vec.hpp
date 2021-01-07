@@ -36,12 +36,7 @@ constexpr bool supportsDoublePrecision = false;
 
 static_assert(has128bitSimdRegisters, "NEON not supported.");
 
-#include "NeonMathFloat.hpp"
-#include "avec/NeonVec.hpp"
-
-#ifdef AVEC_NEON_64
-#include "NeonMathDouble.hpp"
-#endif
+#include "NeonMath.hpp"
 
 #else
 

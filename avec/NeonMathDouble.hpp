@@ -28,7 +28,10 @@
   (this is the zlib license)
 */
 
+#pragma once
 #include "avec/NeonMathFloat.hpp"
+
+#if defined(__aarch64__)
 
 namespace avec {
 namespace detail {
@@ -51,7 +54,7 @@ log_pd(v2sd x)
 
   /* keep only the fractional part */
   ux = vandq_s64(ux, vdupq_n_s64(c_inv_mant_mask));
-  ux = vorrq_s64(ux, vreinterpretq_s64_f64(vdupq_n_f64(0.5f)));
+  ux = vorrq_s64(ux, vreinterpretq_s64_f64(vdupq_n_f64(0.5)));
   x = vreinterpretq_f64_s64(ux);
 
   emm0 = vsubq_s64(emm0, vdupq_n_s64(0x7f));
@@ -98,7 +101,7 @@ log_pd(v2sd x)
   tmp = vmulq_f64(e, vdupq_n_f64(c_cephes_log_q1));
   y = vaddq_f64(y, tmp);
 
-  tmp = vmulq_f64(z, vdupq_n_f64(0.5f));
+  tmp = vmulq_f64(z, vdupq_n_f64(0.5));
   y = vsubq_f64(y, tmp);
 
   tmp = vmulq_f64(e, vdupq_n_f64(c_cephes_log_q2));
@@ -119,7 +122,7 @@ exp_pd(v2sd x)
   x = vmaxq_f64(x, vdupq_n_f64(c_exp_lo));
 
   /* express exp(x) as exp(g + n*log(2)) */
-  fx = vmlaq_f64(vdupq_n_f64(0.5f), x, vdupq_n_f64(c_cephes_LOG2EF));
+  fx = vmlaq_f64(vdupq_n_f64(0.5), x, vdupq_n_f64(c_cephes_LOG2EF));
 
   /* perform a floorf */
   tmp = vcvtq_f64_s64(vcvtq_s64_f64(fx));
@@ -230,7 +233,7 @@ sincos_pd(v2sd x, v2sd* ysin, v2sd* ycos)
   y2 = vmulq_f64(y2, z);
   y1 = vmulq_f64(y1, z);
   y2 = vmulq_f64(y2, x);
-  y1 = vsubq_f64(y1, vmulq_f64(z, vdupq_n_f64(0.5f)));
+  y1 = vsubq_f64(y1, vmulq_f64(z, vdupq_n_f64(0.5)));
   y2 = vaddq_f64(y2, x);
   y1 = vaddq_f64(y1, vdupq_n_f64(1));
 
@@ -259,3 +262,5 @@ cos_pd(v2sd x)
 
 } // namespace detail
 } // namespace avec
+
+#endif
