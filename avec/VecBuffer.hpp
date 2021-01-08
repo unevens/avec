@@ -57,7 +57,7 @@ public:
   /**
    * @return the size of the buffer measured in number of Vec elements
    */
-  inline int getNumSamples() const { return (int)data.size() / Vec::size(); }
+  inline int getNumSamples() const { return (int)data.size() / size<Vec>(); }
 
   /**
    * @return the capacity of the buffer measured in number of Scalar elements
@@ -69,7 +69,7 @@ public:
    */
   inline int getVecCapacity() const
   {
-    return getScalarCapacity() / Vec::size();
+    return getScalarCapacity() / size<Vec>();
   }
 
   /**
@@ -82,7 +82,7 @@ public:
    * Resize the buffer
    * @param newSize the new size measured in number of Vec elements
    */
-  void setNumSamples(int newSize) { setScalarSize(newSize * Vec::size()); }
+  void setNumSamples(int newSize) { setScalarSize(newSize * size<Vec>()); }
 
   /**
    * Set the capacity of the buffer
@@ -94,7 +94,10 @@ public:
    * Resize the buffer
    * @param newCapacity the new size measured in number of Vec elements
    */
-  void reserveVec(int newCapacity) { reserveScalar(newCapacity * Vec::size()); }
+  void reserveVec(int newCapacity)
+  {
+    reserveScalar(newCapacity * size<Vec>());
+  }
 
   /**
    * Fills the buffer with the supplied value
@@ -118,8 +121,8 @@ public:
    */
   VecView<Vec> operator[](int i)
   {
-    assert(i < data.size() / Vec::size());
-    return VecView<Vec>(&data[i * Vec::size()]);
+    assert(i < data.size() / size<Vec>());
+    return VecView<Vec>(&data[i * size<Vec>()]);
   }
 
   /**
@@ -128,8 +131,8 @@ public:
    */
   VecView<Vec> const operator[](int i) const
   {
-    assert(i < data.size() / Vec::size());
-    return VecView<Vec>(const_cast<Scalar*>(&data[i * Vec::size()]));
+    assert(i < data.size() / size<Vec>());
+    return VecView<Vec>(const_cast<Scalar*>(&data[i * size<Vec>()]));
   }
 
   /**
@@ -142,7 +145,7 @@ public:
    * Implicit conversion to Scalar*
    * @return a pointer to the buffer's memory.
    */
-  operator Scalar const*() const { return &data[0]; }
+  operator Scalar const *() const { return &data[0]; }
 };
 
 // static asserts for paranoid me

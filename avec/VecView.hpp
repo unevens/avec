@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 #include "avec/Alignment.hpp"
-#include "avec/Simd.hpp"
+#include "avec/Traits.hpp"
 
 namespace avec {
 
@@ -44,7 +44,8 @@ private:
 public:
   /**
    * Constructor.
-   * @param ptr pointer to the memory to view. It must be aligned to Vec::size()
+   * @param ptr pointer to the memory to view. It must be aligned
+   * tosize<Vec>()
    * * sizeof(Scalar).
    */
   VecView(Scalar* ptr) { setPointer(ptr); }
@@ -52,7 +53,7 @@ public:
   /**
    * Resets the view to point to a different address.
    * @param ptr_ pointer to the memory to view. It must be aligned to
-   * Vec::size()*sizeof(Scalar).
+   *size<Vec>()*sizeof(Scalar).
    */
   void setPointer(Scalar* ptr_)
   {
@@ -89,7 +90,7 @@ public:
       assert(false);
       return *this;
     }
-    std::copy(x.ptr, x.ptr + Vec::size(), ptr);
+    std::copy(x.ptr, x.ptr + size<Vec>(), ptr);
     return *this;
   }
 
@@ -105,7 +106,7 @@ public:
       assert(false);
       return *this;
     }
-    std::copy(other.ptr, other.ptr + Vec::size(), ptr);
+    std::copy(other.ptr, other.ptr + size<Vec>(), ptr);
     return *this;
   }
 
@@ -137,7 +138,7 @@ public:
       assert(false);
       return *this;
     }
-    std::copy(other.ptr, other.ptr + Vec::size(), ptr);
+    std::copy(other.ptr, other.ptr + size<Vec>(), ptr);
     return *this;
   }
 
@@ -147,7 +148,7 @@ public:
    */
   VecView& operator=(Scalar value)
   {
-    for (int i = 0; i < Vec::size(); ++i) {
+    for (int i = 0; i < size<Vec>(); ++i) {
       ptr[i] = value;
     }
     return *this;
@@ -159,7 +160,7 @@ public:
    */
   VecView& operator=(Scalar const* src)
   {
-    std::copy(src, src + Vec::size(), ptr);
+    std::copy(src, src + size<Vec>(), ptr);
     return *this;
   }
 
@@ -183,7 +184,7 @@ public:
    * Implicit conversion to Scalar const*
    * @returns the pointer to the viewed memory.
    */
-  operator Scalar const*() const { return ptr; }
+  operator Scalar const *() const { return ptr; }
 
   /**
    * Implicit conversion to a simd vector object.

@@ -18,6 +18,8 @@ limitations under the License.
 
 #if (defined(__arm__) || defined(__aarch64__) || defined(__arm64__))
 
+namespace avec {
+
 #ifdef __ARM_NEON
 constexpr bool has128bitSimdRegisters = true;
 #else
@@ -36,6 +38,8 @@ constexpr bool supportsDoublePrecision = false;
 
 static_assert(has128bitSimdRegisters, "NEON not supported.");
 
+} // namespace avec
+
 #include "NeonMath.hpp"
 
 #else
@@ -45,12 +49,39 @@ static_assert(has128bitSimdRegisters, "NEON not supported.");
 #include "vectormath_hyp.h"
 #include "vectormath_trig.h"
 
-// see vectorclass/instrset.h
+namespace avec {
+
 constexpr bool has256bitSimdRegisters = INSTRSET >= 7;
 constexpr bool has128bitSimdRegisters = INSTRSET >= 2;
 constexpr bool supportsDoublePrecision = INSTRSET >= 2;
 constexpr bool has512bitSimdRegisters = INSTRSET >= 9;
 static_assert(has128bitSimdRegisters,
               "The minimum supported instruction set is SSE2.");
+} // namespace avec
 
 #endif
+
+namespace avec {
+
+template<class Vec>
+constexpr int
+size()
+{
+  return Vec::size();
+}
+
+template<>
+constexpr int
+size<float>()
+{
+  return 1;
+}
+
+template<>
+constexpr int
+size<double>()
+{
+  return 1;
+}
+
+} // namespace avec
