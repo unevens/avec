@@ -21,19 +21,29 @@ limitations under the License.
 namespace avec {
 
 #ifdef __ARM_NEON
+
 constexpr bool has128bitSimdRegisters = true;
+
 #else
+
 constexpr bool has128bitSimdRegisters = false;
+
 #endif
 
 constexpr bool has256bitSimdRegisters = false;
 constexpr bool has512bitSimdRegisters = false;
 
 #if (defined(__aarch64__) || defined(__arm64__))
-#define AVEC_NEON_64
+
+#define AVEC_NEON 1
+#define AVEC_NEON_64 1
 constexpr bool supportsDoublePrecision = true;
+
 #else
+
+#define AVEC_NEON_64 0
 constexpr bool supportsDoublePrecision = false;
+
 #endif
 
 static_assert(has128bitSimdRegisters, "NEON not supported.");
@@ -51,14 +61,34 @@ static_assert(has128bitSimdRegisters, "NEON not supported.");
 
 namespace avec {
 
-constexpr bool has256bitSimdRegisters = INSTRSET >= 7;
-constexpr bool has128bitSimdRegisters = INSTRSET >= 2;
-constexpr bool supportsDoublePrecision = INSTRSET >= 2;
-constexpr bool has512bitSimdRegisters = INSTRSET >= 9;
+#define AVEC_HAS_SSE2 (INSTRSET >= 2)
+#define AVEC_HAS_AVX (INSTRSET >= 7)
+#define AVEC_HAS_AVX512 (INSTRSET >= 9)
+
+constexpr bool has128bitSimdRegisters = AVEC_HAS_SSE2;
+constexpr bool supportsDoublePrecision = AVEC_HAS_SSE2;
+constexpr bool has256bitSimdRegisters = AVEC_HAS_AVX;
+constexpr bool has512bitSimdRegisters = AVEC_HAS_AVX512;
 static_assert(has128bitSimdRegisters,
               "The minimum supported instruction set is SSE2.");
 } // namespace avec
 
+#endif
+
+#ifndef AVEC_NEON
+#define AVEC_NEON 0
+#endif
+#ifndef AVEC_NEON_64
+#define AVEC_NEON_64 0
+#endif
+#ifndef AVEC_HAS_SSE2
+#define AVEC_HAS_SSE2 0
+#endif
+#ifndef AVEC_HAS_AVX
+#define AVEC_HAS_AVX 0
+#endif
+#ifndef AVEC_HAS_AVX512
+#define AVEC_HAS_AVX512 0
 #endif
 
 namespace avec {
