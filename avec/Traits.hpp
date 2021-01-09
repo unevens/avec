@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "avec/Vec.hpp"
+#include "avec/Simd.hpp"
 #include <type_traits>
 
 namespace avec {

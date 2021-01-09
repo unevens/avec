@@ -18,52 +18,92 @@ limitations under the License.
 #include "NeonMathDouble.hpp"
 #include "NeonMathFloat.hpp"
 #include "NeonVec.hpp"
+#include <utility>
 
 namespace avec {
 
-Vec4f
+inline Vec4f
 sin(Vec4f const x)
 {
   return detail::sin_ps(x);
 }
-Vec4f
+
+inline Vec4f
 cos(Vec4f const x)
 {
   return detail::cos_ps(x);
 }
-Vec4f
+
+inline Vec4f
 log(Vec4f const x)
 {
   return detail::log_ps(x);
 }
-Vec4f
+
+inline Vec4f
 exp(Vec4f const x)
 {
   return detail::exp_ps(x);
 }
 
+inline std::pair<Vec4f>
+sincos(Vec4f const x)
+{
+  Vec4f s, c;
+  return detail::sincos_ps(x, s, c);
+  return { s, c };
+}
+
+inline Vec4f
+tan(Vec4f const x)
+{
+  Vec4f s, c;
+  return detail::sincos_ps(x, s, c);
+  return s / c;
+}
+
 #if defined(__aarch64__)
 
-Vec2d
+inline Vec2d
 sin(Vec2d const x)
 {
   return detail::sin_pd(x);
 }
-Vec2d
+
+inline Vec2d
 cos(Vec2d const x)
 {
   return detail::cos_pd(x);
 }
-Vec2d
+
+inline Vec2d
 log(Vec2d const x)
 {
   return detail::log_pd(x);
 }
-Vec2d
+
+inline Vec2d
 exp(Vec2d const x)
 {
   return detail::exp_pd(x);
 }
+
+inline std::pair<Vec2d>
+sincos(Vec2d const x)
+{
+  Vec2d s, c;
+  return detail::sincos_pd(x, s, c);
+  return { s, c };
+}
+
+inline Vec2d
+tan(Vec2d const x)
+{
+  Vec2d s, c;
+  return detail::sincos_pd(x, s, c);
+  return s / c;
+}
+
 #endif
 
 } // namespace avec
