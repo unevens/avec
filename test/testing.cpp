@@ -115,7 +115,7 @@ testInterleavedBuffer(int numChannels, int samplesPerBlock)
   }
   delete[] inout;
   cout << "completed testing InterleavedBuffer with " << numChannels
-       << "channels and "
+       << " channels and "
        << (typeid(Scalar) == typeid(float) ? "single" : "double")
        << " precision\n\n";
 }
