@@ -19,6 +19,7 @@ limitations under the License.
 #if (defined(__arm__) || defined(__aarch64__) || defined(__arm64__))
 
 #define AVEC_ARM 1
+#define AVEC_X86 0
 
 namespace avec {
 
@@ -58,6 +59,7 @@ static_assert(has128bitSimdRegisters, "NEON not supported.");
 #else
 
 #define AVEC_X86 1
+#define AVEC_ARM 0
 
 #include "vectorclass.h"
 #include "vectormath_exp.h"
