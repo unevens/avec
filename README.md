@@ -4,7 +4,7 @@
 
 It features containers and views for aligned memory, with an API designed to work seamlessly with Agner Fog's [vectorclass](https://github.com/vectorclass/version2), which is included as a submodule. 
 
-Since *vectorclass* only supports x86, *avec* implements some of its functionality for ARM NEON. 
+Since *vectorclass* only supports x86, *avec* reimplements a subset of its functionality for ARM using NEON. 
 
 ## Containers and views
 
