@@ -66,14 +66,14 @@ static_assert(has128bitSimdRegisters, "NEON not supported.");
 
 namespace avec {
 
-#define AVEC_HAS_SSE2 (INSTRSET >= 2)
-#define AVEC_HAS_AVX (INSTRSET >= 7)
-#define AVEC_HAS_AVX512 (INSTRSET >= 9)
+#define AVEC_SSE2 (INSTRSET >= 2)
+#define AVEC_AVX (INSTRSET >= 7)
+#define AVEC_AVX512 (INSTRSET >= 9)
 
-constexpr bool has128bitSimdRegisters = AVEC_HAS_SSE2;
-constexpr bool supportsDoublePrecision = AVEC_HAS_SSE2;
-constexpr bool has256bitSimdRegisters = AVEC_HAS_AVX;
-constexpr bool has512bitSimdRegisters = AVEC_HAS_AVX512;
+constexpr bool has128bitSimdRegisters = AVEC_SSE2;
+constexpr bool supportsDoublePrecision = AVEC_SSE2;
+constexpr bool has256bitSimdRegisters = AVEC_AVX;
+constexpr bool has512bitSimdRegisters = AVEC_AVX512;
 static_assert(has128bitSimdRegisters,
               "The minimum supported instruction set is SSE2.");
 } // namespace avec
@@ -92,14 +92,14 @@ static_assert(has128bitSimdRegisters,
 #ifndef AVEC_X86
 #define AVEC_X86 0
 #endif
-#ifndef AVEC_HAS_SSE2
-#define AVEC_HAS_SSE2 0
+#ifndef AVEC_SSE2
+#define AVEC_SSE2 0
 #endif
-#ifndef AVEC_HAS_AVX
-#define AVEC_HAS_AVX 0
+#ifndef AVEC_AVX
+#define AVEC_AVX 0
 #endif
-#ifndef AVEC_HAS_AVX512
-#define AVEC_HAS_AVX512 0
+#ifndef AVEC_AVX512
+#define AVEC_AVX512 0
 #endif
 
 namespace avec {
