@@ -241,20 +241,20 @@ selectf(float32x4_t const s, float32x4_t const a, float32x4_t const b)
 inline float64x2_t
 selectd(float64x2_t const s, float64x2_t const a, float64x2_t const b)
 {
-  return vbslq_f64(vreinterpretq_u32_f64(s), a, b);
+  return vbslq_f64(vreinterpretq_u64_f64(s), a, b);
 }
 #endif
 
 inline int32x4_t
 _mm_set1_epi32(int _i)
 {
-  return vreinterpretq_s64_s32(vdupq_n_s32(_i));
+  return vdupq_n_s32(_i);
 }
 
 inline float32x4_t
 _mm_castsi128_ps(int32x4_t a)
 {
-  return vreinterpretq_f32_s32(vreinterpretq_s32_s64(a));
+  return vreinterpretq_f32_s32(a);
 }
 
 inline float32x4_t
@@ -268,7 +268,7 @@ inline int32x4_t
 _mm_cvtps_epi32(float32x4_t a)
 {
 #if defined(__aarch64__)
-  return vreinterpretq_s64_s32(vcvtnq_s32_f32(a));
+  return vcvtnq_s32_f32(a);
 #else
   uint32x4_t signmask = vdupq_n_u32(0x80000000);
   float32x4_t half = vbslq_f32(signmask, (a), vdupq_n_f32(0.5f)); /* +/- 0.5 */
@@ -282,17 +282,17 @@ _mm_cvtps_epi32(float32x4_t a)
   float32x4_t delta = vsubq_f32(
     (a), vcvtq_f32_s32(r_trunc)); /* compute delta: delta = (a - [a]) */
   uint32x4_t is_delta_half = vceqq_f32(delta, half); /* delta == +/- 0.5 */
-  return vreinterpretq_s64_s32(vbslq_s32(is_delta_half, r_even, r_normal));
+  return vbslq_s32(is_delta_half, r_even, r_normal);
 #endif
 }
 
 inline float32x4_t
 _mm_cvtepi32_ps(int32x4_t a)
 {
-  return vcvtq_f32_s32(vreinterpretq_s32_s64(a));
+  return vcvtq_f32_s32(a);
 }
 
-inline int32x4_t
+inline int64x2_t
 _mm_cvttps_epi32(float32x4_t a)
 {
   return vreinterpretq_s64_s32(vcvtq_s32_f32(a));
@@ -306,7 +306,7 @@ inline int32x4_t
 _mm_setr_epi32(int i3, int i2, int i1, int i0)
 {
   int32_t __attribute__((aligned(16))) data[4] = { i3, i2, i1, i0 };
-  return vreinterpretq_s64_s32(vld1q_s32(data));
+  return vld1q_s32(data);
 }
 
 constexpr auto _MM_FROUND_TO_NEAREST_INT = 0x00;
@@ -440,7 +440,7 @@ _mm_round_pd<_MM_FROUND_CUR_DIRECTION>(float64x2_t a)
 
 // Generate a constant vector of 4 integers stored in memory.
 template<uint32_t i0, uint32_t i1, uint32_t i2, uint32_t i3>
-static inline constexpr uint32x4_t
+static inline constexpr int32x4_t
 constant4ui()
 {
   return _mm_setr_epi32(i0, i1, i2, i3);
@@ -630,14 +630,14 @@ operator!=(Vec4f const a, Vec4f const b)
 static inline Vec4fb
 operator<(Vec4f const a, Vec4f const b)
 {
-  return vcltq_f32(a, b);
+  return vreinterpretq_f32_u32(vcltq_f32(a, b));
 }
 
 // vector operator <= : returns true for elements for which a <= b
 static inline Vec4fb
 operator<=(Vec4f const a, Vec4f const b)
 {
-  return vcleq_f32(a, b);
+  return vreinterpretq_f32_u32(vcleq_f32(a, b));
 }
 
 // vector operator > : returns true for elements for which a > b
@@ -793,8 +793,8 @@ min(Vec4f const a, Vec4f const b)
 static inline Vec4f
 abs(Vec4f const a)
 {
-  float32x4_t mask = _mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF));
-  return vandq_s32(a, mask);
+  int32x4_t mask = _mm_set1_epi32(0x7FFFFFFF);
+  return vreinterpretq_f32_s32(vandq_s32(vreinterpretq_s32_f32(a), mask));
 }
 
 // function sqrt: square root
@@ -1073,7 +1073,7 @@ operator/=(Vec2d& a, Vec2d const b)
 static inline Vec2db
 operator==(Vec2d const a, Vec2d const b)
 {
-  return vreinterpretq_f64_u32(vceqq_f64(a, b));
+  return vreinterpretq_f64_u64(vceqq_f64(a, b));
 }
 
 // vector operator != : returns true for elements for which a != b
@@ -1095,7 +1095,7 @@ operator<(Vec2d const a, Vec2d const b)
 static inline Vec2db
 operator<=(Vec2d const a, Vec2d const b)
 {
-  return vreinterpretq_f64_u64(vcleq_f32(a, b));
+  return vreinterpretq_f64_u64(vcleq_f64(a, b));
 }
 
 // vector operator > : returns true for elements for which a > b

@@ -46,20 +46,20 @@ exp(Vec4f const x)
   return detail::exp_ps(x);
 }
 
-inline std::pair<Vec4f>
+inline std::pair<Vec4f, Vec4f>
 sincos(Vec4f const x)
 {
-  Vec4f s, c;
-  return detail::sincos_ps(x, s, c);
+  detail::v4sf s, c;
+  detail::sincos_ps(x, &s, &c);
   return { s, c };
 }
 
 inline Vec4f
 tan(Vec4f const x)
 {
-  Vec4f s, c;
-  return detail::sincos_ps(x, s, c);
-  return s / c;
+  detail::v4sf s, c;
+  detail::sincos_ps(x, &s, &c);
+  return Vec4f(s) / Vec4f(c);
 }
 
 #if defined(__aarch64__)
@@ -88,20 +88,20 @@ exp(Vec2d const x)
   return detail::exp_pd(x);
 }
 
-inline std::pair<Vec2d>
+inline std::pair<Vec2d, Vec2d>
 sincos(Vec2d const x)
 {
-  Vec2d s, c;
-  return detail::sincos_pd(x, s, c);
+  detail::v2sd s, c;
+  detail::sincos_pd(x, &s, &c);
   return { s, c };
 }
 
 inline Vec2d
 tan(Vec2d const x)
 {
-  Vec2d s, c;
-  return detail::sincos_pd(x, s, c);
-  return s / c;
+  detail::v2sd s, c;
+  detail::sincos_pd(x, &s, &c);
+  return Vec2d(s) / Vec2d(c);
 }
 
 #endif

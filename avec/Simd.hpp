@@ -18,10 +18,13 @@ limitations under the License.
 
 #if (defined(__arm__) || defined(__aarch64__) || defined(__arm64__))
 
+#define AVEC_ARM 1
+
 namespace avec {
 
 #ifdef __ARM_NEON
 
+#define AVEC_NEON 1
 constexpr bool has128bitSimdRegisters = true;
 
 #else
@@ -54,6 +57,8 @@ static_assert(has128bitSimdRegisters, "NEON not supported.");
 
 #else
 
+#define AVEC_X86 1
+
 #include "vectorclass.h"
 #include "vectormath_exp.h"
 #include "vectormath_hyp.h"
@@ -75,11 +80,17 @@ static_assert(has128bitSimdRegisters,
 
 #endif
 
+#ifndef AVEC_ARM
+#define AVEC_ARM 0
+#endif
 #ifndef AVEC_NEON
 #define AVEC_NEON 0
 #endif
 #ifndef AVEC_NEON_64
 #define AVEC_NEON_64 0
+#endif
+#ifndef AVEC_X86
+#define AVEC_X86 0
 #endif
 #ifndef AVEC_HAS_SSE2
 #define AVEC_HAS_SSE2 0

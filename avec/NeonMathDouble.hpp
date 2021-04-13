@@ -138,7 +138,7 @@ exp_pd(v2sd x)
   x = vsubq_f64(x, tmp);
   x = vsubq_f64(x, z);
 
-  static const float cephes_exp_p[6] = { c_cephes_exp_p0, c_cephes_exp_p1,
+  static const double cephes_exp_p[6] = { c_cephes_exp_p0, c_cephes_exp_p1,
                                          c_cephes_exp_p2, c_cephes_exp_p3,
                                          c_cephes_exp_p4, c_cephes_exp_p5 };
   v2sd y = vld1q_dup_f64(cephes_exp_p + 0);
@@ -165,7 +165,7 @@ exp_pd(v2sd x)
   y = vaddq_f64(y, one);
 
   /* build 2^n */
-  int32x4_t mm;
+  int64x2_t mm;
   mm = vcvtq_s64_f64(fx);
   mm = vaddq_s64(mm, vdupq_n_s64(0x7f));
   mm = vshlq_n_s64(mm, 23);
