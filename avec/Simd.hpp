@@ -50,7 +50,7 @@ constexpr bool supportsDoublePrecision = false;
 
 #endif
 
-static_assert(has128bitSimdRegisters, "NEON not supported.");
+constexpr bool hasSimd = AVEC_NEON;
 
 } // namespace avec
 
@@ -68,6 +68,7 @@ static_assert(has128bitSimdRegisters, "NEON not supported.");
 
 namespace avec {
 
+#define AVEC_SSE (INSTRSET >= 1)
 #define AVEC_SSE2 (INSTRSET >= 2)
 #define AVEC_AVX (INSTRSET >= 7)
 #define AVEC_AVX512 (INSTRSET >= 9)
@@ -76,8 +77,8 @@ constexpr bool has128bitSimdRegisters = AVEC_SSE2;
 constexpr bool supportsDoublePrecision = AVEC_SSE2;
 constexpr bool has256bitSimdRegisters = AVEC_AVX;
 constexpr bool has512bitSimdRegisters = AVEC_AVX512;
-static_assert(has128bitSimdRegisters,
-              "The minimum supported instruction set is SSE2.");
+constexpr bool hasSimd = AVEC_SSE;
+
 } // namespace avec
 
 #endif

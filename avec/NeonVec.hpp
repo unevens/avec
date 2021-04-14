@@ -292,16 +292,18 @@ _mm_cvtepi32_ps(int32x4_t a)
   return vcvtq_f32_s32(a);
 }
 
-inline int64x2_t
+inline int32x4_t
 _mm_cvttps_epi32(float32x4_t a)
 {
-  return vreinterpretq_s64_s32(vcvtq_s32_f32(a));
+  return vcvtq_s32_f32(a);
 }
+
 inline float32x4_t
 _mm_blendv_ps(float32x4_t a, float32x4_t b, float32x4_t mask)
 {
   return vbslq_f32(vreinterpretq_u32_f32(mask), b, a);
 }
+
 inline int32x4_t
 _mm_setr_epi32(int i3, int i2, int i1, int i0)
 {
