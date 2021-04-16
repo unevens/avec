@@ -115,7 +115,7 @@ testInterleavedBuffer(int numChannels, int samplesPerBlock)
   }
   delete[] inout;
   cout << "completed testing InterleavedBuffer with " << numChannels
-       << "channels and "
+       << " channels and "
        << (typeid(Scalar) == typeid(float) ? "single" : "double")
        << " precision\n\n";
 }
@@ -123,7 +123,9 @@ testInterleavedBuffer(int numChannels, int samplesPerBlock)
 int
 main()
 {
-  cout << "avx? " << AVX_AVAILABLE << "\n";
+  cout << "are 256 bit simd registers available? " << (has256bitSimdRegisters ? "yes" : "no") << "\n";
+  cout << "are 64 bit floating point simd operations supported? " << (supportsDoublePrecision? "yes" : "no") << "\n";
+  cout << "sizeof(void*) " << sizeof(void*) << "\n";
 
   for (int c = 1; c < 32; ++c) {
     testInterleavedBuffer<float>(c, 128);

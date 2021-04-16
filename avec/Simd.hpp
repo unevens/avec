@@ -1,5 +1,5 @@
 /*
-Copyright 2019-2020 Dario Mambro
+Copyright 2021 Dario Mambro
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,146 +15,117 @@ limitations under the License.
 */
 
 #pragma once
+
+#if (defined(__arm__) || defined(__aarch64__) || defined(__arm64__))
+
+#define AVEC_ARM 1
+#define AVEC_X86 0
+
+namespace avec {
+
+#ifdef __ARM_NEON
+
+#define AVEC_NEON 1
+constexpr bool has128bitSimdRegisters = true;
+
+#else
+
+constexpr bool has128bitSimdRegisters = false;
+
+#endif
+
+constexpr bool has256bitSimdRegisters = false;
+constexpr bool has512bitSimdRegisters = false;
+
+#if (defined(__aarch64__) || defined(__arm64__))
+
+#define AVEC_NEON 1
+#define AVEC_NEON_64 1
+constexpr bool supportsDoublePrecision = true;
+
+#else
+
+#define AVEC_NEON_64 0
+constexpr bool supportsDoublePrecision = false;
+
+#endif
+
+constexpr bool hasSimd = AVEC_NEON;
+
+} // namespace avec
+
+#include "NeonMath.hpp"
+
+#else
+
+#define AVEC_X86 1
+#define AVEC_ARM 0
+
 #include "vectorclass.h"
 #include "vectormath_exp.h"
 #include "vectormath_hyp.h"
 #include "vectormath_trig.h"
-#include <type_traits>
 
 namespace avec {
 
-// see vectorclass/instrset.h
-constexpr bool AVX_AVAILABLE = INSTRSET >= 7;
-constexpr bool AVX512_AVAILABLE = INSTRSET >= 9;
-constexpr bool SSE2_AVAILABLE = INSTRSET >= 2;
-static_assert(SSE2_AVAILABLE, "The minimum supported instruction set is SSE2.");
+#define AVEC_SSE (INSTRSET >= 1)
+#define AVEC_SSE2 (INSTRSET >= 2)
+#define AVEC_AVX (INSTRSET >= 7)
+#define AVEC_AVX512 (INSTRSET >= 9)
 
-/**
- * Static template class with aliases for the available vectorclass types for a
- * given Scalar type (float or double).
- * @tparam Scalar the scalar type.
- */
-template<typename Scalar>
-struct SimdTypes
+constexpr bool has128bitSimdRegisters = AVEC_SSE2;
+constexpr bool supportsDoublePrecision = AVEC_SSE2;
+constexpr bool has256bitSimdRegisters = AVEC_AVX;
+constexpr bool has512bitSimdRegisters = AVEC_AVX512;
+constexpr bool hasSimd = AVEC_SSE;
+
+} // namespace avec
+
+#endif
+
+#ifndef AVEC_ARM
+#define AVEC_ARM 0
+#endif
+#ifndef AVEC_NEON
+#define AVEC_NEON 0
+#endif
+#ifndef AVEC_NEON_64
+#define AVEC_NEON_64 0
+#endif
+#ifndef AVEC_X86
+#define AVEC_X86 0
+#endif
+#ifndef AVEC_SSE2
+#define AVEC_SSE2 0
+#endif
+#ifndef AVEC_AVX
+#define AVEC_AVX 0
+#endif
+#ifndef AVEC_AVX512
+#define AVEC_AVX512 0
+#endif
+
+namespace avec {
+
+template<class Vec>
+constexpr int
+size()
 {
-  static_assert(std::is_same<Scalar, float>::value ||
-                  std::is_same<Scalar, double>::value,
-                "Only floating point types are allowed here.");
-  /**
-   * 8 elements vectorclass type.
-   */
-  using Vec8 = typename std::
-    conditional<std::is_same<Scalar, float>::value, Vec8f, Vec8d>::type;
-  /**
-   * 4 elements vectorclass type.
-   */
-  using Vec4 = typename std::
-    conditional<std::is_same<Scalar, float>::value, Vec4f, Vec4d>::type;
-  /**
-   * 2 elements vectorclass type.
-   */
-  using Vec2 = typename std::
-    conditional<std::is_same<Scalar, float>::value, Vec4f, Vec2d>::type;
-  /**
-   * bool constexpr, true if 8 elements vector are not emulated.
-   */
-  static constexpr bool VEC8_AVAILABLE =
-    std::is_same<Scalar, float>::value ? AVX_AVAILABLE : AVX512_AVAILABLE;
-  /**
-   * bool constexpr, true if 4 elements vector are not emulated.
-   */
-  static constexpr bool VEC4_AVAILABLE =
-    std::is_same<Scalar, float>::value ? true : AVX_AVAILABLE;
-  /**
-   * bool constexpr, true if 2 elements vector are available.
-   */
-  static constexpr bool VEC2_AVAILABLE =
-    std::is_same<Scalar, double>::value ? true : false;
-};
+  return Vec::size();
+}
 
-/**
- * Static template class with an alias to deduce the underlying Scalar type from
- * a vectorclass type.
- * @tparam Vec the simd vector type.
- */
-template<typename Vec>
-class ScalarTypes
+template<>
+constexpr int
+size<float>()
 {
-private:
-  using ErrorType = bool; // any type different from float or double is ok
+  return 1;
+}
 
-  using Scalar8f = typename std::
-    conditional<std::is_same<Vec, Vec8f>::value, float, ErrorType>::type;
-  using Scalar4f = typename std::
-    conditional<std::is_same<Vec, Vec4f>::value, float, ErrorType>::type;
-  using Scalar8d = typename std::
-    conditional<std::is_same<Vec, Vec8d>::value, double, ErrorType>::type;
-  using Scalar4d = typename std::
-    conditional<std::is_same<Vec, Vec4d>::value, double, ErrorType>::type;
-  using Scalar2d = typename std::
-    conditional<std::is_same<Vec, Vec2d>::value, double, ErrorType>::type;
-
-  using MaybeMaybeDouble = typename std::
-    conditional<std::is_same<Scalar8d, double>::value, double, Scalar4d>::type;
-  using MaybeDouble =
-    typename std::conditional<std::is_same<MaybeMaybeDouble, double>::value,
-                              double,
-                              Scalar2d>::type;
-  using MaybeFloat = typename std::
-    conditional<std::is_same<Scalar8f, float>::value, float, Scalar4f>::type;
-
-public:
-  /**
-   * The scalar type deduced from Vec.
-   */
-  using Scalar =
-    typename std::conditional<std::is_same<MaybeDouble, double>::value,
-                              double,
-                              MaybeFloat>::type;
-
-  static_assert(std::is_same<Scalar, float>::value ||
-                  std::is_same<Scalar, double>::value,
-                "Only Vec8f Vec4f Vec8d Vec4d and Vec2d are allowed here.");
-};
-
-/**
- * Static template class with an alias to deduce the mask type from
- * vectorclass type.
- * @tparam Vec the simd vector type.
- */
-template<typename Vec>
-class MaskTypes
+template<>
+constexpr int
+size<double>()
 {
-public:
-  /**
-   * The Mask type deduced from Vec.
-   */
-  using Mask = typename std::conditional<
-    std::is_same<Vec, Vec8f>::value,
-    Vec8fb,
-    typename std::conditional<
-      std::is_same<Vec, Vec4f>::value,
-      Vec4fb,
-      typename std::conditional<
-        std::is_same<Vec, Vec8d>::value,
-        Vec8db,
-        typename std::conditional<
-          std::is_same<Vec, Vec4d>::value,
-          Vec4db,
-          typename std::conditional<std::is_same<Vec, Vec2d>::value,
-                                    Vec2db,
-                                    bool>::type>::type>::type>::type>::type;
-
-  static_assert(!std::is_same<Mask, bool>::value,
-                "Only Vec8f Vec4f Vec8d Vec4d and Vec2d are allowed here.");
-};
-
-#define AVEC_ASSERT_ALIGNMENT(ptr, Vec)                                        \
-  assert(boost::alignment::is_aligned(                                         \
-    ptr, Vec::size() * sizeof(typename ScalarTypes<Vec>::Scalar)));
-
-#define AVEC_ASSUME_ALIGNMENT(ptr, Vec)                                        \
-  BOOST_ALIGN_ASSUME_ALIGNED(                                                  \
-    ptr, Vec::size() * sizeof(typename ScalarTypes<Vec>::Scalar));
+  return 1;
+}
 
 } // namespace avec

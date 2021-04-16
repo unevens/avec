@@ -1,8 +1,12 @@
 # [*avec*](https://github.com/unevens/avec)
 
-*avec* is a little library for using SIMD instructions in audio applications. 
+*avec* is a little library for using SIMD instructions on both x86 and ARM. 
 
-It features containers and views for aligned memory, with an API designed to work seamlessly with Agner Fog's [vectorclass](https://github.com/vectorclass/version2), which is included as a submodule.
+It features containers for aligned memory, with views, allocators and interleaving/deinterleaving functionality. 
+
+The API is designed to work seamlessly with Agner Fog's [vectorclass](https://github.com/vectorclass/version2), which is included as a submodule. 
+
+Since *vectorclass* only supports x86, *avec* reimplements a subset of its functionality for ARM using NEON. See the section *ARM support* for details.
 
 ## Containers and views
 
@@ -16,9 +20,16 @@ The template class `InterleavedBuffer<Scalar>` (where `Scalar` can be either `fl
 
 Only the `VecBuffers` whose underlying vectorclass type is supported by the hardware will be used, in order to easily abstract over the many SIMD instruction sets.
 
-## Dependencies
 
-*avec* uses [Boost.Align](https://www.boost.org/doc/libs/1_71_0/doc/html/align.html). 
+## ARM support
+
+On ARM, `Vec4f` and `Vec2d` are implemented for `float32x4_t` and `float64x2_t`, with most of their member functions, all of their operators overloaded, and some math function overloads (`exp`, `log`, `sin`, `cos`, `sincos`, `tan`).
+
+## Credits
+
+*avec* includes code from [Boost.Align](https://www.boost.org/doc/libs/1_71_0/doc/html/align.html) by Joseph Fernandes, without depending on the whole Boost library. See the file `BoostAlign.hpp`.
+
+The implementation of `exp`, `log`, `sin`, `cos`, `sincos`, for ARM NEON was written by Julien Pommier, and it is available at http://gruntthepeon.free.fr/ssemath/neon_mathfun.html.
 
 ## Documentation
 

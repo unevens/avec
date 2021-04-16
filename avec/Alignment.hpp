@@ -1,5 +1,5 @@
 /*
-Copyright 2019-2020 Dario Mambro
+Copyright 2019-2021 Dario Mambro
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,11 +15,19 @@ limitations under the License.
 */
 
 #pragma once
-#include <boost/align.hpp>
+#include "avec/BoostAlign.hpp"
 #include <cassert>
 #include <climits>
 #include <cmath>
 #include <vector>
+
+#define AVEC_ASSERT_ALIGNMENT(ptr, Vec)                                        \
+  assert(boost::alignment::is_aligned(                                         \
+    ptr, size<Vec>() * sizeof(typename ScalarTypes<Vec>::Scalar)));
+
+#define AVEC_ASSUME_ALIGNMENT(ptr, Vec)                                        \
+  BOOST_ALIGN_ASSUME_ALIGNED(                                                  \
+    ptr, size<Vec>() * sizeof(typename ScalarTypes<Vec>::Scalar));
 
 namespace avec {
 

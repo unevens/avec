@@ -1,5 +1,5 @@
 /*
-Copyright 2019-2020 Dario Mambro
+Copyright 2019-2021 Dario Mambro
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -47,6 +47,6 @@ using ScalarTypes = avec::ScalarTypes<Vec>;
 template<typename Vec>
 using MaskTypes = avec::MaskTypes<Vec>;
 
-constexpr bool AVX_AVAILABLE = avec::AVX_AVAILABLE;
-constexpr bool AVX512_AVAILABLE = avec::AVX512_AVAILABLE;
-constexpr bool SSE2_AVAILABLE = avec::SSE2_AVAILABLE;
+constexpr bool has256bitSimdRegisters = avec::has256bitSimdRegisters;
+constexpr bool has512bitSimdRegisters = avec::has512bitSimdRegisters;
+constexpr bool has128bitSimdRegisters = avec::has128bitSimdRegisters;
