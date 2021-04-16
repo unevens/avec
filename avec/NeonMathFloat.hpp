@@ -54,7 +54,7 @@ typedef int32x4_t v4si;   // vector of 4 uint32
 /* natural logarithm computed for 4 simultaneous float
    return NaN for x <= 0
 */
-v4sf
+inline v4sf
 log_ps(v4sf x)
 {
   v4sf one = vdupq_n_f32(1);
@@ -141,7 +141,7 @@ log_ps(v4sf x)
 #define c_cephes_exp_p5 5.0000001201E-1
 
 /* exp() computed for 4 float at once */
-v4sf
+inline v4sf
 exp_ps(v4sf x)
 {
   v4sf tmp, fx;
@@ -230,7 +230,7 @@ exp_ps(v4sf x)
    almost no extra price so both sin_ps and cos_ps make use of
    sincos_ps..
   */
-void
+inline void
 sincos_ps(v4sf x, v4sf* ysin, v4sf* ycos)
 { // any x
   v4sf xmm1, xmm2, xmm3, y;
@@ -299,7 +299,7 @@ sincos_ps(v4sf x, v4sf* ysin, v4sf* ycos)
   *ycos = vbslq_f32(sign_mask_cos, yc, vnegq_f32(yc));
 }
 
-v4sf
+inline v4sf
 sin_ps(v4sf x)
 {
   v4sf ysin, ycos;
@@ -307,7 +307,7 @@ sin_ps(v4sf x)
   return ysin;
 }
 
-v4sf
+inline v4sf
 cos_ps(v4sf x)
 {
   v4sf ysin, ycos;

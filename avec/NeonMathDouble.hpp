@@ -40,7 +40,7 @@ typedef float64x2_t v2sd; // vector of 2 double
 typedef uint64x2_t v2su;  // vector of 2 uint64
 typedef int64x2_t v2si;   // vector of 2 uint64
 
-v2sd
+inline v2sd
 log_pd(v2sd x)
 {
   v2sd one = vdupq_n_f64(1);
@@ -112,7 +112,7 @@ log_pd(v2sd x)
   return x;
 }
 
-v2sd
+inline v2sd
 exp_pd(v2sd x)
 {
   v2sd tmp, fx;
@@ -175,7 +175,7 @@ exp_pd(v2sd x)
   return y;
 }
 
-void
+inline void
 sincos_pd(v2sd x, v2sd* ysin, v2sd* ycos)
 { // any x
   v2sd xmm1, xmm2, xmm3, y;
@@ -244,7 +244,7 @@ sincos_pd(v2sd x, v2sd* ysin, v2sd* ycos)
   *ycos = vbslq_f64(sign_mask_cos, yc, vnegq_f64(yc));
 }
 
-v2sd
+inline v2sd
 sin_pd(v2sd x)
 {
   v2sd ysin, ycos;
@@ -252,7 +252,7 @@ sin_pd(v2sd x)
   return ysin;
 }
 
-v2sd
+inline v2sd
 cos_pd(v2sd x)
 {
   v2sd ysin, ycos;

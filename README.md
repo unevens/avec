@@ -1,10 +1,12 @@
 # [*avec*](https://github.com/unevens/avec)
 
-*avec* is a little library for using SIMD instructions in audio applications on both x86 and ARM. 
+*avec* is a little library for using SIMD instructions on both x86 and ARM. 
 
-It features containers and views for aligned memory, with an API designed to work seamlessly with Agner Fog's [vectorclass](https://github.com/vectorclass/version2), which is included as a submodule. 
+It features containers for aligned memory, with views, allocators and interleaving/deinterleaving functionality. 
 
-Since *vectorclass* only supports x86, *avec* reimplements a subset of its functionality for ARM using NEON. 
+The API is designed to work seamlessly with Agner Fog's [vectorclass](https://github.com/vectorclass/version2), which is included as a submodule. 
+
+Since *vectorclass* only supports x86, *avec* reimplements a subset of its functionality for ARM using NEON. See the section *ARM support* for details.
 
 ## Containers and views
 
