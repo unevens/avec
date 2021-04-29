@@ -30,6 +30,7 @@ constexpr bool has128bitSimdRegisters = true;
 
 #else
 
+#define AVEC_NEON 0
 constexpr bool has128bitSimdRegisters = false;
 
 #endif
