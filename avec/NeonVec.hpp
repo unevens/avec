@@ -73,8 +73,6 @@ limitations under the License.
 
 #include <arm_neon.h>
 
-namespace avec {
-
 class Vec4f
 {
 protected:
@@ -666,6 +664,12 @@ operator&(Vec4f const a, Vec4f const b)
     vandq_s32(vreinterpretq_s32_f32(a), vreinterpretq_s32_f32(b)));
 }
 
+static inline Vec4fb
+operator&&(Vec4fb const a, Vec4fb const b)
+{
+    return a & b;
+}
+
 // vector operator &= : bitwise and
 static inline Vec4f&
 operator&=(Vec4f& a, Vec4f const b)
@@ -1124,6 +1128,12 @@ operator&(Vec2d const a, Vec2d const b)
     vandq_s64(vreinterpretq_s64_f64(a), vreinterpretq_s64_f64(b)));
 }
 
+static inline Vec2db
+operator&&(Vec2db const a, Vec2db const b)
+{
+    return a & b;
+}
+
 // vector operator &= : bitwise and
 static inline Vec2d&
 operator&=(Vec2d& a, Vec2d const b)
@@ -1382,5 +1392,3 @@ public:
 };
 
 using Vec16fb = Vec16f;
-
-} // namespace avec
