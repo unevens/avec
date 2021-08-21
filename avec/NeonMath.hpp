@@ -20,45 +20,44 @@ limitations under the License.
 #include "NeonVec.hpp"
 #include <utility>
 
-namespace avec {
 
 inline Vec4f
 sin(Vec4f const x)
 {
-  return detail::sin_ps(x);
+  return avec::detail::sin_ps(x);
 }
 
 inline Vec4f
 cos(Vec4f const x)
 {
-  return detail::cos_ps(x);
+  return avec::detail::cos_ps(x);
 }
 
 inline Vec4f
 log(Vec4f const x)
 {
-  return detail::log_ps(x);
+  return avec::detail::log_ps(x);
 }
 
 inline Vec4f
 exp(Vec4f const x)
 {
-  return detail::exp_ps(x);
+  return avec::detail::exp_ps(x);
 }
 
 inline std::pair<Vec4f, Vec4f>
 sincos(Vec4f const x)
 {
-  detail::v4sf s, c;
-  detail::sincos_ps(x, &s, &c);
+  avec::detail::v4sf s, c;
+  avec::detail::sincos_ps(x, &s, &c);
   return { s, c };
 }
 
 inline Vec4f
 tan(Vec4f const x)
 {
-  detail::v4sf s, c;
-  detail::sincos_ps(x, &s, &c);
+  avec::detail::v4sf s, c;
+  avec::detail::sincos_ps(x, &s, &c);
   return Vec4f(s) / Vec4f(c);
 }
 
@@ -67,43 +66,42 @@ tan(Vec4f const x)
 inline Vec2d
 sin(Vec2d const x)
 {
-  return detail::sin_pd(x);
+  return avec::detail::sin_pd(x);
 }
 
 inline Vec2d
 cos(Vec2d const x)
 {
-  return detail::cos_pd(x);
+  return avec::detail::cos_pd(x);
 }
 
 inline Vec2d
 log(Vec2d const x)
 {
-  return detail::log_pd(x);
+  return avec::detail::log_pd(x);
 }
 
 inline Vec2d
 exp(Vec2d const x)
 {
-  return detail::exp_pd(x);
+  return avec::detail::exp_pd(x);
 }
 
 inline std::pair<Vec2d, Vec2d>
 sincos(Vec2d const x)
 {
-  detail::v2sd s, c;
-  detail::sincos_pd(x, &s, &c);
+  avec::detail::v2sd s, c;
+  avec::detail::sincos_pd(x, &s, &c);
   return { s, c };
 }
 
 inline Vec2d
 tan(Vec2d const x)
 {
-  detail::v2sd s, c;
-  detail::sincos_pd(x, &s, &c);
+  avec::detail::v2sd s, c;
+  avec::detail::sincos_pd(x, &s, &c);
   return Vec2d(s) / Vec2d(c);
 }
 
 #endif
 
-} // namespace avec
