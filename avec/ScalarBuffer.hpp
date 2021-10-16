@@ -103,7 +103,7 @@ public:
   {
     data.resize(numRequiredChannels);
     for (int i = 0; i < data.size(); ++i) {
-      data[i].reserve(data[0].capacity());
+      data[i].reserve(capacity);
       data[i].resize(data[0].size());
     }
     updatePointers();
@@ -128,13 +128,14 @@ public:
   /**
    * Set the size of each channel of the buffer.
    * @param requiredSize the amount of samples to set the size to.
-   * @param shrinkIfSmaller if true, the buffer tells each std::vector to release any
-   * previously allocated memory that is no longer neeeded.
+   * @param shrinkIfSmaller if true, the buffer tells each std::vector to
+   * release any previously allocated memory that is no longer neeeded.
    */
   void setNumSamples(int numSamples, bool shrinkIfSmaller = false)
   {
     reserve(numSamples);
     size = numSamples;
+    capacity = std::max(capacity, size);
     for (int i = 0; i < data.size(); ++i) {
       data[i].resize(numSamples, 0.0);
     }
@@ -183,6 +184,7 @@ public:
    */
   ScalarBuffer(int numChannels = 2, int size = 256)
   {
+    capacity = size;
     setNumChannelsAndSamples(numChannels, size);
   }
 };
