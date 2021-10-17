@@ -43,9 +43,9 @@ class InterleavedBuffer final
   std::vector<VecBuffer<Vec4>> buffers4;
   std::vector<VecBuffer<Vec2>> buffers2;
 
-  int numChannels;
-  int capacity;
-  int numSamples;
+  int numChannels = 0;
+  int capacity = 0;
+  int numSamples = 0;
 
 public:
   /**
@@ -408,6 +408,8 @@ template<typename Scalar>
 void
 InterleavedBuffer<Scalar>::setNumChannels(int value)
 {
+  if (numChannels == value)
+    return;
   numChannels = value;
   int num2, num4, num8;
   getNumOfVecBuffersUsedByInterleavedBuffer<Scalar>(
