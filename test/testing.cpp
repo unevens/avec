@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Dario Mambro
+Copyright 2019-2021 Dario Mambro
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ n2s(double x)
 }
 
 std::string
-i2s(int x)
+i2s(uint32_t x)
 {
   stringstream stream;
   stream << setw(4) << setfill(' ') << x;
@@ -67,25 +67,25 @@ verify(bool condition, string description)
 
 template<typename Scalar>
 void
-testInterleavedBuffer(int numChannels, int samplesPerBlock)
+testInterleavedBuffer(uint32_t numChannels, uint32_t samplesPerBlock)
 {
-  cout << "Testing InterleavedBuffer with " << numChannels << "channels and "
+  cout << "Testing InterleavedBuffer with " << numChannels << " channels and "
        << (typeid(Scalar) == typeid(float) ? "single" : "double")
        << " precision\n";
   // prepare data
-  int v = 0;
+  uint32_t v = 0;
   Scalar** inout = new Scalar*[numChannels];
-  for (int i = 0; i < numChannels; ++i) {
+  for (uint32_t i = 0; i < numChannels; ++i) {
     inout[i] = new Scalar[samplesPerBlock];
-    for (int s = 0; s < samplesPerBlock; ++s) {
+    for (uint32_t s = 0; s < samplesPerBlock; ++s) {
       inout[i][s] = (Scalar)v++;
     }
   }
   // interleaver test
   auto buffer = InterleavedBuffer<Scalar>(numChannels, samplesPerBlock);
   buffer.interleave(inout, numChannels, samplesPerBlock);
-  for (int i = 0; i < numChannels; ++i) {
-    for (int s = 0; s < samplesPerBlock; ++s) {
+  for (uint32_t i = 0; i < numChannels; ++i) {
+    for (uint32_t s = 0; s < samplesPerBlock; ++s) {
       // cout << inout[i][s] << "==" << buffer.at(i, s) << "\n";
       verify(inout[i][s] == buffer.at(i, s)[0],
              "checking InterleaverBuffer::at\n");
@@ -93,16 +93,16 @@ testInterleavedBuffer(int numChannels, int samplesPerBlock)
   }
   cout << "interleaving test complete\n";
   CHECK_MEMORY;
-  for (int i = 0; i < numChannels; ++i) {
-    for (int s = 0; s < samplesPerBlock; ++s) {
+  for (uint32_t i = 0; i < numChannels; ++i) {
+    for (uint32_t s = 0; s < samplesPerBlock; ++s) {
       inout[i][s] = -1.f;
     }
   }
   buffer.deinterleave(inout, numChannels, samplesPerBlock);
   // check
   v = 0;
-  for (int i = 0; i < numChannels; ++i) {
-    for (int s = 0; s < samplesPerBlock; ++s) {
+  for (uint32_t i = 0; i < numChannels; ++i) {
+    for (uint32_t s = 0; s < samplesPerBlock; ++s) {
       // cout << inout[i][s] << "==" << s << "\n";
       verify(inout[i][s] == (Scalar)v++, "checking deinterleaving\n");
     }
@@ -110,7 +110,7 @@ testInterleavedBuffer(int numChannels, int samplesPerBlock)
   cout << "deinterleaving test completed\n";
   CHECK_MEMORY;
   // cleanup
-  for (int i = 0; i < numChannels; ++i) {
+  for (uint32_t i = 0; i < numChannels; ++i) {
     delete[] inout[i];
   }
   delete[] inout;
@@ -127,7 +127,7 @@ main()
   cout << "are 64 bit floating point simd operations supported? " << (supportsDoublePrecision? "yes" : "no") << "\n";
   cout << "sizeof(void*) " << sizeof(void*) << "\n";
 
-  for (int c = 1; c < 32; ++c) {
+  for (uint32_t c = 1; c < 32; ++c) {
     testInterleavedBuffer<float>(c, 128);
     testInterleavedBuffer<double>(c, 128);
   }

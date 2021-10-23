@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #pragma once
+#include <cstdint>
 
 #if (defined(__arm__) || defined(__aarch64__) || defined(__arm64__))
 
@@ -109,21 +110,21 @@ constexpr bool hasSimd = AVEC_SSE;
 namespace avec {
 
 template<class Vec>
-constexpr int
+constexpr uint32_t
 size()
 {
   return Vec::size();
 }
 
 template<>
-constexpr int
+constexpr uint32_t
 size<float>()
 {
   return 1;
 }
 
 template<>
-constexpr int
+constexpr uint32_t
 size<double>()
 {
   return 1;

@@ -1,5 +1,5 @@
 /*
-Copyright 2019-2020 Dario Mambro
+Copyright 2019-2021 Dario Mambro
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -148,7 +148,7 @@ public:
    */
   VecView& operator=(Scalar value)
   {
-    for (int i = 0; i < size<Vec>(); ++i) {
+    for (uint32_t i = 0; i < size<Vec>(); ++i) {
       ptr[i] = value;
     }
     return *this;

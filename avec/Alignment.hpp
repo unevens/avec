@@ -31,7 +31,7 @@ limitations under the License.
 
 namespace avec {
 
-constexpr int ALIGNMENT = 64; // cache line
+constexpr std::size_t ALIGNMENT = 64; // cache line
 
 /**
  * std::vector aligned to the width of a cache line using

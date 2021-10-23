@@ -1,5 +1,5 @@
 /*
-Copyright 2019-2020 Dario Mambro
+Copyright 2019-2021 Dario Mambro
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public:
    * @param numSamples the number of samples to initialize the buffer with
    * @param value value to initialize the memory to
    */
-  VecBuffer(int numSamples = 0, Scalar value = 0.f)
+  VecBuffer(uint32_t numSamples = 0, Scalar value = 0.f)
   {
     setNumSamples(numSamples);
     fill(value);
@@ -52,22 +52,22 @@ public:
   /**
    * @return the size of the buffer measured in number of Scalar elements
    */
-  inline int getScalarSize() const { return (int)data.size(); }
+  inline uint32_t getScalarSize() const { return (uint32_t)data.size(); }
 
   /**
    * @return the size of the buffer measured in number of Vec elements
    */
-  inline int getNumSamples() const { return (int)data.size() / size<Vec>(); }
+  inline uint32_t getNumSamples() const { return (uint32_t)data.size() / size<Vec>(); }
 
   /**
    * @return the capacity of the buffer measured in number of Scalar elements
    */
-  inline int getScalarCapacity() const { return data.capacity(); }
+  inline uint32_t getScalarCapacity() const { return data.capacity(); }
 
   /**
    * @return the capacity of the buffer measured in number of Vec elements
    */
-  inline int getVecCapacity() const
+  inline uint32_t getVecCapacity() const
   {
     return getScalarCapacity() / size<Vec>();
   }
@@ -76,25 +76,25 @@ public:
    * Resize the buffer
    * @param newSize the new size measured in number of Scalar elements
    */
-  void setScalarSize(int newSize) { data.resize(newSize); }
+  void setScalarSize(uint32_t newSize) { data.resize(newSize); }
 
   /**
    * Resize the buffer
    * @param newSize the new size measured in number of Vec elements
    */
-  void setNumSamples(int newSize) { setScalarSize(newSize * size<Vec>()); }
+  void setNumSamples(uint32_t newSize) { setScalarSize(newSize * size<Vec>()); }
 
   /**
    * Set the capacity of the buffer
    * @param newCapacity the new capacity measured in number of Scalar elements
    */
-  void reserveScalar(int newCapacity) { data.reserve(newCapacity); }
+  void reserveScalar(uint32_t newCapacity) { data.reserve(newCapacity); }
 
   /**
    * Resize the buffer
    * @param newCapacity the new size measured in number of Vec elements
    */
-  void reserveVec(int newCapacity)
+  void reserveVec(uint32_t newCapacity)
   {
     reserveScalar(newCapacity * size<Vec>());
   }
@@ -108,18 +108,18 @@ public:
   /**
    * @return a reference to the i-th Scalar elements of the buffer.
    */
-  Scalar& operator()(int i = 0) { return data[i]; }
+  Scalar& operator()(uint32_t i = 0) { return data[i]; }
 
   /**
    * @return a reference to the i-th Scalar elements of the buffer.
    */
-  Scalar const& operator()(int i = 0) const { return data[i]; }
+  Scalar const& operator()(uint32_t i = 0) const { return data[i]; }
 
   /**
    * @return a VecView to the memory corresponding to the i-th vecotr elements
    * of the buffer.
    */
-  VecView<Vec> operator[](int i)
+  VecView<Vec> operator[](uint32_t i)
   {
     assert(i < data.size() / size<Vec>());
     return VecView<Vec>(&data[i * size<Vec>()]);
@@ -129,7 +129,7 @@ public:
    * @return a VecView to the memory corresponding to the i-th vecotr elements
    * of the buffer.
    */
-  VecView<Vec> const operator[](int i) const
+  VecView<Vec> const operator[](uint32_t i) const
   {
     assert(i < data.size() / size<Vec>());
     return VecView<Vec>(const_cast<Scalar*>(&data[i * size<Vec>()]));
