@@ -33,8 +33,8 @@ class ScalarBuffer final
 {
   std::vector<aligned_vector<Scalar>> data;
   std::vector<Scalar*> pointers;
-  uint32_t size;
-  uint32_t capacity;
+  uint32_t size = 0;
+  uint32_t capacity = 0;
 
   void updatePointers()
   {
@@ -101,6 +101,8 @@ public:
    */
   void setNumChannels(uint32_t numRequiredChannels)
   {
+    if (numRequiredChannels == data.size())
+      return;
     data.resize(numRequiredChannels);
     for (auto& d : data) {
       d.reserve(capacity);
@@ -133,6 +135,8 @@ public:
    */
   void setNumSamples(uint32_t numSamples, bool shrinkIfSmaller = false)
   {
+    if (numSamples == size && !shrinkIfSmaller)
+      return;
     reserve(numSamples);
     size = numSamples;
     capacity = std::max(capacity, size);
