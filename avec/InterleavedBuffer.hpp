@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "avec/ScalarBuffer.hpp"
+#include "avec/Buffer.hpp"
 #include "avec/VecBuffer.hpp"
 #include <algorithm>
 
@@ -25,19 +25,19 @@ namespace avec {
 /**
  * A multi channel buffer holding interleaved data to be used with simd
  * vector functions from vectorclass.
- * @tparam Scalar float or double
+ * @tparam Number float or double
  */
 
-template<typename Scalar>
+template<typename Number>
 class InterleavedBuffer final
 {
-  using Vec8 = typename SimdTypes<Scalar>::Vec8;
-  using Vec4 = typename SimdTypes<Scalar>::Vec4;
-  using Vec2 = typename SimdTypes<Scalar>::Vec2;
+  using Vec8 = typename SimdTypes<Number>::Vec8;
+  using Vec4 = typename SimdTypes<Number>::Vec4;
+  using Vec2 = typename SimdTypes<Number>::Vec2;
 
-  static constexpr bool VEC8_AVAILABLE = SimdTypes<Scalar>::VEC8_AVAILABLE;
-  static constexpr bool VEC4_AVAILABLE = SimdTypes<Scalar>::VEC4_AVAILABLE;
-  static constexpr bool VEC2_AVAILABLE = SimdTypes<Scalar>::VEC2_AVAILABLE;
+  static constexpr bool VEC8_AVAILABLE = SimdTypes<Number>::VEC8_AVAILABLE;
+  static constexpr bool VEC4_AVAILABLE = SimdTypes<Number>::VEC4_AVAILABLE;
+  static constexpr bool VEC2_AVAILABLE = SimdTypes<Number>::VEC2_AVAILABLE;
 
   std::vector<VecBuffer<Vec8>> buffers8;
   std::vector<VecBuffer<Vec4>> buffers4;
@@ -143,7 +143,7 @@ public:
    * Fills each buffer with the supplied value
    * @param value value to set all the elements of the buffers to.
    */
-  void fill(Scalar value = 0.f);
+  void fill(Number value = 0.f);
 
   /**
    * Deinterleaves the data to an output.
@@ -155,17 +155,17 @@ public:
    * @return true if deinterleaving was successfull, false if numOutputChannels
    * is greater to the numChannel of the InterleavedBuffer
    */
-  bool deinterleave(Scalar** output,
+  bool deinterleave(Number** output,
                     uint32_t numOutputChannels,
                     uint32_t numSamples) const;
 
   /**
    * Deinterleaves the data to an output.
-   * @param output ScalarBuffer in which to store the deinterleaved data.
+   * @param output Buffer in which to store the deinterleaved data.
    * @return true if deinterleaving was successfull, false if the number of
    * channel of the output is greater to the numChannel of the InterleavedBuffer
    */
-  bool deinterleave(ScalarBuffer<Scalar>& output) const
+  bool deinterleave(Buffer<Number>& output) const
   {
     return deinterleave(
       output.get(), output.getNumChannels(), output.getNumSamples());
@@ -181,19 +181,19 @@ public:
    * @return true if interleaving was successfull, false if numInputChannels
    * is greater to the numChannel of the InterleavedBuffer
    */
-  bool interleave(Scalar* const* input,
+  bool interleave(Number* const* input,
                   uint32_t numInputChannels,
                   uint32_t numInputSamples);
 
   /**
    * Interleaves input data to the VecBuffers.
-   * @param input ScalarBuffer holding the data to interleave.
+   * @param input Buffer holding the data to interleave.
    * @param numInputChannels number of channels to interleave, should be less
    * or equal to the numChannel of the InterleavedBuffer and of the input
    * @return true if interleaving was successfull, false if numInputChannels
    * is greater to the numChannel of the InterleavedBuffer
    */
-  bool interleave(ScalarBuffer<Scalar> const& input, uint32_t numInputChannels)
+  bool interleave(Buffer<Number> const& input, uint32_t numInputChannels)
   {
     if (numInputChannels > input.getNumChannels()) {
       return false;
@@ -207,9 +207,9 @@ public:
    * @param channel
    * @param sample
    * @return a pointer to the const value of the sample of the channel, same as
-   * doing &scalarBuffer[channel][sample] on a ScalarBuffer or a Scalar**
+   * doing &scalarBuffer[channel][sample] on a Buffer or a Number**
    */
-  Scalar const* at(uint32_t channel, uint32_t sample) const;
+  Number const* at(uint32_t channel, uint32_t sample) const;
 
   /**
    * Returns the value of a a specific sample of a specific channel of the
@@ -217,9 +217,9 @@ public:
    * @param channel
    * @param sample
    * @return a pointer to the value of the sample of the channel, same as doing
-   * &scalarBuffer[channel][sample] on a ScalarBuffer or a Scalar**
+   * &scalarBuffer[channel][sample] on a Buffer or a Number**
    */
-  Scalar* at(uint32_t channel, uint32_t sample);
+  Number* at(uint32_t channel, uint32_t sample);
 
   /**
    * Copies the first numSamples of an other interleaved buffer, optionally up
@@ -258,16 +258,16 @@ static_assert(std::is_nothrow_move_assignable<InterleavedBuffer<float>>::value,
  * @param num4 the number of VecBuffer<Vec4> used
  * @param num8 the number of VecBuffer<Vec8> used
  */
-template<typename Scalar>
+template<typename Number>
 inline void
 getNumOfVecBuffersUsedByInterleavedBuffer(uint32_t numChannels,
                                           uint32_t& num2,
                                           uint32_t& num4,
                                           uint32_t& num8)
 {
-  constexpr bool VEC8_AVAILABLE = SimdTypes<Scalar>::VEC8_AVAILABLE;
-  constexpr bool VEC4_AVAILABLE = SimdTypes<Scalar>::VEC4_AVAILABLE;
-  constexpr bool VEC2_AVAILABLE = SimdTypes<Scalar>::VEC2_AVAILABLE;
+  constexpr bool VEC8_AVAILABLE = SimdTypes<Number>::VEC8_AVAILABLE;
+  constexpr bool VEC4_AVAILABLE = SimdTypes<Number>::VEC4_AVAILABLE;
+  constexpr bool VEC2_AVAILABLE = SimdTypes<Number>::VEC2_AVAILABLE;
   if constexpr (VEC8_AVAILABLE) {
     if (numChannels <= 4) {
       num4 = 1;
@@ -317,7 +317,7 @@ getNumOfVecBuffersUsedByInterleavedBuffer(uint32_t numChannels,
  * abstracted from the InterleavedBuffer so that it can be used by other classes
  * that use the same memory layout of the InterleavedBuffer.
  */
-template<typename Scalar>
+template<typename Number>
 struct InterleavedChannel final
 {
   /**
@@ -336,9 +336,9 @@ struct InterleavedChannel final
                           T8& v8,
                           Action action)
   {
-    constexpr bool VEC8_AVAILABLE = SimdTypes<Scalar>::VEC8_AVAILABLE;
-    constexpr bool VEC4_AVAILABLE = SimdTypes<Scalar>::VEC4_AVAILABLE;
-    constexpr bool VEC2_AVAILABLE = SimdTypes<Scalar>::VEC2_AVAILABLE;
+    constexpr bool VEC8_AVAILABLE = SimdTypes<Number>::VEC8_AVAILABLE;
+    constexpr bool VEC4_AVAILABLE = SimdTypes<Number>::VEC4_AVAILABLE;
+    constexpr bool VEC2_AVAILABLE = SimdTypes<Number>::VEC2_AVAILABLE;
 
     if constexpr (VEC8_AVAILABLE) {
       if (v4.size() > 0) {
@@ -393,9 +393,9 @@ struct InterleavedChannel final
 
 // implementation
 
-template<typename Scalar>
+template<typename Number>
 void
-InterleavedBuffer<Scalar>::reserve(uint32_t value)
+InterleavedBuffer<Number>::reserve(uint32_t value)
 {
   if (capacity >= value) {
     return;
@@ -412,9 +412,9 @@ InterleavedBuffer<Scalar>::reserve(uint32_t value)
   }
 }
 
-template<typename Scalar>
+template<typename Number>
 inline void
-InterleavedBuffer<Scalar>::setNumSamples(uint32_t value)
+InterleavedBuffer<Number>::setNumSamples(uint32_t value)
 {
   numSamples = value;
   reserve(value);
@@ -429,15 +429,15 @@ InterleavedBuffer<Scalar>::setNumSamples(uint32_t value)
   }
 }
 
-template<typename Scalar>
+template<typename Number>
 void
-InterleavedBuffer<Scalar>::setNumChannels(uint32_t value)
+InterleavedBuffer<Number>::setNumChannels(uint32_t value)
 {
   if (numChannels == value)
     return;
   numChannels = value;
   uint32_t num2, num4, num8;
-  getNumOfVecBuffersUsedByInterleavedBuffer<Scalar>(
+  getNumOfVecBuffersUsedByInterleavedBuffer<Number>(
     numChannels, num2, num4, num8);
   buffers8.resize(num8);
   buffers4.resize(num4);
@@ -446,9 +446,9 @@ InterleavedBuffer<Scalar>::setNumChannels(uint32_t value)
   setNumSamples(numSamples);
 }
 
-template<typename Scalar>
+template<typename Number>
 void
-InterleavedBuffer<Scalar>::fill(Scalar value)
+InterleavedBuffer<Number>::fill(Number value)
 {
   for (auto& b8 : buffers8) {
     b8.fill(value);
@@ -461,9 +461,9 @@ InterleavedBuffer<Scalar>::fill(Scalar value)
   }
 }
 
-template<typename Scalar>
+template<typename Number>
 bool
-InterleavedBuffer<Scalar>::deinterleave(Scalar** output,
+InterleavedBuffer<Number>::deinterleave(Number** output,
                                         uint32_t numOutputChannels,
                                         uint32_t numOutputSamples) const
 {
@@ -546,9 +546,9 @@ InterleavedBuffer<Scalar>::deinterleave(Scalar** output,
   return false;
 }
 
-template<typename Scalar>
+template<typename Number>
 bool
-InterleavedBuffer<Scalar>::interleave(Scalar* const* input,
+InterleavedBuffer<Number>::interleave(Number* const* input,
                                       uint32_t numInputChannels,
                                       uint32_t numInputSamples)
 {
@@ -649,19 +649,19 @@ InterleavedBuffer<Scalar>::interleave(Scalar* const* input,
   return false;
 }
 
-template<typename Scalar>
-Scalar const*
-InterleavedBuffer<Scalar>::at(uint32_t channel, uint32_t sample) const
+template<typename Number>
+Number const*
+InterleavedBuffer<Number>::at(uint32_t channel, uint32_t sample) const
 {
-  return const_cast<Scalar const*>(
-    const_cast<InterleavedBuffer<Scalar>*>(this)->at(channel, sample));
+  return const_cast<Number const*>(
+    const_cast<InterleavedBuffer<Number>*>(this)->at(channel, sample));
 }
 
-template<typename Scalar>
-Scalar*
-InterleavedBuffer<Scalar>::at(uint32_t channel, uint32_t sample)
+template<typename Number>
+Number*
+InterleavedBuffer<Number>::at(uint32_t channel, uint32_t sample)
 {
-  return InterleavedChannel<Scalar>::doAtChannel(
+  return InterleavedChannel<Number>::doAtChannel(
     channel,
     buffers2,
     buffers4,
@@ -671,9 +671,9 @@ InterleavedBuffer<Scalar>::at(uint32_t channel, uint32_t sample)
     });
 }
 
-template<typename Scalar>
+template<typename Number>
 inline void
-InterleavedBuffer<Scalar>::copyFrom(InterleavedBuffer const& other,
+InterleavedBuffer<Number>::copyFrom(InterleavedBuffer const& other,
                                     uint32_t numSamplesToCopy,
                                     uint32_t numChannelsToCopy)
 {

@@ -36,26 +36,26 @@ public:
   /**
    * The scalar type.
    */
-  using Scalar = typename ScalarTypes<Vec>::Scalar;
+  using Number = typename ScalarTypes<Vec>::Number;
 
 private:
-  Scalar* ptr;
+  Number* ptr;
 
 public:
   /**
    * Constructor.
    * @param ptr pointer to the memory to view. It must be aligned
    * tosize<Vec>()
-   * * sizeof(Scalar).
+   * * sizeof(Number).
    */
-  VecView(Scalar* ptr) { setPointer(ptr); }
+  VecView(Number* ptr) { setPointer(ptr); }
 
   /**
    * Resets the view to point to a different address.
    * @param ptr_ pointer to the memory to view. It must be aligned to
-   *size<Vec>()*sizeof(Scalar).
+   *size<Vec>()*sizeof(Number).
    */
-  void setPointer(Scalar* ptr_)
+  void setPointer(Number* ptr_)
   {
     AVEC_ASSERT_ALIGNMENT(ptr_, Vec);
     ptr = ptr_;
@@ -64,12 +64,12 @@ public:
 
   /**
    * Copies the memory viewed by a VecView<Vec4f>. Can only be called if the
-   * VecView's Scalar is also float.
+   * VecView's Number is also float.
    * @param other the view to copy from.
    */
   VecView& operator=(VecView<Vec4f> const other)
   {
-    if constexpr (!std::is_same<Scalar, float>::value) {
+    if constexpr (!std::is_same<Number, float>::value) {
       // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
       assert(false);
       return *this;
@@ -80,12 +80,12 @@ public:
 
   /**
    * Copies the memory viewed by a VecView<Vec8f>. Can only be called if the
-   * VecView's Scalar is also float.
+   * VecView's Number is also float.
    * @param other the view to copy from.
    */
   VecView& operator=(VecView<Vec8f> const x)
   {
-    if constexpr (!std::is_same<Scalar, float>::value) {
+    if constexpr (!std::is_same<Number, float>::value) {
       // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
       assert(false);
       return *this;
@@ -96,12 +96,12 @@ public:
 
   /**
    * Copies the memory viewed by a VecView<Vec2d>. Can only be called if the
-   * VecView's Scalar is also double.
+   * VecView's Number is also double.
    * @param other the view to copy from.
    */
   VecView& operator=(VecView<Vec2d> const other)
   {
-    if constexpr (!std::is_same<Scalar, double>::value) {
+    if constexpr (!std::is_same<Number, double>::value) {
       // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
       assert(false);
       return *this;
@@ -112,12 +112,12 @@ public:
 
   /**
    * Copies the memory viewed by a VecView<Vec4d>. Can only be called if the
-   * VecView's Scalar is also double.
+   * VecView's Number is also double.
    * @param other the view to copy from.
    */
   VecView& operator=(VecView<Vec4d> const other)
   {
-    if constexpr (!std::is_same<Scalar, double>::value) {
+    if constexpr (!std::is_same<Number, double>::value) {
       // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
       assert(false);
       return *this;
@@ -128,12 +128,12 @@ public:
 
   /**
    * Copies the memory viewed by a VecView<Vec8d>. Can only be called if the
-   * VecView's Scalar is also double.
+   * VecView's Number is also double.
    * @param other the view to copy from.
    */
   VecView& operator=(VecView<Vec8d> const other)
   {
-    if constexpr (!std::is_same<Scalar, double>::value) {
+    if constexpr (!std::is_same<Number, double>::value) {
       // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
       assert(false);
       return *this;
@@ -143,10 +143,10 @@ public:
   }
 
   /**
-   * Set all elements of the viewed memory to a Scalar value.
+   * Set all elements of the viewed memory to a Number value.
    * @param value the value to set the elements to.
    */
-  VecView& operator=(Scalar value)
+  VecView& operator=(Number value)
   {
     for (uint32_t i = 0; i < size<Vec>(); ++i) {
       ptr[i] = value;
@@ -158,7 +158,7 @@ public:
    * Copies the memory pointed to by the argument to the viewed memory.
    * @param src pointer to the memory to copy from.
    */
-  VecView& operator=(Scalar const* src)
+  VecView& operator=(Number const* src)
   {
     std::copy(src, src + size<Vec>(), ptr);
     return *this;
@@ -175,16 +175,16 @@ public:
   }
 
   /**
-   * Implicit conversion to Scalar*
+   * Implicit conversion to Number*
    * @returns the pointer to the viewed memory.
    */
-  operator Scalar*() { return ptr; }
+  operator Number*() { return ptr; }
 
   /**
-   * Implicit conversion to Scalar const*
+   * Implicit conversion to Number const*
    * @returns the pointer to the viewed memory.
    */
-  operator Scalar const *() const { return ptr; }
+  operator Number const *() const { return ptr; }
 
   /**
    * Implicit conversion to a simd vector object.
@@ -198,16 +198,16 @@ public:
   }
 
   /**
-   * Explicit Conversion to Scalar*
+   * Explicit Conversion to Number*
    * @returns the pointer to the viewed memory.
    */
-  Scalar* getPtr() { return ptr; }
+  Number* getPtr() { return ptr; }
 
   /**
-   * Explicit Conversion to Scalar*
+   * Explicit Conversion to Number*
    * @returns the pointer to the viewed memory.
    */
-  Scalar const* getPtr() const { return ptr; }
+  Number const* getPtr() const { return ptr; }
 
   /**
    * A nullptr with VecView type.

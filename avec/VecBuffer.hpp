@@ -32,10 +32,10 @@ public:
   /**
    * The scalar type deduced from the simd vector type.
    */
-  using Scalar = typename ScalarTypes<Vec>::Scalar;
+  using Number = typename ScalarTypes<Vec>::Number;
 
 private:
-  aligned_vector<Scalar> data;
+  aligned_vector<Number> data;
 
 public:
   /**
@@ -43,14 +43,14 @@ public:
    * @param numSamples the number of samples to initialize the buffer with
    * @param value value to initialize the memory to
    */
-  VecBuffer(uint32_t numSamples = 0, Scalar value = 0.f)
+  VecBuffer(uint32_t numSamples = 0, Number value = 0.f)
   {
     setNumSamples(numSamples);
     fill(value);
   }
 
   /**
-   * @return the size of the buffer measured in number of Scalar elements
+   * @return the size of the buffer measured in number of Number elements
    */
   inline uint32_t getScalarSize() const { return (uint32_t)data.size(); }
 
@@ -60,7 +60,7 @@ public:
   inline uint32_t getNumSamples() const { return (uint32_t)data.size() / size<Vec>(); }
 
   /**
-   * @return the capacity of the buffer measured in number of Scalar elements
+   * @return the capacity of the buffer measured in number of Number elements
    */
   inline uint32_t getScalarCapacity() const { return data.capacity(); }
 
@@ -74,7 +74,7 @@ public:
 
   /**
    * Resize the buffer
-   * @param newSize the new size measured in number of Scalar elements
+   * @param newSize the new size measured in number of Number elements
    */
   void setScalarSize(uint32_t newSize) { data.resize(newSize); }
 
@@ -86,7 +86,7 @@ public:
 
   /**
    * Set the capacity of the buffer
-   * @param newCapacity the new capacity measured in number of Scalar elements
+   * @param newCapacity the new capacity measured in number of Number elements
    */
   void reserveScalar(uint32_t newCapacity) { data.reserve(newCapacity); }
 
@@ -103,17 +103,17 @@ public:
    * Fills the buffer with the supplied value
    * @param value value to set all the elements of the buffer to.
    */
-  void fill(Scalar value = 0.f) { std::fill(data.begin(), data.end(), value); }
+  void fill(Number value = 0.f) { std::fill(data.begin(), data.end(), value); }
 
   /**
-   * @return a reference to the i-th Scalar elements of the buffer.
+   * @return a reference to the i-th Number elements of the buffer.
    */
-  Scalar& operator()(uint32_t i = 0) { return data[i]; }
+  Number& operator()(uint32_t i = 0) { return data[i]; }
 
   /**
-   * @return a reference to the i-th Scalar elements of the buffer.
+   * @return a reference to the i-th Number elements of the buffer.
    */
-  Scalar const& operator()(uint32_t i = 0) const { return data[i]; }
+  Number const& operator()(uint32_t i = 0) const { return data[i]; }
 
   /**
    * @return a VecView to the memory corresponding to the i-th vecotr elements
@@ -132,20 +132,20 @@ public:
   VecView<Vec> const operator[](uint32_t i) const
   {
     assert(i < data.size() / size<Vec>());
-    return VecView<Vec>(const_cast<Scalar*>(&data[i * size<Vec>()]));
+    return VecView<Vec>(const_cast<Number*>(&data[i * size<Vec>()]));
   }
 
   /**
-   * Implicit conversion to Scalar*
+   * Implicit conversion to Number*
    * @return a pointer to the buffer's memory.
    */
-  operator Scalar*() { return &data[0]; }
+  operator Number*() { return &data[0]; }
 
   /**
-   * Implicit conversion to Scalar*
+   * Implicit conversion to Number*
    * @return a pointer to the buffer's memory.
    */
-  operator Scalar const *() const { return &data[0]; }
+  operator Number const *() const { return &data[0]; }
 };
 
 // static asserts for paranoid me

@@ -20,19 +20,19 @@ limitations under the License.
 
 namespace avec {
 
-// just a wrapper around std::vector<aligned_vector<Scalar>> to manage a multi
+// just a wrapper around std::vector<aligned_vector<Number>> to manage a multi
 // channel buffer
 
 /**
- * Multi channel buffer, holding an aligned_vector<Scalar> for each
+ * Multi channel buffer, holding an aligned_vector<Number> for each
  * channel
- * @tparam Scalar the sample type, float or double.
+ * @tparam Number the sample type, float or double.
  */
-template<class Scalar>
-class ScalarBuffer final
+template<class Number>
+class Buffer final
 {
-  std::vector<aligned_vector<Scalar>> data;
-  std::vector<Scalar*> pointers;
+  std::vector<aligned_vector<Number>> data;
+  std::vector<Number*> pointers;
   uint32_t size = 0;
   uint32_t capacity = 0;
 
@@ -50,29 +50,29 @@ public:
    * @param i the index of the element to retrieve
    * @return a reference to the i-th element of buffer.
    */
-  aligned_vector<Scalar>& operator[](uint32_t i) { return data[i]; }
+  aligned_vector<Number>& operator[](uint32_t i) { return data[i]; }
   /**
    * Gets a const reference to an element of the buffer.
    * @param i the index of the element to retrieve
    * @return a const reference to the i-th element of buffer.
    */
-  aligned_vector<Scalar> const& operator[](uint32_t i) const { return data[i]; }
+  aligned_vector<Number> const& operator[](uint32_t i) const { return data[i]; }
 
   /**
-   * @return a Scalar** to the buffer.
+   * @return a Number** to the buffer.
    */
-  Scalar** get() { return &pointers[0]; }
+  Number** get() { return &pointers[0]; }
 
   /**
-   * @return a Scalar* const* to the buffer.
+   * @return a Number* const* to the buffer.
    */
-  Scalar* const* get() const { return &pointers[0]; }
+  Number* const* get() const { return &pointers[0]; }
 
   /**
    * Fills the buffer with the supplied value
    * @param value value to set all the elements of the buffer to.
    */
-  void fill(Scalar value)
+  void fill(Number value)
   {
     for (auto& channel : data) {
       std::fill(channel.begin(), channel.end(), value);
@@ -86,7 +86,7 @@ public:
 
   /**
    * @return the capacity of each channel of the buffer - capacity = size of
-   * allocated memory, measured in sizeof(Scalar).
+   * allocated memory, measured in sizeof(Number).
    */
   uint32_t getCapacity() const { return capacity; }
 
@@ -186,7 +186,7 @@ public:
    * @param size the amount of samples to set the size of each channel
    * to.
    */
-  ScalarBuffer(uint32_t numChannels = 2, uint32_t size = 256)
+  Buffer(uint32_t numChannels = 2, uint32_t size = 256)
   {
     capacity = size;
     setNumChannelsAndSamples(numChannels, size);
@@ -195,8 +195,8 @@ public:
 
 template<typename InScalar, typename OutScalar>
 inline void
-copyScalarBuffer(ScalarBuffer<InScalar> const& input,
-                 ScalarBuffer<OutScalar>& output,
+copyScalarBuffer(Buffer<InScalar> const& input,
+                 Buffer<OutScalar>& output,
                  uint32_t numChannels)
 {
   if (numChannels < 0) {
@@ -211,8 +211,7 @@ copyScalarBuffer(ScalarBuffer<InScalar> const& input,
 
 template<typename InScalar, typename OutScalar>
 inline void
-copyScalarBuffer(ScalarBuffer<InScalar> const& input,
-                 ScalarBuffer<OutScalar>& output)
+copyScalarBuffer(Buffer<InScalar> const& input, Buffer<OutScalar>& output)
 {
   auto const numChannels = input.getNumChannels();
   output.setNumChannelsAndSamples(numChannels, input.getNumSamples());
@@ -222,16 +221,16 @@ copyScalarBuffer(ScalarBuffer<InScalar> const& input,
   }
 }
 
-static_assert(std::is_nothrow_move_constructible<ScalarBuffer<float>>::value,
+static_assert(std::is_nothrow_move_constructible<Buffer<float>>::value,
               "Buffer should be noexcept move constructable");
 
-static_assert(std::is_nothrow_move_assignable<ScalarBuffer<float>>::value,
+static_assert(std::is_nothrow_move_assignable<Buffer<float>>::value,
               "Buffer should be noexcept move assignable");
 
-static_assert(std::is_copy_constructible<ScalarBuffer<float>>::value,
+static_assert(std::is_copy_constructible<Buffer<float>>::value,
               "Buffer should be move constructable");
 
-static_assert(std::is_copy_assignable<ScalarBuffer<float>>::value,
+static_assert(std::is_copy_assignable<Buffer<float>>::value,
               "Buffer should be move assignable");
 
 } // namespace avec

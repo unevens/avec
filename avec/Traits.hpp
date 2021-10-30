@@ -23,50 +23,50 @@ namespace avec {
 
 /**
  * Static template class with aliases for the available vectorclass types for a
- * given Scalar type (float or double).
- * @tparam Scalar the scalar type.
+ * given Number type (float or double).
+ * @tparam Number the scalar type.
  */
-template<typename Scalar>
+template<typename Number>
 struct SimdTypes
 {
-  static_assert(std::is_same<Scalar, float>::value ||
-                  std::is_same<Scalar, double>::value,
+  static_assert(std::is_same<Number, float>::value ||
+                  std::is_same<Number, double>::value,
                 "Only floating point types are allowed here.");
   /**
    * 8 elements vectorclass type.
    */
   using Vec8 = typename std::
-    conditional<std::is_same<Scalar, float>::value, Vec8f, Vec8d>::type;
+    conditional<std::is_same<Number, float>::value, Vec8f, Vec8d>::type;
   /**
    * 4 elements vectorclass type.
    */
   using Vec4 = typename std::
-    conditional<std::is_same<Scalar, float>::value, Vec4f, Vec4d>::type;
+    conditional<std::is_same<Number, float>::value, Vec4f, Vec4d>::type;
   /**
    * 2 elements vectorclass type.
    */
   using Vec2 = typename std::
-    conditional<std::is_same<Scalar, float>::value, Vec4f, Vec2d>::type;
+    conditional<std::is_same<Number, float>::value, Vec4f, Vec2d>::type;
   /**
    * bool constexpr, true if 8 elements vector are not emulated.
    */
-  static constexpr bool VEC8_AVAILABLE = std::is_same<Scalar, float>::value
+  static constexpr bool VEC8_AVAILABLE = std::is_same<Number, float>::value
                                            ? has256bitSimdRegisters
                                            : has512bitSimdRegisters;
   /**
    * bool constexpr, true if 4 elements vector are not emulated.
    */
   static constexpr bool VEC4_AVAILABLE =
-    std::is_same<Scalar, float>::value ? true : has256bitSimdRegisters;
+    std::is_same<Number, float>::value ? true : has256bitSimdRegisters;
   /**
    * bool constexpr, true if 2 elements vector are available.
    */
   static constexpr bool VEC2_AVAILABLE =
-    std::is_same<Scalar, double>::value ? true : false;
+    std::is_same<Number, double>::value ? true : false;
 };
 
 /**
- * Static template class with an alias to deduce the underlying Scalar type from
+ * Static template class with an alias to deduce the underlying Number type from
  * a vectorclass type.
  * @tparam Vec the simd vector type.
  */
@@ -100,13 +100,13 @@ public:
   /**
    * The scalar type deduced from Vec.
    */
-  using Scalar =
+  using Number =
     typename std::conditional<std::is_same<MaybeDouble, double>::value,
                               double,
                               MaybeFloat>::type;
 
-  static_assert(std::is_same<Scalar, float>::value ||
-                  std::is_same<Scalar, double>::value,
+  static_assert(std::is_same<Number, float>::value ||
+                  std::is_same<Number, double>::value,
                 "Only Vec8f Vec4f Vec8d Vec4d and Vec2d are allowed here.");
 };
 

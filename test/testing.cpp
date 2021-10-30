@@ -65,24 +65,24 @@ verify(bool condition, string description)
   }
 }
 
-template<typename Scalar>
+template<typename Number>
 void
 testInterleavedBuffer(uint32_t numChannels, uint32_t samplesPerBlock)
 {
   cout << "Testing InterleavedBuffer with " << numChannels << " channels and "
-       << (typeid(Scalar) == typeid(float) ? "single" : "double")
+       << (typeid(Number) == typeid(float) ? "single" : "double")
        << " precision\n";
   // prepare data
   uint32_t v = 0;
-  Scalar** inout = new Scalar*[numChannels];
+  Number** inout = new Number*[numChannels];
   for (uint32_t i = 0; i < numChannels; ++i) {
-    inout[i] = new Scalar[samplesPerBlock];
+    inout[i] = new Number[samplesPerBlock];
     for (uint32_t s = 0; s < samplesPerBlock; ++s) {
-      inout[i][s] = (Scalar)v++;
+      inout[i][s] = (Number)v++;
     }
   }
   // interleaver test
-  auto buffer = InterleavedBuffer<Scalar>(numChannels, samplesPerBlock);
+  auto buffer = InterleavedBuffer<Number>(numChannels, samplesPerBlock);
   buffer.interleave(inout, numChannels, samplesPerBlock);
   for (uint32_t i = 0; i < numChannels; ++i) {
     for (uint32_t s = 0; s < samplesPerBlock; ++s) {
@@ -104,7 +104,7 @@ testInterleavedBuffer(uint32_t numChannels, uint32_t samplesPerBlock)
   for (uint32_t i = 0; i < numChannels; ++i) {
     for (uint32_t s = 0; s < samplesPerBlock; ++s) {
       // cout << inout[i][s] << "==" << s << "\n";
-      verify(inout[i][s] == (Scalar)v++, "checking deinterleaving\n");
+      verify(inout[i][s] == (Number)v++, "checking deinterleaving\n");
     }
   }
   cout << "deinterleaving test completed\n";
@@ -116,7 +116,7 @@ testInterleavedBuffer(uint32_t numChannels, uint32_t samplesPerBlock)
   delete[] inout;
   cout << "completed testing InterleavedBuffer with " << numChannels
        << " channels and "
-       << (typeid(Scalar) == typeid(float) ? "single" : "double")
+       << (typeid(Number) == typeid(float) ? "single" : "double")
        << " precision\n\n";
 }
 
