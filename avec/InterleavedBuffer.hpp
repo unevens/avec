@@ -564,11 +564,8 @@ InterleavedBuffer<Number>::interleave(Number* const* input,
                                       uint32_t numInputChannels,
                                       uint32_t numInputSamples)
 {
-
-  if (numInputChannels > numChannels) {
-    setNumChannels(numInputChannels);
-  }
-  setNumSamples(numInputSamples);
+  assert(numInputChannels <= numChannels);
+  assert(numInputSamples <= numSamples);
 
   if (VEC8_AVAILABLE && buffers8.size() > 0) {
     if (numInputChannels % 8 != 0) {
@@ -692,11 +689,9 @@ InterleavedBuffer<Number>::copyFrom(InterleavedBuffer const& other,
   if (numChannelsToCopy < 0) {
     numChannelsToCopy = other.getNumChannels();
   }
-  if (numChannels < numChannelsToCopy) {
-    setNumChannels(other.getNumChannels());
-  }
+  assert (numChannels >= numChannelsToCopy);
   assert(numSamplesToCopy <= other.getNumSamples());
-  setNumSamples(numSamplesToCopy);
+  assert(numSamplesToCopy <= getNumSamples());
   if constexpr (VEC8_AVAILABLE) {
     for (std::size_t i = 0; i < buffers8.size(); ++i) {
       std::copy(&other.buffers8[i](0),
