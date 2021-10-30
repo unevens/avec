@@ -190,7 +190,7 @@ public:
    * @param input Buffer holding the data to interleave.
    * @param numInputChannels number of channels to interleave, should be less
    * or equal to the numChannel of the InterleavedBuffer and of the input
-   * @return true if interleaving was successfull, false if numInputChannels
+   * @return true if interleaving was successful, false if numInputChannels
    * is greater to the numChannel of the InterleavedBuffer
    */
   bool interleave(Buffer<Number> const& input, uint32_t numInputChannels)
@@ -199,6 +199,18 @@ public:
       return false;
     }
     return interleave(input.get(), numInputChannels, input.getNumSamples());
+  }
+
+  /**
+   * Interleaves input data to the VecBuffers.
+   * @param input Buffer holding the data to interleave.
+   * @return true if interleaving was successful, false if numInputChannels
+   * is greater to the numChannel of the InterleavedBuffer
+   */
+  bool interleave(Buffer<Number> const& input)
+  {
+    return interleave(
+      input.get(), input.getNumChannels(), input.getNumSamples());
   }
 
   /**
