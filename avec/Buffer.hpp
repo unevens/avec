@@ -195,14 +195,16 @@ public:
 
 template<typename InScalar, typename OutScalar>
 inline void
-copyScalarBuffer(Buffer<InScalar> const& input,
+copyBuffer(Buffer<InScalar> const& input,
                  Buffer<OutScalar>& output,
                  uint32_t numChannels)
 {
   if (numChannels < 0) {
     numChannels = input.getNumChannels();
   }
-  output.setNumChannelsAndSamples(numChannels, input.getNumSamples());
+  assert(input.getNumChannels() >= numChannels);
+  assert(output.getNumChannels() >= numChannels);
+  output.setNumSamples(input.getNumSamples());
   for (uint32_t c = 0; c < numChannels; ++c) {
     std::copy(
       &input[c][0], &input[c][0] + input.getNumSamples(), &output[c][0]);
@@ -211,13 +213,17 @@ copyScalarBuffer(Buffer<InScalar> const& input,
 
 template<typename InScalar, typename OutScalar>
 inline void
-copyScalarBuffer(Buffer<InScalar> const& input, Buffer<OutScalar>& output)
+copyBuffer(Buffer<InScalar> const& input, Buffer<OutScalar>& output)
 {
   auto const numChannels = input.getNumChannels();
-  output.setNumChannelsAndSamples(numChannels, input.getNumSamples());
-  for (uint32_t c = 0; c < numChannels; ++c) {
-    std::copy(
-      &input[c][0], &input[c][0] + input.getNumSamples(), &output[c][0]);
+  assert(input.getNumChannels() == output.getNumChannels());
+  assert(input.getNumSamples() <= output.getCapacity());
+  output.setNumSamples(input.getNumSamples());
+  if (input.getNumSamples() > 0) {
+    for (uint32_t c = 0; c < numChannels; ++c) {
+      std::copy(
+        &input[c][0], &input[c][0] + input.getNumSamples(), &output[c][0]);
+    }
   }
 }
 
