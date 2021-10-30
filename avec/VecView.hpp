@@ -36,26 +36,26 @@ public:
   /**
    * The scalar type.
    */
-  using Number = typename ScalarTypes<Vec>::Number;
+  using Float = typename ScalarTypes<Vec>::Float;
 
 private:
-  Number* ptr;
+  Float* ptr;
 
 public:
   /**
    * Constructor.
    * @param ptr pointer to the memory to view. It must be aligned
    * tosize<Vec>()
-   * * sizeof(Number).
+   * * sizeof(Float).
    */
-  VecView(Number* ptr) { setPointer(ptr); }
+  VecView(Float* ptr) { setPointer(ptr); }
 
   /**
    * Resets the view to point to a different address.
    * @param ptr_ pointer to the memory to view. It must be aligned to
-   *size<Vec>()*sizeof(Number).
+   *size<Vec>()*sizeof(Float).
    */
-  void setPointer(Number* ptr_)
+  void setPointer(Float* ptr_)
   {
     AVEC_ASSERT_ALIGNMENT(ptr_, Vec);
     ptr = ptr_;
@@ -64,12 +64,12 @@ public:
 
   /**
    * Copies the memory viewed by a VecView<Vec4f>. Can only be called if the
-   * VecView's Number is also float.
+   * VecView's Float is also float.
    * @param other the view to copy from.
    */
   VecView& operator=(VecView<Vec4f> const other)
   {
-    if constexpr (!std::is_same<Number, float>::value) {
+    if constexpr (!std::is_same<Float, float>::value) {
       // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
       assert(false);
       return *this;
@@ -80,12 +80,12 @@ public:
 
   /**
    * Copies the memory viewed by a VecView<Vec8f>. Can only be called if the
-   * VecView's Number is also float.
+   * VecView's Float is also float.
    * @param other the view to copy from.
    */
   VecView& operator=(VecView<Vec8f> const x)
   {
-    if constexpr (!std::is_same<Number, float>::value) {
+    if constexpr (!std::is_same<Float, float>::value) {
       // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
       assert(false);
       return *this;
@@ -96,12 +96,12 @@ public:
 
   /**
    * Copies the memory viewed by a VecView<Vec2d>. Can only be called if the
-   * VecView's Number is also double.
+   * VecView's Float is also double.
    * @param other the view to copy from.
    */
   VecView& operator=(VecView<Vec2d> const other)
   {
-    if constexpr (!std::is_same<Number, double>::value) {
+    if constexpr (!std::is_same<Float, double>::value) {
       // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
       assert(false);
       return *this;
@@ -112,12 +112,12 @@ public:
 
   /**
    * Copies the memory viewed by a VecView<Vec4d>. Can only be called if the
-   * VecView's Number is also double.
+   * VecView's Float is also double.
    * @param other the view to copy from.
    */
   VecView& operator=(VecView<Vec4d> const other)
   {
-    if constexpr (!std::is_same<Number, double>::value) {
+    if constexpr (!std::is_same<Float, double>::value) {
       // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
       assert(false);
       return *this;
@@ -128,12 +128,12 @@ public:
 
   /**
    * Copies the memory viewed by a VecView<Vec8d>. Can only be called if the
-   * VecView's Number is also double.
+   * VecView's Float is also double.
    * @param other the view to copy from.
    */
   VecView& operator=(VecView<Vec8d> const other)
   {
-    if constexpr (!std::is_same<Number, double>::value) {
+    if constexpr (!std::is_same<Float, double>::value) {
       // Can't assign a VecView<Vec*f> to a VecView<Vec*d> or viceversa.
       assert(false);
       return *this;
@@ -143,10 +143,10 @@ public:
   }
 
   /**
-   * Set all elements of the viewed memory to a Number value.
+   * Set all elements of the viewed memory to a Float value.
    * @param value the value to set the elements to.
    */
-  VecView& operator=(Number value)
+  VecView& operator=(Float value)
   {
     for (uint32_t i = 0; i < size<Vec>(); ++i) {
       ptr[i] = value;
@@ -158,7 +158,7 @@ public:
    * Copies the memory pointed to by the argument to the viewed memory.
    * @param src pointer to the memory to copy from.
    */
-  VecView& operator=(Number const* src)
+  VecView& operator=(Float const* src)
   {
     std::copy(src, src + size<Vec>(), ptr);
     return *this;
@@ -175,16 +175,16 @@ public:
   }
 
   /**
-   * Implicit conversion to Number*
+   * Implicit conversion to Float*
    * @returns the pointer to the viewed memory.
    */
-  operator Number*() { return ptr; }
+  operator Float*() { return ptr; }
 
   /**
-   * Implicit conversion to Number const*
+   * Implicit conversion to Float const*
    * @returns the pointer to the viewed memory.
    */
-  operator Number const *() const { return ptr; }
+  operator Float const *() const { return ptr; }
 
   /**
    * Implicit conversion to a simd vector object.
@@ -198,16 +198,16 @@ public:
   }
 
   /**
-   * Explicit Conversion to Number*
+   * Explicit Conversion to Float*
    * @returns the pointer to the viewed memory.
    */
-  Number* getPtr() { return ptr; }
+  Float* getPtr() { return ptr; }
 
   /**
-   * Explicit Conversion to Number*
+   * Explicit Conversion to Float*
    * @returns the pointer to the viewed memory.
    */
-  Number const* getPtr() const { return ptr; }
+  Float const* getPtr() const { return ptr; }
 
   /**
    * A nullptr with VecView type.

@@ -23,11 +23,11 @@ limitations under the License.
 
 #define AVEC_ASSERT_ALIGNMENT(ptr, Vec)                                        \
   assert(boost::alignment::is_aligned(                                         \
-    ptr, avec::size<Vec>() * sizeof(typename ScalarTypes<Vec>::Number)));
+    ptr, avec::size<Vec>() * sizeof(typename ScalarTypes<Vec>::Float)));
 
 #define AVEC_ASSUME_ALIGNMENT(ptr, Vec)                                        \
   BOOST_ALIGN_ASSUME_ALIGNED(                                                  \
-    ptr, avec::size<Vec>() * sizeof(typename ScalarTypes<Vec>::Number));
+    ptr, avec::size<Vec>() * sizeof(typename ScalarTypes<Vec>::Float));
 
 namespace avec {
 

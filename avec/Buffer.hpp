@@ -20,19 +20,19 @@ limitations under the License.
 
 namespace avec {
 
-// just a wrapper around std::vector<aligned_vector<Number>> to manage a multi
+// just a wrapper around std::vector<aligned_vector<Float>> to manage a multi
 // channel buffer
 
 /**
- * Multi channel buffer, holding an aligned_vector<Number> for each
+ * Multi channel buffer, holding an aligned_vector<Float> for each
  * channel
- * @tparam Number the sample type, float or double.
+ * @tparam Float the sample type, float or double.
  */
-template<class Number>
+template<class Float>
 class Buffer final
 {
-  std::vector<aligned_vector<Number>> data;
-  std::vector<Number*> pointers;
+  std::vector<aligned_vector<Float>> data;
+  std::vector<Float*> pointers;
   uint32_t size = 0;
   uint32_t capacity = 0;
 
@@ -50,29 +50,29 @@ public:
    * @param i the index of the element to retrieve
    * @return a reference to the i-th element of buffer.
    */
-  aligned_vector<Number>& operator[](uint32_t i) { return data[i]; }
+  aligned_vector<Float>& operator[](uint32_t i) { return data[i]; }
   /**
    * Gets a const reference to an element of the buffer.
    * @param i the index of the element to retrieve
    * @return a const reference to the i-th element of buffer.
    */
-  aligned_vector<Number> const& operator[](uint32_t i) const { return data[i]; }
+  aligned_vector<Float> const& operator[](uint32_t i) const { return data[i]; }
 
   /**
-   * @return a Number** to the buffer.
+   * @return a Float** to the buffer.
    */
-  Number** get() { return &pointers[0]; }
+  Float** get() { return &pointers[0]; }
 
   /**
-   * @return a Number* const* to the buffer.
+   * @return a Float* const* to the buffer.
    */
-  Number* const* get() const { return &pointers[0]; }
+  Float* const* get() const { return &pointers[0]; }
 
   /**
    * Fills the buffer with the supplied value
    * @param value value to set all the elements of the buffer to.
    */
-  void fill(Number value)
+  void fill(Float value)
   {
     for (auto& channel : data) {
       std::fill(channel.begin(), channel.end(), value);
@@ -86,7 +86,7 @@ public:
 
   /**
    * @return the capacity of each channel of the buffer - capacity = size of
-   * allocated memory, measured in sizeof(Number).
+   * allocated memory, measured in sizeof(Float).
    */
   uint32_t getCapacity() const { return capacity; }
 

@@ -26,8 +26,8 @@ using aligned_ptr = avec::aligned_ptr<T>;
 template<class T>
 using Aligned = avec::Aligned<T>;
 
-template<class Number>
-using Buffer = avec::Buffer<Number>;
+template<class Float>
+using Buffer = avec::Buffer<Float>;
 
 template<class Vec>
 using VecBuffer = avec::VecBuffer<Vec>;
@@ -35,11 +35,11 @@ using VecBuffer = avec::VecBuffer<Vec>;
 template<class Vec>
 using VecView = avec::VecView<Vec>;
 
-template<typename Number>
-using InterleavedBuffer = avec::InterleavedBuffer<Number>;
+template<typename Float>
+using InterleavedBuffer = avec::InterleavedBuffer<Float>;
 
-template<typename Number>
-using SimdTypes = avec::SimdTypes<Number>;
+template<typename Float>
+using SimdTypes = avec::SimdTypes<Float>;
 
 template<typename Vec>
 using ScalarTypes = avec::ScalarTypes<Vec>;

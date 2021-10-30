@@ -25,19 +25,19 @@ namespace avec {
 /**
  * A multi channel buffer holding interleaved data to be used with simd
  * vector functions from vectorclass.
- * @tparam Number float or double
+ * @tparam Float float or double
  */
 
-template<typename Number>
+template<typename Float>
 class InterleavedBuffer final
 {
-  using Vec8 = typename SimdTypes<Number>::Vec8;
-  using Vec4 = typename SimdTypes<Number>::Vec4;
-  using Vec2 = typename SimdTypes<Number>::Vec2;
+  using Vec8 = typename SimdTypes<Float>::Vec8;
+  using Vec4 = typename SimdTypes<Float>::Vec4;
+  using Vec2 = typename SimdTypes<Float>::Vec2;
 
-  static constexpr bool VEC8_AVAILABLE = SimdTypes<Number>::VEC8_AVAILABLE;
-  static constexpr bool VEC4_AVAILABLE = SimdTypes<Number>::VEC4_AVAILABLE;
-  static constexpr bool VEC2_AVAILABLE = SimdTypes<Number>::VEC2_AVAILABLE;
+  static constexpr bool VEC8_AVAILABLE = SimdTypes<Float>::VEC8_AVAILABLE;
+  static constexpr bool VEC4_AVAILABLE = SimdTypes<Float>::VEC4_AVAILABLE;
+  static constexpr bool VEC2_AVAILABLE = SimdTypes<Float>::VEC2_AVAILABLE;
 
   std::vector<VecBuffer<Vec8>> buffers8;
   std::vector<VecBuffer<Vec4>> buffers4;
@@ -143,7 +143,7 @@ public:
    * Fills each buffer with the supplied value
    * @param value value to set all the elements of the buffers to.
    */
-  void fill(Number value = 0.f);
+  void fill(Float value = 0.f);
 
   /**
    * Deinterleaves the data to an output.
@@ -155,7 +155,7 @@ public:
    * @return true if deinterleaving was successfull, false if numOutputChannels
    * is greater to the numChannel of the InterleavedBuffer
    */
-  bool deinterleave(Number** output,
+  bool deinterleave(Float** output,
                     uint32_t numOutputChannels,
                     uint32_t numSamples) const;
 
@@ -165,7 +165,7 @@ public:
    * @return true if deinterleaving was successfull, false if the number of
    * channel of the output is greater to the numChannel of the InterleavedBuffer
    */
-  bool deinterleave(Buffer<Number>& output) const
+  bool deinterleave(Buffer<Float>& output) const
   {
     return deinterleave(
       output.get(), output.getNumChannels(), output.getNumSamples());
@@ -181,7 +181,7 @@ public:
    * @return true if interleaving was successfull, false if numInputChannels
    * is greater to the numChannel of the InterleavedBuffer
    */
-  bool interleave(Number* const* input,
+  bool interleave(Float* const* input,
                   uint32_t numInputChannels,
                   uint32_t numInputSamples);
 
@@ -193,7 +193,7 @@ public:
    * @return true if interleaving was successful, false if numInputChannels
    * is greater to the numChannel of the InterleavedBuffer
    */
-  bool interleave(Buffer<Number> const& input, uint32_t numInputChannels)
+  bool interleave(Buffer<Float> const& input, uint32_t numInputChannels)
   {
     if (numInputChannels > input.getNumChannels()) {
       return false;
@@ -207,7 +207,7 @@ public:
    * @return true if interleaving was successful, false if numInputChannels
    * is greater to the numChannel of the InterleavedBuffer
    */
-  bool interleave(Buffer<Number> const& input)
+  bool interleave(Buffer<Float> const& input)
   {
     return interleave(
       input.get(), input.getNumChannels(), input.getNumSamples());
@@ -219,9 +219,9 @@ public:
    * @param channel
    * @param sample
    * @return a pointer to the const value of the sample of the channel, same as
-   * doing &scalarBuffer[channel][sample] on a Buffer or a Number**
+   * doing &scalarBuffer[channel][sample] on a Buffer or a Float**
    */
-  Number const* at(uint32_t channel, uint32_t sample) const;
+  Float const* at(uint32_t channel, uint32_t sample) const;
 
   /**
    * Returns the value of a a specific sample of a specific channel of the
@@ -229,9 +229,9 @@ public:
    * @param channel
    * @param sample
    * @return a pointer to the value of the sample of the channel, same as doing
-   * &scalarBuffer[channel][sample] on a Buffer or a Number**
+   * &scalarBuffer[channel][sample] on a Buffer or a Float**
    */
-  Number* at(uint32_t channel, uint32_t sample);
+  Float* at(uint32_t channel, uint32_t sample);
 
   /**
    * Copies the first numSamples of an other interleaved buffer, optionally up
@@ -270,16 +270,16 @@ static_assert(std::is_nothrow_move_assignable<InterleavedBuffer<float>>::value,
  * @param num4 the number of VecBuffer<Vec4> used
  * @param num8 the number of VecBuffer<Vec8> used
  */
-template<typename Number>
+template<typename Float>
 inline void
 getNumOfVecBuffersUsedByInterleavedBuffer(uint32_t numChannels,
                                           uint32_t& num2,
                                           uint32_t& num4,
                                           uint32_t& num8)
 {
-  constexpr bool VEC8_AVAILABLE = SimdTypes<Number>::VEC8_AVAILABLE;
-  constexpr bool VEC4_AVAILABLE = SimdTypes<Number>::VEC4_AVAILABLE;
-  constexpr bool VEC2_AVAILABLE = SimdTypes<Number>::VEC2_AVAILABLE;
+  constexpr bool VEC8_AVAILABLE = SimdTypes<Float>::VEC8_AVAILABLE;
+  constexpr bool VEC4_AVAILABLE = SimdTypes<Float>::VEC4_AVAILABLE;
+  constexpr bool VEC2_AVAILABLE = SimdTypes<Float>::VEC2_AVAILABLE;
   if constexpr (VEC8_AVAILABLE) {
     if (numChannels <= 4) {
       num4 = 1;
@@ -329,7 +329,7 @@ getNumOfVecBuffersUsedByInterleavedBuffer(uint32_t numChannels,
  * abstracted from the InterleavedBuffer so that it can be used by other classes
  * that use the same memory layout of the InterleavedBuffer.
  */
-template<typename Number>
+template<typename Float>
 struct InterleavedChannel final
 {
   /**
@@ -348,9 +348,9 @@ struct InterleavedChannel final
                           T8& v8,
                           Action action)
   {
-    constexpr bool VEC8_AVAILABLE = SimdTypes<Number>::VEC8_AVAILABLE;
-    constexpr bool VEC4_AVAILABLE = SimdTypes<Number>::VEC4_AVAILABLE;
-    constexpr bool VEC2_AVAILABLE = SimdTypes<Number>::VEC2_AVAILABLE;
+    constexpr bool VEC8_AVAILABLE = SimdTypes<Float>::VEC8_AVAILABLE;
+    constexpr bool VEC4_AVAILABLE = SimdTypes<Float>::VEC4_AVAILABLE;
+    constexpr bool VEC2_AVAILABLE = SimdTypes<Float>::VEC2_AVAILABLE;
 
     if constexpr (VEC8_AVAILABLE) {
       if (v4.size() > 0) {
@@ -405,9 +405,9 @@ struct InterleavedChannel final
 
 // implementation
 
-template<typename Number>
+template<typename Float>
 void
-InterleavedBuffer<Number>::reserve(uint32_t value)
+InterleavedBuffer<Float>::reserve(uint32_t value)
 {
   if (capacity >= value) {
     return;
@@ -424,9 +424,9 @@ InterleavedBuffer<Number>::reserve(uint32_t value)
   }
 }
 
-template<typename Number>
+template<typename Float>
 inline void
-InterleavedBuffer<Number>::setNumSamples(uint32_t value)
+InterleavedBuffer<Float>::setNumSamples(uint32_t value)
 {
   numSamples = value;
   reserve(value);
@@ -441,15 +441,15 @@ InterleavedBuffer<Number>::setNumSamples(uint32_t value)
   }
 }
 
-template<typename Number>
+template<typename Float>
 void
-InterleavedBuffer<Number>::setNumChannels(uint32_t value)
+InterleavedBuffer<Float>::setNumChannels(uint32_t value)
 {
   if (numChannels == value)
     return;
   numChannels = value;
   uint32_t num2, num4, num8;
-  getNumOfVecBuffersUsedByInterleavedBuffer<Number>(
+  getNumOfVecBuffersUsedByInterleavedBuffer<Float>(
     numChannels, num2, num4, num8);
   buffers8.resize(num8);
   buffers4.resize(num4);
@@ -458,9 +458,9 @@ InterleavedBuffer<Number>::setNumChannels(uint32_t value)
   setNumSamples(numSamples);
 }
 
-template<typename Number>
+template<typename Float>
 void
-InterleavedBuffer<Number>::fill(Number value)
+InterleavedBuffer<Float>::fill(Float value)
 {
   for (auto& b8 : buffers8) {
     b8.fill(value);
@@ -473,9 +473,9 @@ InterleavedBuffer<Number>::fill(Number value)
   }
 }
 
-template<typename Number>
+template<typename Float>
 bool
-InterleavedBuffer<Number>::deinterleave(Number** output,
+InterleavedBuffer<Float>::deinterleave(Float** output,
                                         uint32_t numOutputChannels,
                                         uint32_t numOutputSamples) const
 {
@@ -558,9 +558,9 @@ InterleavedBuffer<Number>::deinterleave(Number** output,
   return false;
 }
 
-template<typename Number>
+template<typename Float>
 bool
-InterleavedBuffer<Number>::interleave(Number* const* input,
+InterleavedBuffer<Float>::interleave(Float* const* input,
                                       uint32_t numInputChannels,
                                       uint32_t numInputSamples)
 {
@@ -658,19 +658,19 @@ InterleavedBuffer<Number>::interleave(Number* const* input,
   return false;
 }
 
-template<typename Number>
-Number const*
-InterleavedBuffer<Number>::at(uint32_t channel, uint32_t sample) const
+template<typename Float>
+Float const*
+InterleavedBuffer<Float>::at(uint32_t channel, uint32_t sample) const
 {
-  return const_cast<Number const*>(
-    const_cast<InterleavedBuffer<Number>*>(this)->at(channel, sample));
+  return const_cast<Float const*>(
+    const_cast<InterleavedBuffer<Float>*>(this)->at(channel, sample));
 }
 
-template<typename Number>
-Number*
-InterleavedBuffer<Number>::at(uint32_t channel, uint32_t sample)
+template<typename Float>
+Float*
+InterleavedBuffer<Float>::at(uint32_t channel, uint32_t sample)
 {
-  return InterleavedChannel<Number>::doAtChannel(
+  return InterleavedChannel<Float>::doAtChannel(
     channel,
     buffers2,
     buffers4,
@@ -680,9 +680,9 @@ InterleavedBuffer<Number>::at(uint32_t channel, uint32_t sample)
     });
 }
 
-template<typename Number>
+template<typename Float>
 inline void
-InterleavedBuffer<Number>::copyFrom(InterleavedBuffer const& other,
+InterleavedBuffer<Float>::copyFrom(InterleavedBuffer const& other,
                                     uint32_t numSamplesToCopy,
                                     uint32_t numChannelsToCopy)
 {
