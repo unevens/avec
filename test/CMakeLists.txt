@@ -21,6 +21,10 @@ endif (WIN32)
 
 if (UNIX)
 
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+    set(CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+
+
     #universal binary if building on arm64
     if (APPLE)
 
@@ -50,9 +54,6 @@ if (UNIX)
                 message(STATUS "Supported architectures: ${MACHINE_ARCHITECTURE}")
             endif ()
         endif ()
-
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
-        set(CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 
         add_executable(avec-test testing.cpp)
 
