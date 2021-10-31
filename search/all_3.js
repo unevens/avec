@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['fill_6',['fill',['../classavec_1_1_interleaved_buffer.html#a49b7680d6482253326097d8c2b0959b7',1,'avec::InterleavedBuffer::fill()'],['../classavec_1_1_scalar_buffer.html#a11b0d3e9eb6489e546b08a1687b90627',1,'avec::ScalarBuffer::fill()'],['../classavec_1_1_vec_buffer.html#acca00a3ad999f60509d520ab7fa8e3ab',1,'avec::VecBuffer::fill()']]]
+  ['deinterleave_6',['deinterleave',['../classavec_1_1_interleaved_buffer.html#a0c94d9b3898e2af7a19960ccefabae99',1,'avec::InterleavedBuffer::deinterleave(Float **output, uint32_t numOutputChannels, uint32_t numSamples) const'],['../classavec_1_1_interleaved_buffer.html#aea449ace34fc21e7b5d3a0f7ede21ddd',1,'avec::InterleavedBuffer::deinterleave(Buffer&lt; Float &gt; &amp;output) const']]],
+  ['doatchannel_7',['doAtChannel',['../structavec_1_1_interleaved_channel.html#a9b6d6d14c8a317486207acde947e33e2',1,'avec::InterleavedChannel']]]
 ];

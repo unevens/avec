@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['copyfrom_65',['copyFrom',['../classavec_1_1_interleaved_buffer.html#a3f91553c1e4c3a6feb3a3b4b22cf6306',1,'avec::InterleavedBuffer']]]
+  ['buffer_91',['Buffer',['../classavec_1_1_buffer.html#ac8f4e0b9332e03ccbffb01c441c1c5c4',1,'avec::Buffer']]]
 ];

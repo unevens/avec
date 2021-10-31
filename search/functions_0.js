@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['at_64',['at',['../classavec_1_1_interleaved_buffer.html#a7dd9f86c0db028a5f3f988ca908b32d4',1,'avec::InterleavedBuffer::at(int channel, int sample) const'],['../classavec_1_1_interleaved_buffer.html#acc44034226c712b0b5d9159d6ac87849',1,'avec::InterleavedBuffer::at(int channel, int sample)']]]
+  ['at_90',['at',['../classavec_1_1_interleaved_buffer.html#ae55816d6afab4b7a9b33fe3727abdb55',1,'avec::InterleavedBuffer::at(uint32_t channel, uint32_t sample) const'],['../classavec_1_1_interleaved_buffer.html#ae335038dcd59ae3a3a323c9f4904d5ac',1,'avec::InterleavedBuffer::at(uint32_t channel, uint32_t sample)']]]
 ];

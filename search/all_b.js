@@ -1,11 +1,11 @@
 var searchData=
 [
-  ['vec2_46',['Vec2',['../structavec_1_1_simd_types.html#a7229896ca3051cb2b11cc933d595d915',1,'avec::SimdTypes']]],
-  ['vec2_5favailable_47',['VEC2_AVAILABLE',['../structavec_1_1_simd_types.html#a030dc526de3b282786723d2e046df63c',1,'avec::SimdTypes']]],
-  ['vec4_48',['Vec4',['../structavec_1_1_simd_types.html#acc3588e7e2dcf6b10f1a3cfb988e12fc',1,'avec::SimdTypes']]],
-  ['vec4_5favailable_49',['VEC4_AVAILABLE',['../structavec_1_1_simd_types.html#a6d3ba5d75f8ddbf4dc0f266e15a5aac8',1,'avec::SimdTypes']]],
-  ['vec8_50',['Vec8',['../structavec_1_1_simd_types.html#a2c9c61e866a666af76f9c07d68ee2857',1,'avec::SimdTypes']]],
-  ['vec8_5favailable_51',['VEC8_AVAILABLE',['../structavec_1_1_simd_types.html#a039293dadcacd32a1d8c653d31aac666',1,'avec::SimdTypes']]],
-  ['vecbuffer_52',['VecBuffer',['../classavec_1_1_vec_buffer.html',1,'avec::VecBuffer&lt; Vec &gt;'],['../classavec_1_1_vec_buffer.html#ae3024cc3437c6394a0de3e8f7cb10974',1,'avec::VecBuffer::VecBuffer()']]],
-  ['vecview_53',['VecView',['../classavec_1_1_vec_view.html',1,'avec::VecView&lt; Vec &gt;'],['../classavec_1_1_vec_view.html#a551f88c303f2c6c192a79f714a920056',1,'avec::VecView::VecView()']]]
+  ['scalartypes_45',['ScalarTypes',['../classavec_1_1_scalar_types.html',1,'avec']]],
+  ['setnumchannels_46',['setNumChannels',['../classavec_1_1_buffer.html#aa0592f4d26b6efe974ea319b253faf99',1,'avec::Buffer::setNumChannels()'],['../classavec_1_1_interleaved_buffer.html#a5604ac373aa2fb30ab4a5059df728289',1,'avec::InterleavedBuffer::setNumChannels()']]],
+  ['setnumchannelsandsamples_47',['setNumChannelsAndSamples',['../classavec_1_1_buffer.html#a67d9f24004662caa95f8147aaa9e094e',1,'avec::Buffer']]],
+  ['setnumsamples_48',['setNumSamples',['../classavec_1_1_buffer.html#a3aa9c61516c7dbc7ccfd2ab77fcf115f',1,'avec::Buffer::setNumSamples()'],['../classavec_1_1_interleaved_buffer.html#a2095fa420ba12effab76831be6e61810',1,'avec::InterleavedBuffer::setNumSamples()'],['../classavec_1_1_vec_buffer.html#a01faaca0d9e86b0ab92e025a23f01de3',1,'avec::VecBuffer::setNumSamples()']]],
+  ['setpointer_49',['setPointer',['../classavec_1_1_vec_view.html#a230c53f3a1ddcd8dc7f19a09817c58f7',1,'avec::VecView']]],
+  ['setscalarsize_50',['setScalarSize',['../classavec_1_1_vec_buffer.html#a2178a3b0596f8bfdd1807fb212346c0f',1,'avec::VecBuffer']]],
+  ['shrink_51',['shrink',['../classavec_1_1_buffer.html#a3f2c995d1ef42b8e20487521c384a6a6',1,'avec::Buffer']]],
+  ['simdtypes_52',['SimdTypes',['../structavec_1_1_simd_types.html',1,'avec']]]
 ];
