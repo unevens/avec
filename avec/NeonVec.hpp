@@ -214,6 +214,9 @@ public:
   typedef float64x2_t registertype;
 };
 
+
+
+
 #else
 
 class Vec2d
@@ -1343,6 +1346,28 @@ static inline Vec2d
 nmul_add(Vec2d const a, Vec2d const b, Vec2d const c)
 {
   return -mul_sub(a, b, c);
+}
+
+// Permutations
+template<int i0, int i1>
+static inline Vec2d permute2(Vec2d const in)
+{
+  if constexpr (i0 == 1 && i1 == 0) {
+    auto const high = vget_high_f64(in);
+    auto const low = vget_low_f64(in);
+    return vcombine_f64(high, low);
+  }
+  if constexpr (i0 == 0 && i1 == 0) {
+    auto const low = vget_low_f64(in);
+    return vcombine_f64(low, low);
+  }
+  if constexpr (i0 == 1 && i1 == 1) {
+    auto const high = vget_high_f64(in);
+    return vcombine_f64(high, high);
+  }
+  if constexpr (i0 == 0 && i1 == 1) {
+    return in;
+  }
 }
 
 #endif // defined(__aarch64__)
