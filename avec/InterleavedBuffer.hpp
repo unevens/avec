@@ -133,8 +133,8 @@ public:
    * channel
    */
   InterleavedBuffer(uint32_t numChannels = 2, uint32_t numSamples = 256)
-    : numSamples(numSamples)
-    , capacity(numSamples)
+    : capacity(numSamples)
+    , numSamples(numSamples)
   {
     setNumChannels(numChannels);
   }
