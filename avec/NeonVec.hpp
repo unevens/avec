@@ -1348,25 +1348,36 @@ nmul_add(Vec2d const a, Vec2d const b, Vec2d const c)
   return -mul_sub(a, b, c);
 }
 
-// Permutations
+// permute2: rearrange / mask the two lanes of a Vec2d.
+// Mirrors the vectorclass convention: i0/i1 select source lanes (0 or 1),
+// or are negative to zero out that destination lane.
 template<int i0, int i1>
-static inline Vec2d permute2(Vec2d const in)
+static inline Vec2d
+permute2(Vec2d const a)
 {
-  if constexpr (i0 == 1 && i1 == 0) {
-    auto const high = vget_high_f64(in);
-    auto const low = vget_low_f64(in);
-    return vcombine_f64(high, low);
-  }
-  if constexpr (i0 == 0 && i1 == 0) {
-    auto const low = vget_low_f64(in);
-    return vcombine_f64(low, low);
-  }
-  if constexpr (i0 == 1 && i1 == 1) {
-    auto const high = vget_high_f64(in);
-    return vcombine_f64(high, high);
-  }
+  static_assert(i0 < 2 && i1 < 2, "permute2 indices must be < 2 (or negative for zero)");
   if constexpr (i0 == 0 && i1 == 1) {
-    return in;
+    return a;
+  }
+  else if constexpr (i0 == 1 && i1 == 0) {
+    return vextq_f64(a, a, 1);
+  }
+  else if constexpr (i0 == 0 && i1 == 0) {
+    return vdupq_laneq_f64(a, 0);
+  }
+  else if constexpr (i0 == 1 && i1 == 1) {
+    return vdupq_laneq_f64(a, 1);
+  }
+  else if constexpr (i0 < 0 && i1 < 0) {
+    return Vec2d(0.0);
+  }
+  else {
+    constexpr double zero = 0.0;
+    float64x2_t z = vdupq_n_f64(zero);
+    float64x2_t src = a;
+    float64x2_t lo = (i0 < 0) ? z : (i0 == 0 ? src : vextq_f64(src, src, 1));
+    float64x2_t hi = (i1 < 0) ? z : (i1 == 0 ? vextq_f64(src, src, 1) : src);
+    return vcombine_f64(vget_low_f64(lo), vget_high_f64(hi));
   }
 }
 
