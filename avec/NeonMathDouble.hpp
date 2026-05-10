@@ -33,6 +33,23 @@
 
 #if defined(__aarch64__)
 
+// TODO: precision is ~f32-grade (~7 decimal digits), not full double.
+// The IEEE 754 bit-layout constants here are correct for double
+// (exponent at bit 52, bias 0x3FF, mantissa mask ~0x7FF0...), but the
+// polynomial coefficients (c_cephes_log_p0..p8, c_cephes_exp_p0..p5,
+// sincof/coscof) and the argument-reduction splits (exp_C1/C2,
+// minus_cephes_DP1/DP2/DP3) are inherited from NeonMathFloat.hpp and
+// tuned for f32. Likewise c_exp_hi/c_exp_lo clamp to the f32 range
+// (~±88) instead of the f64 range (~±709). For full f64 precision a
+// proper double-precision Cephes port is needed: longer polynomials
+// and higher-precision constant splits.
+
+// Double-precision IEEE 754 bit layout (compare c_inv_mant_mask in
+// NeonMathFloat.hpp, which is the f32 equivalent).
+#define c_inv_mant_mask_pd (~0x7FF0000000000000LL)
+#define c_double_exp_shift 52
+#define c_double_exp_bias  0x3FF
+
 namespace avec {
 namespace detail {
 
@@ -50,14 +67,14 @@ log_pd(v2sd x)
 
   v2si ux = vreinterpretq_s64_f64(x);
 
-  v2si emm0 = vshrq_n_s64(ux, 23);
+  v2si emm0 = vshrq_n_s64(ux, c_double_exp_shift);
 
   /* keep only the fractional part */
-  ux = vandq_s64(ux, vdupq_n_s64(c_inv_mant_mask));
+  ux = vandq_s64(ux, vdupq_n_s64(c_inv_mant_mask_pd));
   ux = vorrq_s64(ux, vreinterpretq_s64_f64(vdupq_n_f64(0.5)));
   x = vreinterpretq_f64_s64(ux);
 
-  emm0 = vsubq_s64(emm0, vdupq_n_s64(0x7f));
+  emm0 = vsubq_s64(emm0, vdupq_n_s64(c_double_exp_bias));
   v2sd e = vcvtq_f64_s64(emm0);
 
   e = vaddq_f64(e, one);
@@ -167,8 +184,8 @@ exp_pd(v2sd x)
   /* build 2^n */
   int64x2_t mm;
   mm = vcvtq_s64_f64(fx);
-  mm = vaddq_s64(mm, vdupq_n_s64(0x7f));
-  mm = vshlq_n_s64(mm, 23);
+  mm = vaddq_s64(mm, vdupq_n_s64(c_double_exp_bias));
+  mm = vshlq_n_s64(mm, c_double_exp_shift);
   v2sd pow2n = vreinterpretq_f64_s64(mm);
 
   y = vmulq_f64(y, pow2n);
