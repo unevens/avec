@@ -63,10 +63,45 @@ constexpr bool hasSimd = AVEC_NEON;
 #define AVEC_X86 1
 #define AVEC_ARM 0
 
+// Put vectorclass into its own namespace so its free functions (notably
+// `extend` and friends, declared at global scope when MAX_VECTOR_SIZE >= 256)
+// don't collide with system headers. On macOS in particular, any TU that
+// pulls in <Cocoa/Cocoa.h> via iPlug2's IControls.h transitively gets
+// <MacTypes.h>, whose anonymous enum declares a global enumerator
+// `extend = 0x40`. With VCL_NAMESPACE set, vectorclass's `extend` lives at
+// `vcl::extend` and the collision goes away. Consumers of avec who reference
+// vectorclass types unqualified (audio-dsp, Curvessor's CurvessorDsp.cpp,
+// Overdraw, …) keep working via the using-declarations below.
+#ifndef VCL_NAMESPACE
+#define VCL_NAMESPACE vcl
+#endif
 #include "vectorclass.h"
 #include "vectormath_exp.h"
 #include "vectormath_hyp.h"
 #include "vectormath_trig.h"
+
+// Re-export the vectorclass identifiers that avec and its consumers
+// reference without a `vcl::` qualifier. Operator overloads and free
+// functions found via ADL (e.g. `exp(Vec2d)`) don't need re-exporting —
+// argument-dependent lookup finds them in `vcl::` automatically. Template
+// functions invoked with explicit template arguments (e.g. `permute2<1,0>(v)`)
+// do need to be visible by name, so they go below.
+using vcl::Vec2d;
+using vcl::Vec4d;
+using vcl::Vec8d;
+using vcl::Vec4f;
+using vcl::Vec8f;
+using vcl::Vec16f;
+using vcl::Vec2db;
+using vcl::Vec4db;
+using vcl::Vec8db;
+using vcl::Vec4fb;
+using vcl::Vec8fb;
+using vcl::Vec16fb;
+using vcl::permute2;
+using vcl::permute4;
+using vcl::permute8;
+using vcl::select;
 
 namespace avec {
 
