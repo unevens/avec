@@ -45,6 +45,50 @@ The default `Vec2d` math implementation is a NEON port of the double-precision m
 
 The single-precision NEON math overloads (`Vec4f` `exp`, `log`, `sin`, `cos`, `sincos`, `tan`), and the alternative double-precision Pommier-style overloads available under `AVEC_USE_NEON_PD`, were written by Julien Pommier and are available at http://gruntthepeon.free.fr/ssemath/neon_mathfun.html.
 
+## Namespace
+
+vectorclass declarations live inside `namespace vcl` (forced via `VCL_NAMESPACE=vcl`
+before the `vectorclass.h` includes in `avec/Simd.hpp`). The widely-used identifiers
+— `Vec2d`, `Vec4f`, `Vec4d`, `Vec8d`, `Vec8f`, `Vec16f`, their `*b` mask cousins,
+`permute2/4/8`, `select` — are re-exported at global scope so existing consumer
+code (audio-dsp, individual plugin DSP TUs) keeps compiling without `vcl::`
+qualifiers. Free functions found via ADL (operator overloads, `exp(Vec2d)`, …)
+still resolve correctly because the operand types live in `vcl::`.
+
+The reason this matters: vectorclass's `vector_convert.h` declares free functions
+named `extend()` for the AVX-2 / AVX-512 vector widths. On macOS, that name
+collides with the anonymous-enum value `extend = 0x40` declared at global scope
+by `<MacTypes.h>`, which iPlug2's `IControls.h` pulls in transitively via Cocoa
+headers. Without the namespace wrapper, no iPlug2 + avec plugin builds for
+x86_64 on macOS.
+
+## Tests
+
+```bash
+$ cd test
+$ ./run-tests.sh
+```
+
+builds and runs the doctest-based test suite for every architecture this host
+supports. On Apple Silicon that's both `arm64` (NEON path) and `x86_64`
+(vectorclass path via Rosetta). On Intel and Linux it's just the host arch.
+
+What's covered:
+
+- SIMD math (`exp`, `log`, `sin`, `cos`, `tan`, `sqrt`) on `Vec2d` per lane,
+  compared against `std::` within a per-function ULP tolerance — catches
+  drift between the x86 vectorclass implementation and the NEON shim.
+- Arithmetic operators on `Vec2d` and `Vec4f`.
+- Aligned and unaligned `load`/`store` round-trips.
+- `permute2<i, j>` — every {0,1}×{0,1} combination, verifies the indexing
+  convention matches across architectures.
+- `InterleavedBuffer<Float>::interleave` + `deinterleave` round-trip,
+  parameterised over channel counts that exercise both the Vec-aligned
+  path and the tail path.
+
+Each `REQUIRE` / `CHECK` is a doctest assertion, so a regression produces a
+non-zero exit code and a precise file:line failure report — suitable for CI.
+
 ## Documentation
 
 The documentation, available at https://unevens.github.io/avec/, can be generated with [Doxygen](http://doxygen.nl/) running
